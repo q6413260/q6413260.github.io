@@ -1,0 +1,888 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="en">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="spring cloud,eureka," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/uploads/avatar.png?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="上一篇文章我们介绍了eureka client的工作模式，我们知道eureka client是通过http rest来与eureka server交互，来注册服务，续约服务，取消服务，服务查询。所以，eureka server肯定要提供上述http的服务端实现，这也是我们本篇文章研究eureka server的一个切入点。另外我们还要关注下，server是怎么剔除一些长时间没有发送心跳的clien">
+<meta property="og:type" content="article">
+<meta property="og:title" content="spring-cloud-eureka源码分析二(server端)">
+<meta property="og:url" content="http://yeming.me/2016/12/02/eureka2/index.html">
+<meta property="og:site_name" content="Smartの小明">
+<meta property="og:description" content="上一篇文章我们介绍了eureka client的工作模式，我们知道eureka client是通过http rest来与eureka server交互，来注册服务，续约服务，取消服务，服务查询。所以，eureka server肯定要提供上述http的服务端实现，这也是我们本篇文章研究eureka server的一个切入点。另外我们还要关注下，server是怎么剔除一些长时间没有发送心跳的clien">
+<meta property="og:image" content="https://coding.net/u/lightoheaven/p/image2/git/raw/master/201612/eureka_server_1.jpeg">
+<meta property="og:image" content="https://coding.net/u/lightoheaven/p/image2/git/raw/master/201612/eureka_server_2.jpeg">
+<meta property="og:image" content="https://coding.net/u/lightoheaven/p/image2/git/raw/master/201612/eureka_server_3.jpeg">
+<meta property="og:image" content="https://coding.net/u/lightoheaven/p/image2/git/raw/master/201612/eureka_server_4.jpeg">
+<meta property="og:image" content="https://coding.net/u/lightoheaven/p/image2/git/raw/master/201612/eureka_server_5.jpeg">
+<meta property="og:image" content="https://coding.net/u/lightoheaven/p/image2/git/raw/master/201612/eureka_server_7.jpeg">
+<meta property="og:image" content="https://coding.net/u/lightoheaven/p/image2/git/raw/master/201612/eureka_server_6.jpeg">
+<meta property="og:updated_time" content="2016-12-02T10:43:42.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="spring-cloud-eureka源码分析二(server端)">
+<meta name="twitter:description" content="上一篇文章我们介绍了eureka client的工作模式，我们知道eureka client是通过http rest来与eureka server交互，来注册服务，续约服务，取消服务，服务查询。所以，eureka server肯定要提供上述http的服务端实现，这也是我们本篇文章研究eureka server的一个切入点。另外我们还要关注下，server是怎么剔除一些长时间没有发送心跳的clien">
+<meta name="twitter:image" content="https://coding.net/u/lightoheaven/p/image2/git/raw/master/201612/eureka_server_1.jpeg">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '6252881861358388000',
+      author: '小明'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yeming.me/2016/12/02/eureka2/"/>
+
+
+
+
+
+  <title> spring-cloud-eureka源码分析二(server端) | Smartの小明 </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="en">
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">Smartの小明</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle">屌丝搬砖程序猿,码农界的搬运工,哪里需要搬哪里</p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            Categories
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            About
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            Archives
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            Tags
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+  <link itemprop="mainEntityOfPage" href="http://yeming.me/2016/12/02/eureka2/">
+
+  <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <meta itemprop="name" content="Smartの小明">
+    <meta itemprop="description" content="">
+    <meta itemprop="image" content="/uploads/avatar.png">
+  </span>
+
+  <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+    <meta itemprop="name" content="Smartの小明">
+    <span style="display:none" itemprop="logo" itemscope itemtype="http://schema.org/ImageObject">
+      <img style="display:none;" itemprop="url image" alt="Smartの小明" src="">
+    </span>
+  </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                spring-cloud-eureka源码分析二(server端)
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2016-12-02T18:41:32+08:00">
+                2016-12-02
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+              <span class="post-meta-divider">|</span>
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/spring-cloud/" itemprop="url" rel="index">
+                    <span itemprop="name">spring cloud</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+
+          
+          
+             <span id="/2016/12/02/eureka2/" class="leancloud_visitors" data-flag-title="spring-cloud-eureka源码分析二(server端)">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               <span class="post-meta-item-text">Visitors </span>
+               <span class="leancloud-visitors-count"></span>
+              </span>
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="page-pv"><i class="fa fa-file-o"></i>
+            <span class="busuanzi-value" id="busuanzi_value_page_pv" ></span>
+            </span>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>上一篇文章我们介绍了eureka client的工作模式，我们知道eureka client是通过http rest来与eureka server交互，来注册服务，续约服务，取消服务，服务查询。所以，eureka server肯定要提供上述http的服务端实现，这也是我们本篇文章研究eureka server的一个切入点。另外我们还要关注下，server是怎么剔除一些长时间没有发送心跳的client端，server集群之间是怎么replicate的也是我们需要关注的一个重点。<br><a id="more"></a></p>
+<h2 id="server端提供的rest接口"><a href="#server端提供的rest接口" class="headerlink" title="server端提供的rest接口"></a>server端提供的rest接口</h2><p>server端提供给client端的rest接口主要包括注册服务，续约服务，取消服务，获取服务，下面我们会一个接一个的看下server端是什么实现这些接口的</p>
+<h3 id="server端启动注册rest接口"><a href="#server端启动注册rest接口" class="headerlink" title="server端启动注册rest接口"></a>server端启动注册rest接口</h3><p>我们看下server端启动源码<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div></pre></td><td class="code"><pre><div class="line">@EnableEurekaServer</div><div class="line">@SpringBootApplication</div><div class="line">public class EurekaServerApplication &#123;</div><div class="line">    public static void main(String[] args) &#123;</div><div class="line">        SpringApplication.run(EurekaServerApplication.class, args);</div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line">@Target(ElementType.TYPE)</div><div class="line">@Retention(RetentionPolicy.RUNTIME)</div><div class="line">@Documented</div><div class="line">@Import(EurekaServerConfiguration.class)</div><div class="line">public @interface EnableEurekaServer &#123;</div><div class="line">&#125;</div><div class="line"></div><div class="line">@Configuration</div><div class="line">@Import(EurekaServerInitializerConfiguration.class)</div><div class="line">@EnableDiscoveryClient</div><div class="line">@EnableConfigurationProperties(EurekaDashboardProperties.class)</div><div class="line">@PropertySource(&quot;classpath:/eureka/server.properties&quot;)</div><div class="line">public class EurekaServerConfiguration extends WebMvcConfigurerAdapter &#123;</div><div class="line">	/**</div><div class="line">	 * Register the Jersey filter</div><div class="line">	 */</div><div class="line">	@Bean</div><div class="line">	public FilterRegistrationBean jerseyFilterRegistration(</div><div class="line">			javax.ws.rs.core.Application eurekaJerseyApp) &#123;</div><div class="line">		FilterRegistrationBean bean = new FilterRegistrationBean();</div><div class="line">		bean.setFilter(new ServletContainer(eurekaJerseyApp));</div><div class="line">		bean.setOrder(Ordered.LOWEST_PRECEDENCE);</div><div class="line">		bean.setUrlPatterns(</div><div class="line">				Collections.singletonList(EurekaConstants.DEFAULT_PREFIX + &quot;/*&quot;));</div><div class="line"></div><div class="line">		return bean;</div><div class="line">	&#125;</div><div class="line"></div><div class="line">	/**</div><div class="line">	 * Construct a Jersey &#123;@link javax.ws.rs.core.Application&#125; with all the resources</div><div class="line">	 * required by the Eureka server.</div><div class="line">	 */</div><div class="line">	@Bean</div><div class="line">	public javax.ws.rs.core.Application jerseyApplication(Environment environment,</div><div class="line">			ResourceLoader resourceLoader) &#123;</div><div class="line"></div><div class="line">		ClassPathScanningCandidateComponentProvider provider = new ClassPathScanningCandidateComponentProvider(</div><div class="line">				false, environment);</div><div class="line"></div><div class="line">		// Filter to include only classes that have a particular annotation.</div><div class="line">		//</div><div class="line">		provider.addIncludeFilter(new AnnotationTypeFilter(Path.class));</div><div class="line">		provider.addIncludeFilter(new AnnotationTypeFilter(Provider.class));</div><div class="line"></div><div class="line">		// Find classes in Eureka packages (or subpackages)</div><div class="line">		//</div><div class="line">		Set&lt;Class&lt;?&gt;&gt; classes = new HashSet&lt;Class&lt;?&gt;&gt;();</div><div class="line">		for (String basePackage : EUREKA_PACKAGES) &#123;</div><div class="line">			Set&lt;BeanDefinition&gt; beans = provider.findCandidateComponents(basePackage);</div><div class="line">			for (BeanDefinition bd : beans) &#123;</div><div class="line">				Class&lt;?&gt; cls = ClassUtils.resolveClassName(bd.getBeanClassName(),</div><div class="line">						resourceLoader.getClassLoader());</div><div class="line">				classes.add(cls);</div><div class="line">			&#125;</div><div class="line">		&#125;</div><div class="line"></div><div class="line">		// Construct the Jersey ResourceConfig</div><div class="line">		//</div><div class="line">		Map&lt;String, Object&gt; propsAndFeatures = new HashMap&lt;String, Object&gt;();</div><div class="line">		propsAndFeatures.put(</div><div class="line">				// Skip static content used by the webapp</div><div class="line">				ServletContainer.PROPERTY_WEB_PAGE_CONTENT_REGEX,</div><div class="line">				EurekaConstants.DEFAULT_PREFIX + &quot;/(fonts|images|css|js)/.*&quot;);</div><div class="line"></div><div class="line">		DefaultResourceConfig rc = new DefaultResourceConfig(classes);</div><div class="line">		rc.setPropertiesAndFeatures(propsAndFeatures);</div><div class="line"></div><div class="line">		return rc;</div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>和client端启动一样，重点关注<font color="#08c">@EnableEurekaServer</font>，这个注解import了EurekaServerConfiguration配置类。EurekaServerConfiguration这个配置类有两个方法，jerseyFilterRegistration方法用来注册jersey fliter，jerseyApplication方法会加载下面这个类<br><img src="https://coding.net/u/lightoheaven/p/image2/git/raw/master/201612/eureka_server_1.jpeg" alt="jersery resources"><br>之列resources类可以理解成spring mvc中的controller，用来接收client端的rest请求的，下面就逐个分析这些rest请求。</p>
+<h3 id="注册服务-register"><a href="#注册服务-register" class="headerlink" title="注册服务(register)"></a>注册服务(register)</h3><p>时序图如下：<br><img src="https://coding.net/u/lightoheaven/p/image2/git/raw/master/201612/eureka_server_2.jpeg" alt="注册服务时序图"></p>
+<p>可以看到ApplicationResource接收到client端的注册请求后，调用PeerAwareInstanceRegistryImpl的register方法，该方法先调用父类register方法将client端传过来的实例注册到自身，然后再同步给其他节点<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">@Override</div><div class="line">    public void register(final InstanceInfo info, final boolean isReplication) &#123;</div><div class="line">        ......</div><div class="line">        super.register(info, leaseDuration, isReplication);</div><div class="line">        replicateToPeers(Action.Register, info.getAppName(),   info.getId(), info, null, isReplication);</div><div class="line">    &#125;</div></pre></td></tr></table></figure></p>
+<p>AbstractInstanceRegistry的register方法是注册服务的真正实现，具体源码不看了，主要是通过各种锁(ReentrantReadWriteLock,synchronized)来获取待注册实例，然后保存到一个二维map<br>第一层map的key是应用的名称(appName)，value是该应用下面所有实例组成的一个map。(比如user这个应用，生产环境肯定有多台user应用)<br>第二层map的key是单个应用的实例id(全集群唯一确定)，value是应用info</p>
+<p>然后看下replicateToPeers这个方法，这个方法在以下几个条件，就提前return:</p>
+<ul>
+<li>集群中没有其他server，显然不需要replicate</li>
+<li>轮训出来的节点是自身，显然也不需要通知自己</li>
+<li>isReplication为true，首先我们要清楚，client发起rest请求只会到一台server上，client发出的rest请求header里面isReplication为false，所以接收到client请求的某台server就会把这个信息同步给其他其他server，也是调用相同的rest接口请求其他server，只不过此时会把hader参数isReplication设置为true，就可以避免通知已经注册过的节点</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div></pre></td><td class="code"><pre><div class="line">private void replicateToPeers(Action action, String appName, String id,InstanceInfo info /* optional */,InstanceStatus newStatus /* optional */, boolean isReplication) &#123;</div><div class="line">        Stopwatch tracer = action.getTimer().start();</div><div class="line">        try &#123;</div><div class="line">            if (isReplication) &#123;</div><div class="line">                numberOfReplicationsLastMin.increment();</div><div class="line">            &#125;</div><div class="line">            if (peerEurekaNodes == Collections.EMPTY_LIST || isReplication) &#123;</div><div class="line">                return;</div><div class="line">            &#125;</div><div class="line"></div><div class="line">            for (final PeerEurekaNode node : peerEurekaNodes.getPeerEurekaNodes()) &#123;</div><div class="line">                if (peerEurekaNodes.isThisMyUrl(node.getServiceUrl())) &#123;</div><div class="line">                    continue;</div><div class="line">                &#125;</div><div class="line">                replicateInstanceActionsToPeers(action, appName, id, info, newStatus, node);</div><div class="line">            &#125;</div><div class="line">        &#125; finally &#123;</div><div class="line">            tracer.stop();</div><div class="line">        &#125;</div><div class="line">    &#125;</div></pre></td></tr></table></figure>
+<h3 id="续约服务-renew"><a href="#续约服务-renew" class="headerlink" title="续约服务(renew)"></a>续约服务(renew)</h3><p>同上面注册服务过程基本一样，直接画出时序图<br><img src="https://coding.net/u/lightoheaven/p/image2/git/raw/master/201612/eureka_server_3.jpeg" alt="renew"></p>
+<h3 id="取消服务-cancel"><a href="#取消服务-cancel" class="headerlink" title="取消服务(cancel)"></a>取消服务(cancel)</h3><p>同上面注册服务过程基本一样，直接画出时序图<br><img src="https://coding.net/u/lightoheaven/p/image2/git/raw/master/201612/eureka_server_4.jpeg" alt="renew"></p>
+<h3 id="服务列表查询-fetch-registry"><a href="#服务列表查询-fetch-registry" class="headerlink" title="服务列表查询(fetch registry)"></a>服务列表查询(fetch registry)</h3><p>比较简单，直接画出时序图<br><img src="https://coding.net/u/lightoheaven/p/image2/git/raw/master/201612/eureka_server_5.jpeg" alt="renew"></p>
+<h2 id="定时任务剔除失效服务-Eviction"><a href="#定时任务剔除失效服务-Eviction" class="headerlink" title="定时任务剔除失效服务(Eviction)"></a>定时任务剔除失效服务(Eviction)</h2><p>时序图如下：<br><img src="https://coding.net/u/lightoheaven/p/image2/git/raw/master/201612/eureka_server_7.jpeg" alt="Eviction"></p>
+<p>Eviction（失效服务剔除）用来定期在Eureka Server检测失效的服务，检测标准就是超过一定时间没有Renew的服务。</p>
+<p>默认失效时间为90秒，也就是如果有服务超过90秒没有向Eureka Server发起Renew请求的话，就会被当做失效服务剔除掉。</p>
+<p>失效时间可以通过eureka.instance.leaseExpirationDurationInSeconds进行配置，默认90s(这个时间设置太大的话，有可能客户端会获得已经失效的服务，设置太小的话，由于网络原因，客户端心跳没有及时发过来导致被剔除。这个时间最少应该设置大于客户端心跳发送的时间)定期扫描时间可以通过eureka.server.evictionIntervalTimerInMs进行配置，默认60s。</p>
+<h2 id="新server加入server集群"><a href="#新server加入server集群" class="headerlink" title="新server加入server集群"></a>新server加入server集群</h2><p>最后再来看一下一个新的Eureka Server节点加进来，或者Eureka Server重启后，如何来做初始化，从而能够正常提供服务，整体时序图如下：<br><img src="https://coding.net/u/lightoheaven/p/image2/git/raw/master/201612/eureka_server_6.jpeg" alt="新server"><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div></pre></td><td class="code"><pre><div class="line">@Path(&quot;batch&quot;)</div><div class="line">@POST</div><div class="line">public Response batchReplication(ReplicationList replicationList) &#123;</div><div class="line">    for (ReplicationInstance instanceInfo :  replicationList.getReplicationList()) &#123;</div><div class="line">         batchResponse.addResponse(dispatch(instanceInfo));</div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line">private ReplicationInstanceResponse dispatch(ReplicationInstance instanceInfo) &#123;</div><div class="line">        switch (instanceInfo.getAction()) &#123;</div><div class="line">            case Register:</div><div class="line">                singleResponseBuilder = handleRegister(instanceInfo, applicationResource);</div><div class="line">                break;</div><div class="line">            case Heartbeat:</div><div class="line">                singleResponseBuilder = handleHeartbeat(resource, lastDirtyTimestamp, overriddenStatus, instanceStatus);</div><div class="line">                break;</div><div class="line">            case Cancel:</div><div class="line">                singleResponseBuilder = handleCancel(resource);</div><div class="line">                break;</div><div class="line">            case StatusUpdate:</div><div class="line">                singleResponseBuilder = handleStatusUpdate(instanceInfo, resource);</div><div class="line">                break;</div><div class="line">            case DeleteStatusOverride:</div><div class="line">                singleResponseBuilder = handleDeleteStatusOverride(instanceInfo, resource);</div><div class="line">                break;</div><div class="line">        &#125;</div><div class="line">        return singleResponseBuilder.build();</div><div class="line">    &#125;</div></pre></td></tr></table></figure></p>
+<p>上面PeerReplicationResource这个类作为一个jersey resource会定时接收其他server同步过来的信息(debug调试可以知道包括其他server，或者client端的Register，Heartbeat，Cancel，StatusUpdate，DeleteStatusUpdate)，然后调用dispatch方法，根据不同类型处理不同的事件。所以新的server一启动，其他server就会把已经注册的服务实例传送过来，然后对每一个实例调用上面的服务注册(register)方法。</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/spring-cloud/" rel="tag"># spring cloud</a>
+          
+            <a href="/tags/eureka/" rel="tag"># eureka</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/12/01/eureka1/" rel="next" title="spring-cloud-eureka源码分析一(client端)">
+                <i class="fa fa-chevron-left"></i> spring-cloud-eureka源码分析一(client端)
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/12/17/kafkaProducer/" rel="prev" title="spring-kafka源码分析一(Producer)">
+                spring-kafka源码分析一(Producer) <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div id="cloud-tie-wrapper" class="cloud-tie-wrapper"></div>
+      <script>
+        var cloudTieConfig = {
+          url: document.location.href,
+          sourceId: "",
+          productKey: "f6968bd56d71417cad7a11c8df334d35",
+          target: "cloud-tie-wrapper"
+        };
+      </script>
+      <script src="https://img1.cache.netease.com/f2e/tie/yun/sdk/loader.js"></script>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/uploads/avatar.png"
+               alt="Smartの小明" />
+          <p class="site-author-name" itemprop="name">Smartの小明</p>
+          <p class="site-description motion-element" itemprop="description">屌丝搬砖程序猿,码农界的搬运工,哪里需要搬哪里</p>
+        </div>
+
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">18</span>
+              <span class="site-state-item-name">posts</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">4</span>
+                <span class="site-state-item-name">categories</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">15</span>
+                <span class="site-state-item-name">tags</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/q6413260" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/1855404367/profile?rightmod=1&wvr=6&mod=personinfo&is_all=1" target="_blank" title="微博">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  微博
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://www.douban.com/people/142298114/" target="_blank" title="豆瓣">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  豆瓣
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://www.zhihu.com/people/xiaoming1990" target="_blank" title="知乎">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  知乎
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#server端提供的rest接口"><span class="nav-number">1.</span> <span class="nav-text">server端提供的rest接口</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#server端启动注册rest接口"><span class="nav-number">1.1.</span> <span class="nav-text">server端启动注册rest接口</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#注册服务-register"><span class="nav-number">1.2.</span> <span class="nav-text">注册服务(register)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#续约服务-renew"><span class="nav-number">1.3.</span> <span class="nav-text">续约服务(renew)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#取消服务-cancel"><span class="nav-number">1.4.</span> <span class="nav-text">取消服务(cancel)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#服务列表查询-fetch-registry"><span class="nav-number">1.5.</span> <span class="nav-text">服务列表查询(fetch registry)</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#定时任务剔除失效服务-Eviction"><span class="nav-number">2.</span> <span class="nav-text">定时任务剔除失效服务(Eviction)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#新server加入server集群"><span class="nav-number">3.</span> <span class="nav-text">新server加入server集群</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Smartの小明</span>
+</div>
+
+
+<div class="powered-by">
+  Powered by <a class="theme-link" href="https://hexo.io">Hexo</a>
+</div>
+
+<div class="theme-info">
+  Theme -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+
+        
+
+<div class="busuanzi-count">
+
+  <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv"><i class="fa fa-user"></i><span class="busuanzi-value" id="busuanzi_value_site_uv"></span></span>
+  
+
+  
+    <span class="site-pv"><i class="fa fa-eye"></i><span class="busuanzi-value" id="busuanzi_value_site_pv"></span></span>
+  
+  
+</div>
+
+
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.0"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+	
+
+
+
+
+  
+  
+
+  
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.1.js"></script>
+  <script>AV.initialize("Y2lqjwOrlt5p333cMSW3HNxD-gzGzoHsz", "Y6lssmQDLyXlT0HE1pgVn0UK");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+  
+
+
+</body>
+</html>

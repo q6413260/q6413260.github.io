@@ -1,0 +1,902 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="en">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="spring-kafka,NIO," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/uploads/avatar.png?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="spring-kafka是运用spring的概念基于apache kafka(linkedin开源已经捐献给apache基金会)消息解决方案开发的一个java client端。它提供了一些接口来更方便收发消息与kafka server端交互，并且支持spring 注解形式。并且我们知道消息是一个异步调用逻辑，我们下文也会分析源码体现出spring kafka怎么实现这个异步的过程。下面我们通过一个">
+<meta property="og:type" content="article">
+<meta property="og:title" content="spring-kafka源码分析一(Producer)">
+<meta property="og:url" content="http://yeming.me/2016/12/17/kafkaProducer/index.html">
+<meta property="og:site_name" content="Smartの小明">
+<meta property="og:description" content="spring-kafka是运用spring的概念基于apache kafka(linkedin开源已经捐献给apache基金会)消息解决方案开发的一个java client端。它提供了一些接口来更方便收发消息与kafka server端交互，并且支持spring 注解形式。并且我们知道消息是一个异步调用逻辑，我们下文也会分析源码体现出spring kafka怎么实现这个异步的过程。下面我们通过一个">
+<meta property="og:image" content="https://coding.net/u/lightoheaven/p/image2/git/raw/master/201612/kafkaUml.jpeg">
+<meta property="og:image" content="https://coding.net/u/lightoheaven/p/image2/git/raw/master/201612/kafkaProducer.jpeg">
+<meta property="og:image" content="https://coding.net/u/lightoheaven/p/image2/git/raw/master/201612/sender.jpeg">
+<meta property="og:updated_time" content="2016-12-17T07:31:04.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="spring-kafka源码分析一(Producer)">
+<meta name="twitter:description" content="spring-kafka是运用spring的概念基于apache kafka(linkedin开源已经捐献给apache基金会)消息解决方案开发的一个java client端。它提供了一些接口来更方便收发消息与kafka server端交互，并且支持spring 注解形式。并且我们知道消息是一个异步调用逻辑，我们下文也会分析源码体现出spring kafka怎么实现这个异步的过程。下面我们通过一个">
+<meta name="twitter:image" content="https://coding.net/u/lightoheaven/p/image2/git/raw/master/201612/kafkaUml.jpeg">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '6252881861358388000',
+      author: '小明'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yeming.me/2016/12/17/kafkaProducer/"/>
+
+
+
+
+
+  <title> spring-kafka源码分析一(Producer) | Smartの小明 </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="en">
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">Smartの小明</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle">屌丝搬砖程序猿,码农界的搬运工,哪里需要搬哪里</p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            Categories
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            About
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            Archives
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            Tags
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+  <link itemprop="mainEntityOfPage" href="http://yeming.me/2016/12/17/kafkaProducer/">
+
+  <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <meta itemprop="name" content="Smartの小明">
+    <meta itemprop="description" content="">
+    <meta itemprop="image" content="/uploads/avatar.png">
+  </span>
+
+  <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+    <meta itemprop="name" content="Smartの小明">
+    <span style="display:none" itemprop="logo" itemscope itemtype="http://schema.org/ImageObject">
+      <img style="display:none;" itemprop="url image" alt="Smartの小明" src="">
+    </span>
+  </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                spring-kafka源码分析一(Producer)
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2016-12-17T15:26:10+08:00">
+                2016-12-17
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+              <span class="post-meta-divider">|</span>
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/技术分享/" itemprop="url" rel="index">
+                    <span itemprop="name">技术分享</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+
+          
+          
+             <span id="/2016/12/17/kafkaProducer/" class="leancloud_visitors" data-flag-title="spring-kafka源码分析一(Producer)">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               <span class="post-meta-item-text">Visitors </span>
+               <span class="leancloud-visitors-count"></span>
+              </span>
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="page-pv"><i class="fa fa-file-o"></i>
+            <span class="busuanzi-value" id="busuanzi_value_page_pv" ></span>
+            </span>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p><img src="https://coding.net/u/lightoheaven/p/image2/git/raw/master/201612/kafkaUml.jpeg" alt="spring kafka uml类图"><br>spring-kafka是运用spring的概念基于apache kafka(linkedin开源已经捐献给apache基金会)消息解决方案开发的一个java client端。它提供了一些接口来更方便收发消息与kafka server端交互，并且支持spring 注解形式。并且我们知道消息是一个异步调用逻辑，我们下文也会分析源码体现出spring kafka怎么实现这个异步的过程。下面我们通过一个demo来分析下spring kafka的源码。<br><a id="more"></a><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line">public static void main(String[] args) throws InterruptedException &#123;</div><div class="line">        ContainerProperties containerProps = new ContainerProperties(&quot;topic1&quot;, &quot;topic2&quot;);</div><div class="line">        containerProps.setMessageListener(new MessageListener&lt;Integer, String&gt;() &#123;</div><div class="line">            @Override</div><div class="line">            public void onMessage(ConsumerRecord&lt;Integer, String&gt; message) &#123;</div><div class="line">                System.out.println(&quot;received: &quot; + message);</div><div class="line">            &#125;</div><div class="line"></div><div class="line">        &#125;);</div><div class="line">        KafkaMessageListenerContainer&lt;Integer, String&gt; container = createContainer(containerProps);</div><div class="line">        container.setBeanName(&quot;testAuto&quot;);</div><div class="line">        container.start();</div><div class="line">---------------------------------------------------------</div><div class="line">        KafkaTemplate&lt;Integer, String&gt; template = createTemplate();</div><div class="line">        template.setDefaultTopic(&quot;topic1&quot;);</div><div class="line">        template.sendDefault(0, &quot;foo&quot;);</div><div class="line">        template.flush();</div><div class="line">        container.stop();</div><div class="line">    &#125;</div></pre></td></tr></table></figure></p>
+<p>上述方法被“—-”分割为两部分，上面一部分是从kafka server接受消息的相关配置，下面一部分是发消息给kafka server的配置。本文我们也主要从这两个方面来分析spring-kafka的源码(消息系统理所当然就是收发消息的嘛)</p>
+<h2 id="发消息主线程-调用发送消息的线程"><a href="#发消息主线程-调用发送消息的线程" class="headerlink" title="发消息主线程(调用发送消息的线程)"></a>发消息主线程(调用发送消息的线程)</h2><h3 id="KafkaTemplate"><a href="#KafkaTemplate" class="headerlink" title="KafkaTemplate"></a>KafkaTemplate</h3><p>KafkaTemplate是spring提供给我们用来发送消息的实现类，我们看下怎么创建一个KafkaTemplate<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div></pre></td><td class="code"><pre><div class="line">KafkaTemplate&lt;Integer, String&gt; template = createTemplate();</div><div class="line"></div><div class="line">private static KafkaTemplate&lt;Integer, String&gt; createTemplate() &#123;</div><div class="line">        Map&lt;String, Object&gt; senderProps = senderProps();</div><div class="line">        ProducerFactory&lt;Integer, String&gt; pf =</div><div class="line">                new DefaultKafkaProducerFactory&lt;Integer, String&gt;(senderProps);</div><div class="line">        KafkaTemplate&lt;Integer, String&gt; template = new KafkaTemplate&lt;Integer, String&gt;(pf);</div><div class="line">        return template;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">private static Map&lt;String, Object&gt; senderProps() &#123;</div><div class="line">        Map&lt;String, Object&gt; props = new HashMap&lt;String, Object&gt;();</div><div class="line">        props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, &quot;localhost:9092&quot;);</div><div class="line">        props.put(ProducerConfig.RETRIES_CONFIG, 0);</div><div class="line">        props.put(ProducerConfig.BATCH_SIZE_CONFIG, 16384);</div><div class="line">        props.put(ProducerConfig.LINGER_MS_CONFIG, 1);</div><div class="line">        props.put(ProducerConfig.BUFFER_MEMORY_CONFIG, 33554432);</div><div class="line">        props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, IntegerSerializer.class);</div><div class="line">        props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class);</div><div class="line">        return props;</div><div class="line">    &#125;</div></pre></td></tr></table></figure></p>
+<p>可以看到，你首先需要创建一个DefaultKafkaConsumerFactory，而创建<br>DefaultKafkaConsumerFactory需要指定kafka server地址相关的一些配置参数，然后调用KafkaTemplate的构造方法把factory当作参数传进去<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">   public KafkaTemplate(ProducerFactory&lt;K, V&gt; producerFactory)    &#123;</div><div class="line">	this(producerFactory, false);</div><div class="line">&#125;</div><div class="line"></div><div class="line">public KafkaTemplate(ProducerFactory&lt;K, V&gt; producerFactory, boolean autoFlush) &#123;</div><div class="line">	this.producerFactory = producerFactory;</div><div class="line">	this.autoFlush = autoFlush;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>解释下autoFlush，默认为false，若设置为true，则代表每次send后自动flush。</p>
+<h3 id="主线程KafkaTemplate-send发消息"><a href="#主线程KafkaTemplate-send发消息" class="headerlink" title="主线程KafkaTemplate.send发消息"></a>主线程KafkaTemplate.send发消息</h3><p>文章开头的main方法中template.sendDefault最终会调用KafkaTemplate.doSend方法。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div></pre></td><td class="code"><pre><div class="line">@Override</div><div class="line">	public ListenableFuture&lt;SendResult&lt;K, V&gt;&gt; send(String topic, K key, V data) &#123;</div><div class="line">		ProducerRecord&lt;K, V&gt; producerRecord = new ProducerRecord&lt;&gt;(topic, key, data);</div><div class="line">		return doSend(producerRecord);</div><div class="line">	&#125;</div><div class="line"></div><div class="line">	protected ListenableFuture&lt;SendResult&lt;K, V&gt;&gt; doSend(final ProducerRecord&lt;K, V&gt; producerRecord) &#123;</div><div class="line">		getTheProducer();  -------------(1)--------------</div><div class="line">		if (this.logger.isTraceEnabled()) &#123;</div><div class="line">			this.logger.trace(&quot;Sending: &quot; + producerRecord);</div><div class="line">		&#125;</div><div class="line">		final SettableListenableFuture&lt;SendResult&lt;K, V&gt;&gt; future = new SettableListenableFuture&lt;&gt;();</div><div class="line">--(2)---getTheProducer().send(producerRecord, new Callback() &#123;</div><div class="line"></div><div class="line">			@Override</div><div class="line">			public void onCompletion(RecordMetadata metadata, Exception exception) &#123;</div><div class="line">				if (exception == null) &#123;</div><div class="line">					future.set(new SendResult&lt;&gt;(producerRecord, metadata));</div><div class="line">					if (KafkaTemplate.this.producerListener != null</div><div class="line">							&amp;&amp; KafkaTemplate.this.producerListener.isInterestedInSuccess()) &#123;</div><div class="line">						KafkaTemplate.this.producerListener.onSuccess(producerRecord.topic(),</div><div class="line">								producerRecord.partition(), producerRecord.key(), producerRecord.value(), metadata);</div><div class="line">					&#125;</div><div class="line">				&#125;</div><div class="line">				else &#123;</div><div class="line">					future.setException(new KafkaProducerException(producerRecord, &quot;Failed to send&quot;, exception));</div><div class="line">					if (KafkaTemplate.this.producerListener != null) &#123;</div><div class="line">						KafkaTemplate.this.producerListener.onError(producerRecord.topic(),</div><div class="line">								producerRecord.partition(), producerRecord.key(), producerRecord.value(), exception);</div><div class="line">					&#125;</div><div class="line">				&#125;</div><div class="line">			&#125;</div><div class="line"></div><div class="line">		&#125;);</div><div class="line">		if (this.autoFlush) &#123;</div><div class="line">			flush();</div><div class="line">		&#125;</div><div class="line">		if (this.logger.isTraceEnabled()) &#123;</div><div class="line">			this.logger.trace(&quot;Sent: &quot; + producerRecord);</div><div class="line">		&#125;</div><div class="line">		return future;</div><div class="line">	&#125;</div></pre></td></tr></table></figure></p>
+<p>我们下面关注下getTheProducer(),时序图如下<br><img src="https://coding.net/u/lightoheaven/p/image2/git/raw/master/201612/kafkaProducer.jpeg" alt="getTheProducer()时序图"></p>
+<font color="#08c">KafkaTemplate</font><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">private Producer&lt;K, V&gt; getTheProducer() &#123;</div><div class="line">		if (this.producer == null) &#123;</div><div class="line">			synchronized (this) &#123;</div><div class="line">				if (this.producer == null) &#123;</div><div class="line">					this.producer = this.producerFactory.createProducer();</div><div class="line">				&#125;</div><div class="line">			&#125;</div><div class="line">		&#125;</div><div class="line">		return this.producer;</div><div class="line">	&#125;</div></pre></td></tr></table></figure><br><br>我们可以看到KafkaTemplate里面getTheProducer方法会初始化一个KafkaProducer，并且采用了synchronized，保证了只会new一次。我们从KafkaProducer类开头的注释可以看到，KafkaProducer是kafka client端publish record到kafka cluster上的。并且它是线程安全的，并且在多线程环境下共享一个实例比多个实例效率高很多。<br><font color="#08c">另外我们关注到上面时序图最后一步KafkaProducer构造方法会初始化producer相关的参数，比如会初始化一个类似于mesageQueue的RecordAccumulator(这个后面会提到)，并启动一个sender线程，这个线程基本就是kafaka producer的工作io线程(可能大家会想难道producer就靠一个线程，没错，我们等会会讲，它也用到了nio的selector事件循环机制，讲多个kafka server clusters对应的channel都绑定到这个selector上面)。</font>
+
+<h3 id="KafkaProducer-send"><a href="#KafkaProducer-send" class="headerlink" title="KafkaProducer.send"></a>KafkaProducer.send</h3><p>继续看最上面一段代码我们标记的—(2)—getTheProducer().send(x,x)。这个getTheProducer()会返回一个CloseSafeProducer，从本文第一张图可以看到这个类其实有个代理类KafkaProducer。最终会调用到KafkaProducer.doSend(ProducerRecord<k, v=""> record, Callback callback)方法。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div></pre></td><td class="code"><pre><div class="line">private Future&lt;RecordMetadata&gt; doSend(ProducerRecord&lt;K, V&gt; record, Callback callback) &#123;</div><div class="line">    TopicPartition tp = null;</div><div class="line">    // first make sure the metadata for the topic is available</div><div class="line">    long waitedOnMetadataMs = waitOnMetadata(record.topic(), this.maxBlockTimeMs);</div><div class="line">    long remainingWaitMs = Math.max(0, this.maxBlockTimeMs - waitedOnMetadataMs);</div><div class="line">    byte[] serializedKey;</div><div class="line">    try &#123;</div><div class="line">        serializedKey = keySerializer.serialize(record.topic(), record.key());</div><div class="line">    &#125; catch (ClassCastException cce) &#123;</div><div class="line">        throw new SerializationException(&quot;Can&apos;t convert key of class &quot; + record.key().getClass().getName() +</div><div class="line">                &quot; to class &quot; + producerConfig.getClass(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG).getName() +</div><div class="line">                &quot; specified in key.serializer&quot;);</div><div class="line">    &#125;</div><div class="line">    byte[] serializedValue;</div><div class="line">    try &#123;</div><div class="line">        serializedValue = valueSerializer.serialize(record.topic(), record.value());</div><div class="line">    &#125; catch (ClassCastException cce) &#123;</div><div class="line">        throw new SerializationException(&quot;Can&apos;t convert value of class &quot; + record.value().getClass().getName() +</div><div class="line">                &quot; to class &quot; + producerConfig.getClass(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG).getName() +</div><div class="line">                &quot; specified in value.serializer&quot;);</div><div class="line">    &#125;</div><div class="line">    int partition = partition(record, serializedKey, serializedValue, metadata.fetch());</div><div class="line">    int serializedSize = Records.LOG_OVERHEAD + Record.recordSize(serializedKey, serializedValue);</div><div class="line">    ensureValidRecordSize(serializedSize);</div><div class="line">    tp = new TopicPartition(record.topic(), partition);</div><div class="line">    long timestamp = record.timestamp() == null ? time.milliseconds() : record.timestamp();</div><div class="line">    log.trace(&quot;Sending record &#123;&#125; with callback &#123;&#125; to topic &#123;&#125; partition &#123;&#125;&quot;, record, callback, record.topic(), partition);</div><div class="line">    // producer callback will make sure to call both &apos;callback&apos; and interceptor callback</div><div class="line">    Callback interceptCallback = this.interceptors == null ? callback : new InterceptorCallback&lt;&gt;(callback, this.interceptors, tp);</div><div class="line">    RecordAccumulator.RecordAppendResult result = accumulator.append(tp, timestamp, serializedKey, serializedValue, interceptCallback, remainingWaitMs);</div><div class="line">    if (result.batchIsFull || result.newBatchCreated) &#123;</div><div class="line">        log.trace(&quot;Waking up the sender since topic &#123;&#125; partition &#123;&#125; is either full or getting a new batch&quot;, record.topic(), partition);</div><div class="line">        this.sender.wakeup();</div><div class="line">    &#125;</div><div class="line">    return result.future;</div><div class="line">    // handling exceptions and record the errors;</div><div class="line">    // for API exceptions return them in the future,</div><div class="line">    // for other exceptions throw directly</div><div class="line">&#125;</div></pre></td></tr></table></figure></k,></p>
+<p>上面源码我们可以看到它首先会把消息的key和value都序列化，然后得到要发送到的partition，然后验证消息的长度是否合法，最后会调用到RecordAccumulator.append方法。这个方法会把消息append到这个accumulator，以供producer io子线程发给kafka server。</p>
+<font color="#08c">总结上面的send过程，我们可以看到主线程(调用template.sendDefault线程)并没有把消息真正发送到kafka server，只是把消息累加到一个类似于queue的RecordAccumulator上面。(正因为这样，所以发消息才会很迅速，因为都是操作内存，没有io)我们不难猜测上文我们提到的sender子线程会获取RecordAccumulator上的消息record，然后把消息发给kafka server，这也体现了发送消息确实是一个异步的过程</font>
+
+<h2 id="真正与server交互的线程"><a href="#真正与server交互的线程" class="headerlink" title="真正与server交互的线程"></a>真正与server交互的线程</h2><h3 id="sender线程时序图"><a href="#sender线程时序图" class="headerlink" title="sender线程时序图"></a>sender线程时序图</h3><p><img src="https://coding.net/u/lightoheaven/p/image2/git/raw/master/201612/sender.jpeg" alt="kafka producer线程时序图"></p>
+<h3 id="Sender"><a href="#Sender" class="headerlink" title="Sender"></a>Sender</h3><p>通过Sender类开头的注释我们可以知道它是真正与kafka server交互的一个后台线程，它会把待发送的消息发给合适的server集群节点。它实现了Runnable接口，来看下它的run方法。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div></pre></td><td class="code"><pre><div class="line">public void run() &#123;</div><div class="line">        log.debug(&quot;Starting Kafka producer I/O thread.&quot;);</div><div class="line"></div><div class="line">        // main loop, runs until close is called</div><div class="line">        while (running) &#123;</div><div class="line">            try &#123;</div><div class="line">                run(time.milliseconds());</div><div class="line">            &#125; catch (Exception e) &#123;</div><div class="line">                log.error(&quot;Uncaught error in kafka producer I/O thread: &quot;, e);</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        log.debug(&quot;Beginning shutdown of Kafka producer I/O thread, sending remaining records.&quot;);</div><div class="line"></div><div class="line">        // okay we stopped accepting requests but there may still be</div><div class="line">        // requests in the accumulator or waiting for acknowledgment,</div><div class="line">        // wait until these are completed.</div><div class="line">        while (!forceClose &amp;&amp; (this.accumulator.hasUnsent() || this.client.inFlightRequestCount() &gt; 0)) &#123;</div><div class="line">            try &#123;</div><div class="line">                run(time.milliseconds());</div><div class="line">            &#125; catch (Exception e) &#123;</div><div class="line">                log.error(&quot;Uncaught error in kafka producer I/O thread: &quot;, e);</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line">        if (forceClose) &#123;</div><div class="line">            // We need to fail all the incomplete batches and wake up the threads waiting on</div><div class="line">            // the futures.</div><div class="line">            this.accumulator.abortIncompleteBatches();</div><div class="line">        &#125;</div><div class="line">        try &#123;</div><div class="line">            this.client.close();</div><div class="line">        &#125; catch (Exception e) &#123;</div><div class="line">            log.error(&quot;Failed to close network client&quot;, e);</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        log.debug(&quot;Shutdown of Kafka producer I/O thread has completed.&quot;);</div><div class="line">    &#125;</div></pre></td></tr></table></figure></p>
+<p>上述代码大致可以分为3部分：</p>
+<ul>
+<li>如果sender线程还处于running状态，则调用run方法发送消息。</li>
+<li>如果sender线程不在running状态，调用者也没有强制close，accumulator中还有待发送的request或者还有等待kafka server返回ack的请求，都会继续调用run方法。</li>
+<li>若sender线程不在running状态，并且已经强制关闭了，则放弃所有还未完成的request</li>
+</ul>
+<p>我们主要分析下第一部分中的run方法<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div></pre></td><td class="code"><pre><div class="line">void run(long now) &#123;</div><div class="line">        Cluster cluster = metadata.fetch();</div><div class="line">        // get the list of partitions with data ready to send</div><div class="line">        RecordAccumulator.ReadyCheckResult result = this.accumulator.ready(cluster, now);</div><div class="line"></div><div class="line">        // if there are any partitions whose leaders are not known yet, force metadata update</div><div class="line">        if (result.unknownLeadersExist)</div><div class="line">            this.metadata.requestUpdate();</div><div class="line"></div><div class="line">        // remove any nodes we aren&apos;t ready to send to</div><div class="line">        Iterator&lt;Node&gt; iter = result.readyNodes.iterator();</div><div class="line">        long notReadyTimeout = Long.MAX_VALUE;</div><div class="line">        while (iter.hasNext()) &#123;</div><div class="line">            Node node = iter.next();</div><div class="line">            if (!this.client.ready(node, now)) &#123;</div><div class="line">                iter.remove();</div><div class="line">                notReadyTimeout = Math.min(notReadyTimeout, this.client.connectionDelay(node, now));</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        // create produce requests</div><div class="line">        Map&lt;Integer, List&lt;RecordBatch&gt;&gt; batches = this.accumulator.drain(cluster,</div><div class="line">                                                                         result.readyNodes,</div><div class="line">                                                                         this.maxRequestSize,</div><div class="line">                                                                         now);</div><div class="line">        if (guaranteeMessageOrder) &#123;</div><div class="line">            // Mute all the partitions drained</div><div class="line">            for (List&lt;RecordBatch&gt; batchList : batches.values()) &#123;</div><div class="line">                for (RecordBatch batch : batchList)</div><div class="line">                    this.accumulator.mutePartition(batch.topicPartition);</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        List&lt;RecordBatch&gt; expiredBatches = this.accumulator.abortExpiredBatches(this.requestTimeout, now);</div><div class="line">        // update sensors</div><div class="line">        for (RecordBatch expiredBatch : expiredBatches)</div><div class="line">            this.sensors.recordErrors(expiredBatch.topicPartition.topic(), expiredBatch.recordCount);</div><div class="line"></div><div class="line">        sensors.updateProduceRequestMetrics(batches);</div><div class="line">        List&lt;ClientRequest&gt; requests = createProduceRequests(batches, now);</div><div class="line">        // If we have any nodes that are ready to send + have sendable data, poll with 0 timeout so this can immediately</div><div class="line">        // loop and try sending more data. Otherwise, the timeout is determined by nodes that have partitions with data</div><div class="line">        // that isn&apos;t yet sendable (e.g. lingering, backing off). Note that this specifically does not include nodes</div><div class="line">        // with sendable data that aren&apos;t ready to send since they would cause busy looping.</div><div class="line">        long pollTimeout = Math.min(result.nextReadyCheckDelayMs, notReadyTimeout);</div><div class="line">        if (result.readyNodes.size() &gt; 0) &#123;</div><div class="line">            log.trace(&quot;Nodes with data ready to send: &#123;&#125;&quot;, result.readyNodes);</div><div class="line">            log.trace(&quot;Created &#123;&#125; produce requests: &#123;&#125;&quot;, requests.size(), requests);</div><div class="line">            pollTimeout = 0;</div><div class="line">        &#125;</div><div class="line">        for (ClientRequest request : requests)</div><div class="line">            client.send(request, now);</div><div class="line"></div><div class="line">        // if some partitions are already ready to be sent, the select time would be 0;</div><div class="line">        // otherwise if some partition already has some data accumulated but not ready yet,</div><div class="line">        // the select time will be the time difference between now and its linger expiry time;</div><div class="line">        // otherwise the select time will be the time difference between now and the metadata expiry time;</div><div class="line">        this.client.poll(pollTimeout, now);</div><div class="line">    &#125;</div></pre></td></tr></table></figure></p>
+<p>不难看到它先从accumulator(之前template.sendDefault的线程已经把待发的record append到accumulator了)读取待发送的消息信息。考虑到这段代码比较复杂，我们只关注一下两部分:</p>
+<ul>
+<li>怎么与kafka server端建立连接</li>
+<li>向kafka server端发送数据</li>
+</ul>
+<h3 id="与kafka-server端建立连接"><a href="#与kafka-server端建立连接" class="headerlink" title="与kafka server端建立连接"></a>与kafka server端建立连接</h3><p>NetworkClient类<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div></pre></td><td class="code"><pre><div class="line">/**</div><div class="line">     * Initiate a connection to the given node</div><div class="line">     */</div><div class="line">    private void initiateConnect(Node node, long now) &#123;</div><div class="line">        String nodeConnectionId = node.idString();</div><div class="line">        try &#123;</div><div class="line">            log.debug(&quot;Initiating connection to node &#123;&#125; at &#123;&#125;:&#123;&#125;.&quot;, node.id(), node.host(), node.port());</div><div class="line">            this.connectionStates.connecting(nodeConnectionId, now);</div><div class="line">            selector.connect(nodeConnectionId,</div><div class="line">                             new InetSocketAddress(node.host(), node.port()),</div><div class="line">                             this.socketSendBuffer,</div><div class="line">                             this.socketReceiveBuffer);</div><div class="line">        &#125; catch (IOException e) &#123;</div><div class="line">            /* attempt failed, we&apos;ll try again after the backoff */</div><div class="line">            connectionStates.disconnected(nodeConnectionId, now);</div><div class="line">            /* maybe the problem is our metadata, update it */</div><div class="line">            metadataUpdater.requestUpdate();</div><div class="line">            log.debug(&quot;Error connecting to node &#123;&#125; at &#123;&#125;:&#123;&#125;:&quot;, node.id(), node.host(), node.port(), e);</div><div class="line">        &#125;</div><div class="line">    &#125;</div></pre></td></tr></table></figure></p>
+<p>上述这个方法也是在sender子线程里面完成的，它会调用selector.connect方法(这个类是spring-kafka封装的一个类似于nio selector的实现类，它通过持有一个java.nio.channels.Selector成员变量，采用非阻塞事件驱动形式，用来实现非阻塞的连接，发送，接受消息，之前我们再nio源码分析中已经讲到过)，源码如下:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div></pre></td><td class="code"><pre><div class="line">public void connect(String id, InetSocketAddress address, int sendBufferSize, int receiveBufferSize) throws IOException &#123;</div><div class="line">        if (this.channels.containsKey(id))</div><div class="line">            throw new IllegalStateException(&quot;There is already a connection for id &quot; + id);</div><div class="line"></div><div class="line">        SocketChannel socketChannel = SocketChannel.open();</div><div class="line">        socketChannel.configureBlocking(false);</div><div class="line">        Socket socket = socketChannel.socket();</div><div class="line">        socket.setKeepAlive(true);</div><div class="line">        if (sendBufferSize != Selectable.USE_DEFAULT_BUFFER_SIZE)</div><div class="line">            socket.setSendBufferSize(sendBufferSize);</div><div class="line">        if (receiveBufferSize != Selectable.USE_DEFAULT_BUFFER_SIZE)</div><div class="line">            socket.setReceiveBufferSize(receiveBufferSize);</div><div class="line">        socket.setTcpNoDelay(true);</div><div class="line">        boolean connected;</div><div class="line">        try &#123;</div><div class="line">            connected = socketChannel.connect(address);</div><div class="line">        &#125; catch (UnresolvedAddressException e) &#123;</div><div class="line">            socketChannel.close();</div><div class="line">            throw new IOException(&quot;Can&apos;t resolve address: &quot; + address, e);</div><div class="line">        &#125; catch (IOException e) &#123;</div><div class="line">            socketChannel.close();</div><div class="line">            throw e;</div><div class="line">        &#125;</div><div class="line">        SelectionKey key = socketChannel.register(nioSelector, SelectionKey.OP_CONNECT);</div><div class="line">        KafkaChannel channel = channelBuilder.buildChannel(id, key, maxReceiveSize);</div><div class="line">        key.attach(channel);</div><div class="line">        this.channels.put(id, channel);</div><div class="line"></div><div class="line">        if (connected) &#123;</div><div class="line">            // OP_CONNECT won&apos;t trigger for immediately connected channels</div><div class="line">            log.debug(&quot;Immediately connected to node &#123;&#125;&quot;, channel.id());</div><div class="line">            immediatelyConnectedKeys.add(key);</div><div class="line">            key.interestOps(0);</div><div class="line">        &#125;</div><div class="line">    &#125;</div></pre></td></tr></table></figure></p>
+<p>上述代码我们在之前的博文中<a href="http://yeming.me/2016/02/28/nio/">Nio学习简单理解</a>已经分析过了，首先与kafka serve端建立了一个non blocking 的SocketChannel，然后将该channel注册到一个java.nio.channels.Selector上面，并注册OP_CONNECT事件，可以看到这是很典型的nio selector的用法。</p>
+<h3 id="真正的向kafka-sever发送消息"><a href="#真正的向kafka-sever发送消息" class="headerlink" title="真正的向kafka sever发送消息"></a>真正的向kafka sever发送消息</h3><p>先来看下KafkaChannel类里面的这个方法<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">public void setSend(Send send) &#123;</div><div class="line">        if (this.send != null)</div><div class="line">            throw new IllegalStateException(&quot;Attempt to begin a send operation with prior send operation still in progress.&quot;);</div><div class="line">        this.send = send;</div><div class="line">        this.transportLayer.addInterestOps(SelectionKey.OP_WRITE);</div><div class="line">    &#125;</div></pre></td></tr></table></figure></p>
+<p>可以看到，这里又注册了OP_WRITE事件。</p>
+<p>然后我们再回到之前的sender run(long time)方法，看下这个方法最后一部分<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"> for (ClientRequest request : requests)</div><div class="line">            client.send(request, now);</div><div class="line"></div><div class="line">        // if some partitions are already ready to be sent, the select time would be 0;</div><div class="line">        // otherwise if some partition already has some data accumulated but not ready yet,</div><div class="line">        // the select time will be the time difference between now and its linger expiry time;</div><div class="line">        // otherwise the select time will be the time difference between now and the metadata expiry time;</div><div class="line">this.client.poll(pollTimeout, now);</div></pre></td></tr></table></figure></p>
+<p>它先把待发给kafka server的request放进queue里面(client.send方法)，然后调用client.poll方法<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div></pre></td><td class="code"><pre><div class="line">public List&lt;ClientResponse&gt; poll(long timeout, long now) &#123;</div><div class="line">        long metadataTimeout = metadataUpdater.maybeUpdate(now);</div><div class="line">        try &#123;</div><div class="line">            this.selector.poll(Utils.min(timeout, metadataTimeout, requestTimeoutMs));</div><div class="line">        &#125; catch (IOException e) &#123;</div><div class="line">            log.error(&quot;Unexpected error during I/O&quot;, e);</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        // process completed actions</div><div class="line">        long updatedNow = this.time.milliseconds();</div><div class="line">        List&lt;ClientResponse&gt; responses = new ArrayList&lt;&gt;();</div><div class="line">        handleCompletedSends(responses, updatedNow);</div><div class="line">        handleCompletedReceives(responses, updatedNow);</div><div class="line">        handleDisconnections(responses, updatedNow);</div><div class="line">        handleConnections();</div><div class="line">        handleTimedOutRequests(responses, updatedNow);</div><div class="line"></div><div class="line">        // invoke callbacks</div><div class="line">        for (ClientResponse response : responses) &#123;</div><div class="line">            if (response.request().hasCallback()) &#123;</div><div class="line">                try &#123;</div><div class="line">                    response.request().callback().onComplete(response);</div><div class="line">                &#125; catch (Exception e) &#123;</div><div class="line">                    log.error(&quot;Uncaught error in request completion:&quot;, e);</div><div class="line">                &#125;</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        return responses;</div><div class="line">    &#125;</div></pre></td></tr></table></figure></p>
+<p>这个方法又会调用this.selector.poll(Utils.min(timeout, metadataTimeout, requestTimeoutMs))方法，并且会调用回调函数，这里我们先来讲解一下回调<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">ListenableFuture&lt;SendResult&lt;Integer, String&gt;&gt; future = template.sendDefault(0, &quot;foo&quot;);</div><div class="line">        future.addCallback(new ListenableFutureCallback&lt;SendResult&lt;Integer, String&gt;&gt;() &#123;</div><div class="line"></div><div class="line">            @Override</div><div class="line">            public void onSuccess(SendResult&lt;Integer, String&gt; result) &#123;</div><div class="line">                System.out.println(&quot;xiaoming send success&quot;);</div><div class="line">            &#125;</div><div class="line"></div><div class="line">            @Override</div><div class="line">            public void onFailure(Throwable ex) &#123;</div><div class="line">            &#125;</div><div class="line"></div><div class="line">        &#125;);</div></pre></td></tr></table></figure></p>
+<p>最早发送消息template.sendDefault方法会返回一个ListenableFuture<sendresult<integer, string="">&gt; future参数，如果你对发送消息的结果(是否发送成功)之类的感兴趣，当然你可以直接调用future.get，但是这是个阻塞方法，会阻塞当前线程。所以你可以像上面一样future.addCallback添加一个回调参数。<br>最终这个response.request().callback().onComplete(response)就会调用这个回调函数(具体这个回调是怎么实现的我这里就不展开了)。</sendresult<integer,></p>
+<font color="#08c">所以这个回调函数显示不是发生在template.sendDefault的线程里面，它是在kafka producer的工作io线程中，也就是nio eventloop那个事件循环的线程中，所以我们这个回调函数里面最好不要直接进行一些耗时的操作，这样会影响整个producer的工作。实在要进行耗时操作，可以启动一个子线程来完成</font>
+
+<p>然后我们回到this.selector.poll(Utils.min(timeout, metadataTimeout, requestTimeoutMs))这个方法。这个方法最终会调用到Selector.pollSelectionKeys方法<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div></pre></td><td class="code"><pre><div class="line">private void pollSelectionKeys(Iterable&lt;SelectionKey&gt; selectionKeys, boolean isImmediatelyConnected) &#123;</div><div class="line">        Iterator&lt;SelectionKey&gt; iterator = selectionKeys.iterator();</div><div class="line">        while (iterator.hasNext()) &#123;</div><div class="line">            SelectionKey key = iterator.next();</div><div class="line">            iterator.remove();</div><div class="line">            KafkaChannel channel = channel(key);</div><div class="line"></div><div class="line">            // register all per-connection metrics at once</div><div class="line">            sensors.maybeRegisterConnectionMetrics(channel.id());</div><div class="line">            lruConnections.put(channel.id(), currentTimeNanos);</div><div class="line"></div><div class="line">            try &#123;</div><div class="line"></div><div class="line">                /* complete any connections that have finished their handshake (either normally or immediately) */</div><div class="line">                if (isImmediatelyConnected || key.isConnectable()) &#123;</div><div class="line">                    if (channel.finishConnect()) &#123;</div><div class="line">                        this.connected.add(channel.id());</div><div class="line">                        this.sensors.connectionCreated.record();</div><div class="line">                    &#125; else</div><div class="line">                        continue;</div><div class="line">                &#125;</div><div class="line"></div><div class="line">                /* if channel is not ready finish prepare */</div><div class="line">                if (channel.isConnected() &amp;&amp; !channel.ready())</div><div class="line">                    channel.prepare();</div><div class="line"></div><div class="line">                /* if channel is ready read from any connections that have readable data */</div><div class="line">                if (channel.ready() &amp;&amp; key.isReadable() &amp;&amp; !hasStagedReceive(channel)) &#123;</div><div class="line">                    NetworkReceive networkReceive;</div><div class="line">                    while ((networkReceive = channel.read()) != null)</div><div class="line">                        addToStagedReceives(channel, networkReceive);</div><div class="line">                &#125;</div><div class="line"></div><div class="line">                /* if channel is ready write to any sockets that have space in their buffer and for which we have data */</div><div class="line">                if (channel.ready() &amp;&amp; key.isWritable()) &#123;</div><div class="line">                    Send send = channel.write();</div><div class="line">                    if (send != null) &#123;</div><div class="line">                        this.completedSends.add(send);</div><div class="line">                        this.sensors.recordBytesSent(channel.id(), send.size());</div><div class="line">                    &#125;</div><div class="line">                &#125;</div><div class="line"></div><div class="line">                /* cancel any defunct sockets */</div><div class="line">                if (!key.isValid()) &#123;</div><div class="line">                    close(channel);</div><div class="line">                    this.disconnected.add(channel.id());</div><div class="line">                &#125;</div><div class="line"></div><div class="line">            &#125; catch (Exception e) &#123;</div><div class="line">                String desc = channel.socketDescription();</div><div class="line">                if (e instanceof IOException)</div><div class="line">                    log.debug(&quot;Connection with &#123;&#125; disconnected&quot;, desc, e);</div><div class="line">                else</div><div class="line">                    log.warn(&quot;Unexpected error from &#123;&#125;; closing connection&quot;, desc, e);</div><div class="line">                close(channel);</div><div class="line">                this.disconnected.add(channel.id());</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line">    &#125;</div></pre></td></tr></table></figure></p>
+<p>通过这个方法的名字就能看到这里是找到之前注册的OP_CONNECT，OP_WRITE，OP_READ(后面接受消息会讲)这些事件已经就绪的事件，然后调用相应方法来处理。对于发送消息，就是想上面那样，如果channel.ready() &amp;&amp; key.isWritable()那么就调用Send send = channel.write()<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line">public Send write() throws IOException &#123;</div><div class="line">        Send result = null;</div><div class="line">        if (send != null &amp;&amp; send(send)) &#123;</div><div class="line">            result = send;</div><div class="line">            send = null;</div><div class="line">        &#125;</div><div class="line">        return result;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">private boolean send(Send send) throws IOException &#123;</div><div class="line">        send.writeTo(transportLayer);</div><div class="line">        if (send.completed())</div><div class="line">            transportLayer.removeInterestOps(SelectionKey.OP_WRITE);</div><div class="line"></div><div class="line">        return send.completed();</div><div class="line">    &#125;</div></pre></td></tr></table></figure></p>
+<p>真正向socker写数据，写完必须删除OP_WRITE事件，不然会造成空循环，这个我们之前nio那篇文章中也已经讲过。</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/spring-kafka/" rel="tag"># spring-kafka</a>
+          
+            <a href="/tags/NIO/" rel="tag"># NIO</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/12/02/eureka2/" rel="next" title="spring-cloud-eureka源码分析二(server端)">
+                <i class="fa fa-chevron-left"></i> spring-cloud-eureka源码分析二(server端)
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/12/30/kafkaConsumer/" rel="prev" title="spring-kafka源码分析二(Consumer)">
+                spring-kafka源码分析二(Consumer) <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div id="cloud-tie-wrapper" class="cloud-tie-wrapper"></div>
+      <script>
+        var cloudTieConfig = {
+          url: document.location.href,
+          sourceId: "",
+          productKey: "f6968bd56d71417cad7a11c8df334d35",
+          target: "cloud-tie-wrapper"
+        };
+      </script>
+      <script src="https://img1.cache.netease.com/f2e/tie/yun/sdk/loader.js"></script>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/uploads/avatar.png"
+               alt="Smartの小明" />
+          <p class="site-author-name" itemprop="name">Smartの小明</p>
+          <p class="site-description motion-element" itemprop="description">屌丝搬砖程序猿,码农界的搬运工,哪里需要搬哪里</p>
+        </div>
+
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">18</span>
+              <span class="site-state-item-name">posts</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">4</span>
+                <span class="site-state-item-name">categories</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">15</span>
+                <span class="site-state-item-name">tags</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/q6413260" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/1855404367/profile?rightmod=1&wvr=6&mod=personinfo&is_all=1" target="_blank" title="微博">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  微博
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://www.douban.com/people/142298114/" target="_blank" title="豆瓣">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  豆瓣
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://www.zhihu.com/people/xiaoming1990" target="_blank" title="知乎">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  知乎
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#发消息主线程-调用发送消息的线程"><span class="nav-number">1.</span> <span class="nav-text">发消息主线程(调用发送消息的线程)</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#KafkaTemplate"><span class="nav-number">1.1.</span> <span class="nav-text">KafkaTemplate</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#主线程KafkaTemplate-send发消息"><span class="nav-number">1.2.</span> <span class="nav-text">主线程KafkaTemplate.send发消息</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#KafkaProducer-send"><span class="nav-number">1.3.</span> <span class="nav-text">KafkaProducer.send</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#真正与server交互的线程"><span class="nav-number">2.</span> <span class="nav-text">真正与server交互的线程</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#sender线程时序图"><span class="nav-number">2.1.</span> <span class="nav-text">sender线程时序图</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Sender"><span class="nav-number">2.2.</span> <span class="nav-text">Sender</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#与kafka-server端建立连接"><span class="nav-number">2.3.</span> <span class="nav-text">与kafka server端建立连接</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#真正的向kafka-sever发送消息"><span class="nav-number">2.4.</span> <span class="nav-text">真正的向kafka sever发送消息</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Smartの小明</span>
+</div>
+
+
+<div class="powered-by">
+  Powered by <a class="theme-link" href="https://hexo.io">Hexo</a>
+</div>
+
+<div class="theme-info">
+  Theme -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+
+        
+
+<div class="busuanzi-count">
+
+  <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv"><i class="fa fa-user"></i><span class="busuanzi-value" id="busuanzi_value_site_uv"></span></span>
+  
+
+  
+    <span class="site-pv"><i class="fa fa-eye"></i><span class="busuanzi-value" id="busuanzi_value_site_pv"></span></span>
+  
+  
+</div>
+
+
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.0"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+	
+
+
+
+
+  
+  
+
+  
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.1.js"></script>
+  <script>AV.initialize("Y2lqjwOrlt5p333cMSW3HNxD-gzGzoHsz", "Y6lssmQDLyXlT0HE1pgVn0UK");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+  
+
+
+</body>
+</html>

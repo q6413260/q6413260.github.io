@@ -1,0 +1,884 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="en">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="spring-kafka,NIO," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/uploads/avatar.png?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="上一篇文章我们分析了spring-kafka的producer，这篇文章我们就要来分析下consumer。123456789101112131415161718192021222324252627282930313233ContainerProperties containerProps = new ContainerProperties(&amp;quot;topic1&amp;quot;, &amp;quot;top">
+<meta property="og:type" content="article">
+<meta property="og:title" content="spring-kafka源码分析二(Consumer)">
+<meta property="og:url" content="http://yeming.me/2016/12/30/kafkaConsumer/index.html">
+<meta property="og:site_name" content="Smartの小明">
+<meta property="og:description" content="上一篇文章我们分析了spring-kafka的producer，这篇文章我们就要来分析下consumer。123456789101112131415161718192021222324252627282930313233ContainerProperties containerProps = new ContainerProperties(&amp;quot;topic1&amp;quot;, &amp;quot;top">
+<meta property="og:updated_time" content="2016-12-30T13:07:01.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="spring-kafka源码分析二(Consumer)">
+<meta name="twitter:description" content="上一篇文章我们分析了spring-kafka的producer，这篇文章我们就要来分析下consumer。123456789101112131415161718192021222324252627282930313233ContainerProperties containerProps = new ContainerProperties(&amp;quot;topic1&amp;quot;, &amp;quot;top">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '6252881861358388000',
+      author: '小明'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yeming.me/2016/12/30/kafkaConsumer/"/>
+
+
+
+
+
+  <title> spring-kafka源码分析二(Consumer) | Smartの小明 </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="en">
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">Smartの小明</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle">屌丝搬砖程序猿,码农界的搬运工,哪里需要搬哪里</p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            Categories
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            About
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            Archives
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            Tags
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+  <link itemprop="mainEntityOfPage" href="http://yeming.me/2016/12/30/kafkaConsumer/">
+
+  <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <meta itemprop="name" content="Smartの小明">
+    <meta itemprop="description" content="">
+    <meta itemprop="image" content="/uploads/avatar.png">
+  </span>
+
+  <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+    <meta itemprop="name" content="Smartの小明">
+    <span style="display:none" itemprop="logo" itemscope itemtype="http://schema.org/ImageObject">
+      <img style="display:none;" itemprop="url image" alt="Smartの小明" src="">
+    </span>
+  </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                spring-kafka源码分析二(Consumer)
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2016-12-30T21:05:07+08:00">
+                2016-12-30
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+              <span class="post-meta-divider">|</span>
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/技术分享/" itemprop="url" rel="index">
+                    <span itemprop="name">技术分享</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+
+          
+          
+             <span id="/2016/12/30/kafkaConsumer/" class="leancloud_visitors" data-flag-title="spring-kafka源码分析二(Consumer)">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               <span class="post-meta-item-text">Visitors </span>
+               <span class="leancloud-visitors-count"></span>
+              </span>
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="page-pv"><i class="fa fa-file-o"></i>
+            <span class="busuanzi-value" id="busuanzi_value_page_pv" ></span>
+            </span>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>上一篇文章我们分析了spring-kafka的producer，这篇文章我们就要来分析下consumer。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div></pre></td><td class="code"><pre><div class="line">ContainerProperties containerProps = new ContainerProperties(&quot;topic1&quot;, &quot;topic2&quot;);</div><div class="line">containerProps.setMessageListener(new MessageListener&lt;Integer, String&gt;() &#123;</div><div class="line"></div><div class="line">    @Override</div><div class="line">    public void onMessage(ConsumerRecord&lt;Integer, String&gt; message) &#123;</div><div class="line">        System.out.println(&quot;received: &quot; + message);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">&#125;);</div><div class="line">KafkaMessageListenerContainer&lt;Integer, String&gt; container = createContainer(containerProps);</div><div class="line">container.setBeanName(&quot;testAuto&quot;);</div><div class="line">container.start();</div><div class="line"></div><div class="line">private static KafkaMessageListenerContainer&lt;Integer, String&gt; createContainer(ContainerProperties containerProps) &#123;</div><div class="line">    Map&lt;String, Object&gt; props = consumerProps();</div><div class="line">    DefaultKafkaConsumerFactory&lt;Integer, String&gt; cf =</div><div class="line">            new DefaultKafkaConsumerFactory&lt;Integer, String&gt;(props);</div><div class="line">    KafkaMessageListenerContainer&lt;Integer, String&gt; container =</div><div class="line">            new KafkaMessageListenerContainer&lt;Integer, String&gt;(cf, containerProps);</div><div class="line">    return container;</div><div class="line">&#125;</div><div class="line"></div><div class="line">private static Map&lt;String, Object&gt; consumerProps() &#123;</div><div class="line">        Map&lt;String, Object&gt; props = new HashMap&lt;String, Object&gt;();</div><div class="line">        props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, &quot;localhost:9092&quot;);</div><div class="line">        props.put(ConsumerConfig.GROUP_ID_CONFIG, &quot;group&quot;);</div><div class="line">        props.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, true);</div><div class="line">        props.put(ConsumerConfig.AUTO_COMMIT_INTERVAL_MS_CONFIG, &quot;100&quot;);</div><div class="line">        props.put(ConsumerConfig.SESSION_TIMEOUT_MS_CONFIG, &quot;15000&quot;);</div><div class="line">        props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, IntegerDeserializer.class);</div><div class="line">        props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);</div><div class="line">        return props;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>可以看到我们需要创建一个KafkaMessageListenerContainer，而创建上述container又需要创建一个DefaultKafkaConsumerFactory和一个ContainerProperties。注意ContainerProperties必须设置一个MessageListener，这个listener有个onMessage方法，如果consumer收到消息，就会调用这个方法。创建了上述container之后，然后调用container.start方法就可以开启consumer了。<br><a id="more"></a></p>
+<h2 id="KafkaMessageListenerContainer-start"><a href="#KafkaMessageListenerContainer-start" class="headerlink" title="KafkaMessageListenerContainer.start"></a>KafkaMessageListenerContainer.start</h2><p>看源码不难发现，上述方法最终会调用到KafkaMessageListenerContainer.doStart方法<br>KafkaMessageListenerContainer.start==&gt;AbstractMessageListenerContainer.start==&gt;KafkaMessageListenerContainer.doStart<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div></pre></td><td class="code"><pre><div class="line">protected void doStart() &#123;</div><div class="line">    if (isRunning()) &#123;</div><div class="line">        return;</div><div class="line">    &#125;</div><div class="line">    ContainerProperties containerProperties = getContainerProperties();</div><div class="line"></div><div class="line">    if (!this.consumerFactory.isAutoCommit()) &#123;</div><div class="line">        AckMode ackMode = containerProperties.getAckMode();</div><div class="line">        if (ackMode.equals(AckMode.COUNT) || ackMode.equals(AckMode.COUNT_TIME)) &#123;</div><div class="line">            Assert.state(containerProperties.getAckCount() &gt; 0, &quot;&apos;ackCount&apos; must be &gt; 0&quot;);</div><div class="line">        &#125;</div><div class="line">        if ((ackMode.equals(AckMode.TIME) || ackMode.equals(AckMode.COUNT_TIME))</div><div class="line">                &amp;&amp; containerProperties.getAckTime() == 0) &#123;</div><div class="line">            containerProperties.setAckTime(5000);</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    Object messageListener = containerProperties.getMessageListener();</div><div class="line">    Assert.state(messageListener != null, &quot;A MessageListener is required&quot;);</div><div class="line">    if (messageListener instanceof GenericAcknowledgingMessageListener) &#123;</div><div class="line">        this.acknowledgingMessageListener = (GenericAcknowledgingMessageListener&lt;?&gt;) messageListener;</div><div class="line">    &#125;</div><div class="line">    else if (messageListener instanceof GenericMessageListener) &#123;</div><div class="line">        this.listener = (GenericMessageListener&lt;?&gt;) messageListener;</div><div class="line">    &#125;</div><div class="line">    else &#123;</div><div class="line">        throw new IllegalStateException(&quot;messageListener must be &apos;MessageListener&apos; &quot;</div><div class="line">                + &quot;or &apos;AcknowledgingMessageListener&apos;, not &quot; + messageListener.getClass().getName());</div><div class="line">    &#125;</div><div class="line">    if (containerProperties.getConsumerTaskExecutor() == null) &#123;</div><div class="line">        SimpleAsyncTaskExecutor consumerExecutor = new SimpleAsyncTaskExecutor(</div><div class="line">                (getBeanName() == null ? &quot;&quot; : getBeanName()) + &quot;-kafka-consumer-&quot;);</div><div class="line">        containerProperties.setConsumerTaskExecutor(consumerExecutor);</div><div class="line">    &#125;</div><div class="line">    if (containerProperties.getListenerTaskExecutor() == null) &#123;</div><div class="line">        SimpleAsyncTaskExecutor listenerExecutor = new SimpleAsyncTaskExecutor(</div><div class="line">                (getBeanName() == null ? &quot;&quot; : getBeanName()) + &quot;-kafka-listener-&quot;);</div><div class="line">        containerProperties.setListenerTaskExecutor(listenerExecutor);</div><div class="line">    &#125;</div><div class="line">    this.listenerConsumer = new ListenerConsumer(this.listener, this.acknowledgingMessageListener);</div><div class="line">    setRunning(true);</div><div class="line">    this.listenerConsumerFuture = containerProperties</div><div class="line">            .getConsumerTaskExecutor()</div><div class="line">            .submitListenable(this.listenerConsumer);</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>可以看到这个方法给containerProperties设置了consumerTaskExecutor和listenerTaskExecutor。然后我们重点关注下这个方法最后会调用xxx.getConsumerTaskExecutor().submitListenable(this.listenerConsumer);这个方法会开启一个”-kafka-consumer-“线程，这个线程会运行ListenerConsumer.run()方法。</p>
+<p><font color="#08c">KafkaMessageListenerContainer</font><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div><div class="line">79</div><div class="line">80</div><div class="line">81</div><div class="line">82</div><div class="line">83</div><div class="line">84</div><div class="line">85</div><div class="line">86</div><div class="line">87</div><div class="line">88</div><div class="line">89</div><div class="line">90</div><div class="line">91</div><div class="line">92</div><div class="line">93</div></pre></td><td class="code"><pre><div class="line">public void run() &#123;</div><div class="line">    if (this.autoCommit &amp;&amp; this.theListener instanceof ConsumerSeekAware) &#123;</div><div class="line">        ((ConsumerSeekAware) this.theListener).registerSeekCallback(this);</div><div class="line">    &#125;</div><div class="line">    this.count = 0;</div><div class="line">    this.last = System.currentTimeMillis();</div><div class="line">    if (isRunning() &amp;&amp; this.definedPartitions != null) &#123;</div><div class="line">        initPartitionsIfNeeded();</div><div class="line">        // we start the invoker here as there will be no rebalance calls to</div><div class="line">        // trigger it, but only if the container is not set to autocommit</div><div class="line">        // otherwise we will process records on a separate thread</div><div class="line">        if (!this.autoCommit) &#123;</div><div class="line">            startInvoker();</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">    long lastReceive = System.currentTimeMillis();</div><div class="line">    long lastAlertAt = lastReceive;</div><div class="line">    while (isRunning()) &#123;</div><div class="line">        try &#123;</div><div class="line">            if (!this.autoCommit) &#123;</div><div class="line">                processCommits();</div><div class="line">            &#125;</div><div class="line">            processSeeks();</div><div class="line">            if (this.logger.isTraceEnabled()) &#123;</div><div class="line">                this.logger.trace(&quot;Polling (paused=&quot; + this.paused + &quot;)...&quot;);</div><div class="line">            &#125;</div><div class="line">            ConsumerRecords&lt;K, V&gt; records = this.consumer.poll(this.containerProperties.getPollTimeout());</div><div class="line">            if (records != null &amp;&amp; this.logger.isDebugEnabled()) &#123;</div><div class="line">                this.logger.debug(&quot;Received: &quot; + records.count() + &quot; records&quot;);</div><div class="line">            &#125;</div><div class="line">            if (records != null &amp;&amp; records.count() &gt; 0) &#123;</div><div class="line">                if (this.containerProperties.getIdleEventInterval() != null) &#123;</div><div class="line">                    lastReceive = System.currentTimeMillis();</div><div class="line">                &#125;</div><div class="line">                // if the container is set to auto-commit, then execute in the</div><div class="line">                // same thread</div><div class="line">                // otherwise send to the buffering queue</div><div class="line">                if (this.autoCommit) &#123;</div><div class="line">                    invokeListener(records);</div><div class="line">                &#125;</div><div class="line">                else &#123;</div><div class="line">                    if (sendToListener(records)) &#123;</div><div class="line">                        if (this.assignedPartitions != null) &#123;</div><div class="line">                            // avoid group management rebalance due to a slow</div><div class="line">                            // consumer</div><div class="line">                            this.consumer.pause(this.assignedPartitions);</div><div class="line">                            this.paused = true;</div><div class="line">                            this.unsent = records;</div><div class="line">                        &#125;</div><div class="line">                    &#125;</div><div class="line">                &#125;</div><div class="line">            &#125;</div><div class="line">            else &#123;</div><div class="line">                if (this.containerProperties.getIdleEventInterval() != null) &#123;</div><div class="line">                    long now = System.currentTimeMillis();</div><div class="line">                    if (now &gt; lastReceive + this.containerProperties.getIdleEventInterval()</div><div class="line">                            &amp;&amp; now &gt; lastAlertAt + this.containerProperties.getIdleEventInterval()) &#123;</div><div class="line">                        publishIdleContainerEvent(now - lastReceive);</div><div class="line">                        lastAlertAt = now;</div><div class="line">                        if (this.theListener instanceof ConsumerSeekAware) &#123;</div><div class="line">                            seekPartitions(getAssignedPartitions(), true);</div><div class="line">                        &#125;</div><div class="line">                    &#125;</div><div class="line">                &#125;</div><div class="line">            &#125;</div><div class="line">            this.unsent = checkPause(this.unsent);</div><div class="line">        &#125;</div><div class="line">        catch (WakeupException e) &#123;</div><div class="line">            this.unsent = checkPause(this.unsent);</div><div class="line">        &#125;</div><div class="line">        catch (Exception e) &#123;</div><div class="line">            if (this.containerProperties.getGenericErrorHandler() != null) &#123;</div><div class="line">                this.containerProperties.getGenericErrorHandler().handle(e, null);</div><div class="line">            &#125;</div><div class="line">            else &#123;</div><div class="line">                this.logger.error(&quot;Container exception&quot;, e);</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">    if (this.listenerInvokerFuture != null) &#123;</div><div class="line">        stopInvokerAndCommitManualAcks();</div><div class="line">    &#125;</div><div class="line">    try &#123;</div><div class="line">        this.consumer.unsubscribe();</div><div class="line">    &#125;</div><div class="line">    catch (WakeupException e) &#123;</div><div class="line">        // No-op. Continue process</div><div class="line">    &#125;</div><div class="line">    this.consumer.close();</div><div class="line">    if (this.logger.isInfoEnabled()) &#123;</div><div class="line">        this.logger.info(&quot;Consumer stopped&quot;);</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p><font color="#08c">我们需要注意一点，上述代码很多地方都判断了if (!this.autoCommit)是不是自动提交，这个地方我们后面会提到</font>。我们先看到while(isRunning())循环里面有个ConsumerRecords<k, v=""> records = this.consumer.poll(this.containerProperties.getPollTimeout());这个是获取从kafka broker拿到的record，下面会判断如果record不为空，并且<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">if (this.autoCommit) &#123;</div><div class="line">	invokeListener(records);</div><div class="line">&#125;</div></pre></td></tr></table></figure></k,></p>
+<p>则最终通过这个方法会调用到我们最早注册的MessageListener的onMessage方法。下面我们就会就这两个方面来分析一下源码。</p>
+<h2 id="从broker获取record"><a href="#从broker获取record" class="headerlink" title="从broker获取record"></a>从broker获取record</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div></pre></td><td class="code"><pre><div class="line">public ConsumerRecords&lt;K, V&gt; poll(long timeout) &#123;</div><div class="line">    acquire();</div><div class="line">    try &#123;</div><div class="line">        if (timeout &lt; 0)</div><div class="line">            throw new IllegalArgumentException(&quot;Timeout must not be negative&quot;);</div><div class="line"></div><div class="line">        // poll for new data until the timeout expires</div><div class="line">        long start = time.milliseconds();</div><div class="line">        long remaining = timeout;</div><div class="line">        do &#123;</div><div class="line">            Map&lt;TopicPartition, List&lt;ConsumerRecord&lt;K, V&gt;&gt;&gt; records = pollOnce(remaining);</div><div class="line">            if (!records.isEmpty()) &#123;</div><div class="line">                fetcher.sendFetches();</div><div class="line">                client.pollNoWakeup();</div><div class="line"></div><div class="line">                if (this.interceptors == null)</div><div class="line">                    return new ConsumerRecords&lt;&gt;(records);</div><div class="line">                else</div><div class="line">                    return this.interceptors.onConsume(new ConsumerRecords&lt;&gt;(records));</div><div class="line">            &#125;</div><div class="line"></div><div class="line">            long elapsed = time.milliseconds() - start;</div><div class="line">            remaining = timeout - elapsed;</div><div class="line">        &#125; while (remaining &gt; 0);</div><div class="line"></div><div class="line">        return ConsumerRecords.empty();</div><div class="line">    &#125; finally &#123;</div><div class="line">        release();</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>我们看到上述方法又会调用pollOnce方法来获取record</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div></pre></td><td class="code"><pre><div class="line">private Map&lt;TopicPartition, List&lt;ConsumerRecord&lt;K, V&gt;&gt;&gt; pollOnce(long timeout) &#123;</div><div class="line">    // TODO: Sub-requests should take into account the poll timeout (KAFKA-1894)</div><div class="line">    coordinator.ensureCoordinatorReady();</div><div class="line"></div><div class="line">    // ensure we have partitions assigned if we expect to</div><div class="line">    if (subscriptions.partitionsAutoAssigned())</div><div class="line">        coordinator.ensurePartitionAssignment();</div><div class="line"></div><div class="line">    // fetch positions if we have partitions we&apos;re subscribed to that we</div><div class="line">    // don&apos;t know the offset for</div><div class="line">    if (!subscriptions.hasAllFetchPositions())</div><div class="line">        updateFetchPositions(this.subscriptions.missingFetchPositions());</div><div class="line"></div><div class="line">    long now = time.milliseconds();</div><div class="line"></div><div class="line">    // execute delayed tasks (e.g. autocommits and heartbeats) prior to fetching records</div><div class="line">    client.executeDelayedTasks(now);</div><div class="line"></div><div class="line">    // init any new fetches (won&apos;t resend pending fetches)</div><div class="line">    Map&lt;TopicPartition, List&lt;ConsumerRecord&lt;K, V&gt;&gt;&gt; records = fetcher.fetchedRecords();</div><div class="line"></div><div class="line">    // if data is available already, e.g. from a previous network client poll() call to commit,</div><div class="line">    // then just return it immediately</div><div class="line">    if (!records.isEmpty())</div><div class="line">        return records;</div><div class="line"></div><div class="line">    fetcher.sendFetches();</div><div class="line">    client.poll(timeout, now);</div><div class="line">    return fetcher.fetchedRecords();</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>这个方法通过注释就能看到，它首先在获取数据之前会确保subscribed topics or partitions，然后执行autocommits and heartbeats任务，最后会调用client.poll(timeout, now)方法。我们猜测这个方法会把获取的record放在一个类似于queue里面，然后通过fetcher.fetchedRecords()返回。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div></pre></td><td class="code"><pre><div class="line">private void poll(long timeout, long now, boolean executeDelayedTasks) &#123;</div><div class="line">    // send all the requests we can send now</div><div class="line">    trySend(now);</div><div class="line"></div><div class="line">    // ensure we don&apos;t poll any longer than the deadline for</div><div class="line">    // the next scheduled task</div><div class="line">    timeout = Math.min(timeout, delayedTasks.nextTimeout(now));</div><div class="line">    clientPoll(timeout, now);</div><div class="line">    now = time.milliseconds();</div><div class="line"></div><div class="line">    // handle any disconnects by failing the active requests. note that disconnects must</div><div class="line">    // be checked immediately following poll since any subsequent call to client.ready()</div><div class="line">    // will reset the disconnect status</div><div class="line">    checkDisconnects(now);</div><div class="line"></div><div class="line">    // execute scheduled tasks</div><div class="line">    if (executeDelayedTasks)</div><div class="line">        delayedTasks.poll(now);</div><div class="line"></div><div class="line">    // try again to send requests since buffer space may have been</div><div class="line">    // cleared or a connect finished in the poll</div><div class="line">    trySend(now);</div><div class="line"></div><div class="line">    // fail requests that couldn&apos;t be sent if they have expired</div><div class="line">    failExpiredRequests(now);</div><div class="line">&#125;</div><div class="line"></div><div class="line">private void clientPoll(long timeout, long now) &#123;</div><div class="line">    client.poll(timeout, now);</div><div class="line">    maybeTriggerWakeup();</div><div class="line">&#125;</div><div class="line"></div><div class="line">@Override</div><div class="line">public List&lt;ClientResponse&gt; poll(long timeout, long now) &#123;</div><div class="line">    long metadataTimeout = metadataUpdater.maybeUpdate(now);</div><div class="line">    try &#123;</div><div class="line">        this.selector.poll(Utils.min(timeout, metadataTimeout, requestTimeoutMs));</div><div class="line">    &#125; catch (IOException e) &#123;</div><div class="line">        log.error(&quot;Unexpected error during I/O&quot;, e);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    // process completed actions</div><div class="line">    long updatedNow = this.time.milliseconds();</div><div class="line">    List&lt;ClientResponse&gt; responses = new ArrayList&lt;&gt;();</div><div class="line">    handleCompletedSends(responses, updatedNow);</div><div class="line">    handleCompletedReceives(responses, updatedNow);</div><div class="line">    handleDisconnections(responses, updatedNow);</div><div class="line">    handleConnections();</div><div class="line">    handleTimedOutRequests(responses, updatedNow);</div><div class="line"></div><div class="line">    // invoke callbacks</div><div class="line">    for (ClientResponse response : responses) &#123;</div><div class="line">        if (response.request().hasCallback()) &#123;</div><div class="line">            try &#123;</div><div class="line">                response.request().callback().onComplete(response);</div><div class="line">            &#125; catch (Exception e) &#123;</div><div class="line">                log.error(&quot;Uncaught error in request completion:&quot;, e);</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    return responses;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>可以看到最终又会调用到NetworkClient.poll方法，上一篇关于spring-kafka producer的文章我们已经讲到了这个类。它是通过NIO的Selector，将各种socketChannel绑定在这个selector上面，然后监听各种事件。</p>
+<p>我们接下来看下kafka的selector是怎么处理就绪的读事件的</p>
+<p><font color="#08c">org.apache.kafka.common.network.Selector</font><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div></pre></td><td class="code"><pre><div class="line">@Override</div><div class="line">public void poll(long timeout) throws IOException &#123;</div><div class="line">    if (timeout &lt; 0)</div><div class="line">        throw new IllegalArgumentException(&quot;timeout should be &gt;= 0&quot;);</div><div class="line"></div><div class="line">    clear();</div><div class="line"></div><div class="line">    if (hasStagedReceives() || !immediatelyConnectedKeys.isEmpty())</div><div class="line">        timeout = 0;</div><div class="line"></div><div class="line">    /* check ready keys */</div><div class="line">    long startSelect = time.nanoseconds();</div><div class="line">    int readyKeys = select(timeout);</div><div class="line">    long endSelect = time.nanoseconds();</div><div class="line">    currentTimeNanos = endSelect;</div><div class="line">    this.sensors.selectTime.record(endSelect - startSelect, time.milliseconds());</div><div class="line"></div><div class="line">    if (readyKeys &gt; 0 || !immediatelyConnectedKeys.isEmpty()) &#123;</div><div class="line">        pollSelectionKeys(this.nioSelector.selectedKeys(), false);</div><div class="line">        pollSelectionKeys(immediatelyConnectedKeys, true);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    addToCompletedReceives();</div><div class="line"></div><div class="line">    long endIo = time.nanoseconds();</div><div class="line">    this.sensors.ioTime.record(endIo - endSelect, time.milliseconds());</div><div class="line">    maybeCloseOldestConnection();</div><div class="line">&#125;</div><div class="line"></div><div class="line"></div><div class="line">private void pollSelectionKeys(Iterable&lt;SelectionKey&gt; selectionKeys, boolean isImmediatelyConnected) &#123;</div><div class="line">    Iterator&lt;SelectionKey&gt; iterator = selectionKeys.iterator();</div><div class="line">    while (iterator.hasNext()) &#123;</div><div class="line">        SelectionKey key = iterator.next();</div><div class="line">        iterator.remove();</div><div class="line">        KafkaChannel channel = channel(key);</div><div class="line">            /* if channel is ready read from any connections that have readable data */</div><div class="line">            if (channel.ready() &amp;&amp; key.isReadable() &amp;&amp; !hasStagedReceive(channel)) &#123;</div><div class="line">                NetworkReceive networkReceive;</div><div class="line">                while ((networkReceive = channel.read()) != null)</div><div class="line">                    addToStagedReceives(channel, networkReceive);</div><div class="line">&#125;</div><div class="line"></div><div class="line">private void addToStagedReceives(KafkaChannel channel, NetworkReceive receive) &#123;</div><div class="line">    if (!stagedReceives.containsKey(channel))</div><div class="line">        stagedReceives.put(channel, new ArrayDeque&lt;NetworkReceive&gt;());</div><div class="line"></div><div class="line">    Deque&lt;NetworkReceive&gt; deque = stagedReceives.get(channel);</div><div class="line">    deque.add(receive);</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>我们看到如果当前channel已经准备好并且SelectionKey已经可以读取并且没有staged receive，那么就把收到的消息缓存到Map<kafkachannel, deque<networkreceive="">&gt; stagedReceives这个里面。然后我们看下后续是怎么处理这些缓存的消息的。<br>上面poll方法处理完了pollSelectionKeys之后，就会调用addToCompletedReceives，从方法名字也可以看出，它是把上面暂存的stagedReceives放进一个List<networkreceive> completedReceives里面。<br>下面handleCompletedReceives会用到这个list</networkreceive></kafkachannel,></p>
+<p><font color="#08c">NetworkClient</font><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div></pre></td><td class="code"><pre><div class="line">public List&lt;ClientResponse&gt; poll(long timeout, long now) &#123;</div><div class="line">    long metadataTimeout = metadataUpdater.maybeUpdate(now);</div><div class="line">    try &#123;</div><div class="line">        this.selector.poll(Utils.min(timeout, metadataTimeout, requestTimeoutMs));</div><div class="line">    &#125; catch (IOException e) &#123;</div><div class="line">        log.error(&quot;Unexpected error during I/O&quot;, e);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    // process completed actions</div><div class="line">    long updatedNow = this.time.milliseconds();</div><div class="line">    List&lt;ClientResponse&gt; responses = new ArrayList&lt;&gt;();</div><div class="line">    handleCompletedSends(responses, updatedNow);</div><div class="line">    handleCompletedReceives(responses, updatedNow);</div><div class="line">    handleDisconnections(responses, updatedNow);</div><div class="line">    handleConnections();</div><div class="line">    handleTimedOutRequests(responses, updatedNow);</div><div class="line"></div><div class="line">    // invoke callbacks</div><div class="line">    for (ClientResponse response : responses) &#123;</div><div class="line">        if (response.request().hasCallback()) &#123;</div><div class="line">            try &#123;</div><div class="line">                response.request().callback().onComplete(response);</div><div class="line">            &#125; catch (Exception e) &#123;</div><div class="line">                log.error(&quot;Uncaught error in request completion:&quot;, e);</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    return responses;</div><div class="line">&#125;</div><div class="line"></div><div class="line">private void handleCompletedReceives(List&lt;ClientResponse&gt; responses, long now) &#123;</div><div class="line">    for (NetworkReceive receive : this.selector.completedReceives()) &#123;</div><div class="line">        String source = receive.source();</div><div class="line">        ClientRequest req = inFlightRequests.completeNext(source);</div><div class="line">        Struct body = parseResponse(receive.payload(), req.request().header());</div><div class="line">        if (!metadataUpdater.maybeHandleCompletedReceive(req, now, body))</div><div class="line">            responses.add(new ClientResponse(req, now, false, body));</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>可以看到上述方法会根据之前获得的List<networkreceive> completedReceives组装response，然后调用response.request().callback().onComplete(response);最终会触发Fetcher类sendFetches方法中注册RequestFutureListener的回调onSuccess方法<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div></pre></td><td class="code"><pre><div class="line">public void sendFetches() &#123;</div><div class="line">    for (Map.Entry&lt;Node, FetchRequest&gt; fetchEntry: createFetchRequests().entrySet()) &#123;</div><div class="line">        final FetchRequest request = fetchEntry.getValue();</div><div class="line">        client.send(fetchEntry.getKey(), ApiKeys.FETCH, request)</div><div class="line">                .addListener(new RequestFutureListener&lt;ClientResponse&gt;() &#123;</div><div class="line">                    @Override</div><div class="line">                    public void onSuccess(ClientResponse resp) &#123;</div><div class="line">                        FetchResponse response = new FetchResponse(resp.responseBody());</div><div class="line">                        Set&lt;TopicPartition&gt; partitions = new HashSet&lt;&gt;(response.responseData().keySet());</div><div class="line">                        FetchResponseMetricAggregator metricAggregator = new FetchResponseMetricAggregator(sensors, partitions);</div><div class="line"></div><div class="line">                        for (Map.Entry&lt;TopicPartition, FetchResponse.PartitionData&gt; entry : response.responseData().entrySet()) &#123;</div><div class="line">                            TopicPartition partition = entry.getKey();</div><div class="line">                            long fetchOffset = request.fetchData().get(partition).offset;</div><div class="line">                            FetchResponse.PartitionData fetchData = entry.getValue();</div><div class="line">                            completedFetches.add(new CompletedFetch(partition, fetchOffset, fetchData, metricAggregator));</div><div class="line">                        &#125;</div><div class="line"></div><div class="line">                        sensors.fetchLatency.record(resp.requestLatencyMs());</div><div class="line">                        sensors.fetchThrottleTimeSensor.record(response.getThrottleTime());</div><div class="line">                    &#125;</div><div class="line"></div><div class="line">                    @Override</div><div class="line">                    public void onFailure(RuntimeException e) &#123;</div><div class="line">                        log.debug(&quot;Fetch failed&quot;, e);</div><div class="line">                    &#125;</div><div class="line">                &#125;);</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></networkreceive></p>
+<p>可以看到onSuccess回调方法会把record封装后，添加到List<completedfetch> completedFetches，之前上面讲到的pollOnce方法会调用<br>fetcher.fetchedRecords()方法，这个方法会根据获得的completedFetches，返回一个封装好的Map<topicpartition, list<consumerrecord<k,="" v="">&gt;&gt; recordMap。</topicpartition,></completedfetch></p>
+<h2 id="消费获取的record"><a href="#消费获取的record" class="headerlink" title="消费获取的record"></a>消费获取的record</h2><h3 id="配置了自动commit"><a href="#配置了自动commit" class="headerlink" title="配置了自动commit"></a>配置了自动commit</h3><p>回到最开始的KafkaMessageListenerContainer.ListenerConsumer类的run方法<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div></pre></td><td class="code"><pre><div class="line">ConsumerRecords&lt;K, V&gt; records = this.consumer.poll(this.containerProperties.getPollTimeout());</div><div class="line">if (records != null &amp;&amp; this.logger.isDebugEnabled()) &#123;</div><div class="line">	this.logger.debug(&quot;Received: &quot; + records.count() + &quot; records&quot;);</div><div class="line">&#125;</div><div class="line">if (records != null &amp;&amp; records.count() &gt; 0) &#123;</div><div class="line">	if (this.containerProperties.getIdleEventInterval() != null) &#123;</div><div class="line">	    lastReceive = System.currentTimeMillis();</div><div class="line">	&#125;</div><div class="line">	if (this.autoCommit) &#123;</div><div class="line">		invokeListener(records);</div><div class="line">	&#125;</div><div class="line">	else &#123;</div><div class="line">		if (sendToListener(records)) &#123;</div><div class="line">			if (this.assignedPartitions != null) &#123;</div><div class="line">		    	this.consumer.pause(this.assignedPartitions）;</div><div class="line">				this.paused = true;</div><div class="line">				this.unsent = records;</div><div class="line">			&#125;</div><div class="line">		&#125;</div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>可以看到若获取到的records不为空，并且配置了自动commit，则会执行invokeListener(records);</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div></pre></td><td class="code"><pre><div class="line">private void invokeListener(final ConsumerRecords&lt;K, V&gt; records) &#123;</div><div class="line">	if (this.isBatchListener) &#123;</div><div class="line">	    invokeBatchListener(records);</div><div class="line">    &#125;else &#123;</div><div class="line">	    invokeRecordListener(records);</div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line">private void invokeRecordListener(final ConsumerRecords&lt;K, V&gt; records) &#123;</div><div class="line">    Iterator&lt;ConsumerRecord&lt;K, V&gt;&gt; iterator = records.iterator();</div><div class="line">    while (iterator.hasNext() &amp;&amp; (this.autoCommit || (this.invoker != null &amp;&amp; this.invoker.active))) &#123;</div><div class="line">        final ConsumerRecord&lt;K, V&gt; record = iterator.next();</div><div class="line">        if (this.logger.isTraceEnabled()) &#123;</div><div class="line">            this.logger.trace(&quot;Processing &quot; + record);</div><div class="line">        &#125;</div><div class="line">        try &#123;</div><div class="line">            if (this.acknowledgingMessageListener != null) &#123;</div><div class="line">                this.acknowledgingMessageListener.onMessage(record,</div><div class="line">                        this.isAnyManualAck</div><div class="line">                                ? new ConsumerAcknowledgment(record, this.isManualImmediateAck)</div><div class="line">                                : null);</div><div class="line">            &#125;</div><div class="line">            else &#123;</div><div class="line">                this.listener.onMessage(record);</div><div class="line">            &#125;</div><div class="line">            if (!this.isAnyManualAck &amp;&amp; !this.autoCommit) &#123;</div><div class="line">                this.acks.add(record);</div><div class="line">            &#125;</div><div class="line">            if (this.isRecordAck) &#123;</div><div class="line">                this.consumer.wakeup();</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line">        catch (Exception e) &#123;</div><div class="line">            if (this.containerProperties.isAckOnError() &amp;&amp; !this.autoCommit) &#123;</div><div class="line">                this.acks.add(record);</div><div class="line">            &#125;</div><div class="line">            try &#123;</div><div class="line">                this.errorHandler.handle(e, record);</div><div class="line">            &#125;</div><div class="line">            catch (Exception ee) &#123;</div><div class="line">                this.logger.error(&quot;Error handler threw an exception&quot;, ee);</div><div class="line">            &#125;</div><div class="line">            catch (Error er) &#123; //NOSONAR</div><div class="line">                this.logger.error(&quot;Error handler threw an error&quot;, er);</div><div class="line">                throw er;</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">    if (this.isManualAck || this.isBatchAck) &#123;</div><div class="line">        this.consumer.wakeup();</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>可以看到最终会调用到this.listener.onMessage(record);<br>这个listnerer就是我们最开始给ContainerProperties设置的MessageListener，这样就调用到了这个listener的onMessage方法，也就回调到了业务逻辑了。可以看到这里就和我们上一篇文章有点比较像了，上一篇文章我们也可以添加发送消息成功后的回调函数，这里也可以看做是一个回调函数用来消费消息。两者都是在发送/接受消息的io线程里面。所以尽量都不能在这里面做一些比较耗时的操作，如果实在需要，建议开启子线程来处理。</p>
+<h3 id="没有配置自动commit"><a href="#没有配置自动commit" class="headerlink" title="没有配置自动commit"></a>没有配置自动commit</h3><p>我们可以看到KafkaMessageListenerContainer.ListenerConsumer的run方法开始，有以下逻辑<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">if (!this.autoCommit) &#123;</div><div class="line">    startInvoker();</div><div class="line">&#125;</div><div class="line"></div><div class="line">private void startInvoker() &#123;</div><div class="line">	ListenerConsumer.this.invoker = new ListenerInvoker();</div><div class="line">	ListenerConsumer.this.listenerInvokerFuture =      this.containerProperties.getListenerTaskExecutor().submit(ListenerConsumer.this.invoker);</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>可以看到如果没有配置自动commit，就会用到了KafkaMessageListenerContainer的doStart方法中设置的listenerTaskExecutor，并开启了一个<font color="#08c">‘-kafka-listener-‘线程</font>。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div></pre></td><td class="code"><pre><div class="line">if (this.autoCommit) &#123;</div><div class="line">	invokeListener(records);</div><div class="line">&#125;</div><div class="line">else &#123;</div><div class="line">	if (sendToListener(records)) &#123;</div><div class="line">		if (this.assignedPartitions != null) &#123;</div><div class="line">			this.consumer.pause(this.assignedPartitions);</div><div class="line">			this.paused = true;</div><div class="line">			this.unsent = records;</div><div class="line">		&#125;</div><div class="line">	&#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line">private boolean sendToListener(final ConsumerRecords&lt;K, V&gt; records) throws InterruptedException &#123;</div><div class="line">	if (this.containerProperties.isPauseEnabled() &amp;&amp; CollectionUtils.isEmpty(this.definedPartitions)) &#123;</div><div class="line">		return !this.recordsToProcess.offer(records, this.containerProperties.getPauseAfter(),</div><div class="line">				TimeUnit.MILLISECONDS);</div><div class="line">	&#125;</div><div class="line">	else &#123;</div><div class="line">		this.recordsToProcess.put(records);</div><div class="line">		return false;</div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>可以看到如果不是自动commit，则会把这个record丢进BlockingQueue<consumerrecords<k, v="">&gt; recordsToProcess 里面，然后上面开启的<font color="#08c">‘-kafka-listener-‘线程</font>会用到这个<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div></pre></td><td class="code"><pre><div class="line">public void run() &#123;</div><div class="line">	Assert.isTrue(this.active, &quot;This instance is not active anymore&quot;);</div><div class="line">	if (ListenerConsumer.this.theListener instanceof ConsumerSeekAware) &#123;</div><div class="line">		((ConsumerSeekAware) ListenerConsumer.this.theListener).registerSeekCallback(ListenerConsumer.this);</div><div class="line">	&#125;</div><div class="line">	try &#123;</div><div class="line">		this.executingThread = Thread.currentThread();</div><div class="line">		while (this.active) &#123;</div><div class="line">			try &#123;</div><div class="line">				ConsumerRecords&lt;K, V&gt; records = ListenerConsumer.this.recordsToProcess.poll(1,</div><div class="line">						TimeUnit.SECONDS);</div><div class="line">				if (this.active) &#123;</div><div class="line">					if (records != null) &#123;</div><div class="line">						invokeListener(records);</div><div class="line">					&#125;</div><div class="line">					else &#123;</div><div class="line">						if (ListenerConsumer.this.logger.isTraceEnabled()) &#123;</div><div class="line">							ListenerConsumer.this.logger.trace(&quot;No records to process&quot;);</div><div class="line">						&#125;</div><div class="line">					&#125;</div><div class="line">				&#125;</div><div class="line">			&#125;</div><div class="line">			catch (InterruptedException e) &#123;</div><div class="line">				if (!this.active) &#123;</div><div class="line">					Thread.currentThread().interrupt();</div><div class="line">				&#125;</div><div class="line">				else &#123;</div><div class="line">					ListenerConsumer.this.logger.debug(&quot;Interrupt ignored&quot;);</div><div class="line">				&#125;</div><div class="line">			&#125;</div><div class="line">			if (!ListenerConsumer.this.isManualImmediateAck &amp;&amp; this.active) &#123;</div><div class="line">				ListenerConsumer.this.consumer.wakeup();</div><div class="line">			&#125;</div><div class="line">		&#125;</div><div class="line">	&#125;</div><div class="line">	finally &#123;</div><div class="line">		this.active = false;</div><div class="line">		this.exitLatch.countDown();</div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></consumerrecords<k,></p>
+<p>可以看到这里先从recordsToProcess取出一条record，如果record不为空，则跟之前一样调用invokeListener(records);所以我们可以理解这个<font color="#08c">‘-kafka-listener-‘线程</font>仅仅是把消息的真正消费的逻辑从consumer的io线程搬到了这个单独的线程。</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/spring-kafka/" rel="tag"># spring-kafka</a>
+          
+            <a href="/tags/NIO/" rel="tag"># NIO</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/12/17/kafkaProducer/" rel="next" title="spring-kafka源码分析一(Producer)">
+                <i class="fa fa-chevron-left"></i> spring-kafka源码分析一(Producer)
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/01/24/elasticJob/" rel="prev" title="elastic-job源码分析">
+                elastic-job源码分析 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div id="cloud-tie-wrapper" class="cloud-tie-wrapper"></div>
+      <script>
+        var cloudTieConfig = {
+          url: document.location.href,
+          sourceId: "",
+          productKey: "f6968bd56d71417cad7a11c8df334d35",
+          target: "cloud-tie-wrapper"
+        };
+      </script>
+      <script src="https://img1.cache.netease.com/f2e/tie/yun/sdk/loader.js"></script>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/uploads/avatar.png"
+               alt="Smartの小明" />
+          <p class="site-author-name" itemprop="name">Smartの小明</p>
+          <p class="site-description motion-element" itemprop="description">屌丝搬砖程序猿,码农界的搬运工,哪里需要搬哪里</p>
+        </div>
+
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">18</span>
+              <span class="site-state-item-name">posts</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">4</span>
+                <span class="site-state-item-name">categories</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">15</span>
+                <span class="site-state-item-name">tags</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/q6413260" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/1855404367/profile?rightmod=1&wvr=6&mod=personinfo&is_all=1" target="_blank" title="微博">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  微博
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://www.douban.com/people/142298114/" target="_blank" title="豆瓣">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  豆瓣
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://www.zhihu.com/people/xiaoming1990" target="_blank" title="知乎">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  知乎
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#KafkaMessageListenerContainer-start"><span class="nav-number">1.</span> <span class="nav-text">KafkaMessageListenerContainer.start</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#从broker获取record"><span class="nav-number">2.</span> <span class="nav-text">从broker获取record</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#消费获取的record"><span class="nav-number">3.</span> <span class="nav-text">消费获取的record</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#配置了自动commit"><span class="nav-number">3.1.</span> <span class="nav-text">配置了自动commit</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#没有配置自动commit"><span class="nav-number">3.2.</span> <span class="nav-text">没有配置自动commit</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Smartの小明</span>
+</div>
+
+
+<div class="powered-by">
+  Powered by <a class="theme-link" href="https://hexo.io">Hexo</a>
+</div>
+
+<div class="theme-info">
+  Theme -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+
+        
+
+<div class="busuanzi-count">
+
+  <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv"><i class="fa fa-user"></i><span class="busuanzi-value" id="busuanzi_value_site_uv"></span></span>
+  
+
+  
+    <span class="site-pv"><i class="fa fa-eye"></i><span class="busuanzi-value" id="busuanzi_value_site_pv"></span></span>
+  
+  
+</div>
+
+
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.0"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+	
+
+
+
+
+  
+  
+
+  
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.1.js"></script>
+  <script>AV.initialize("Y2lqjwOrlt5p333cMSW3HNxD-gzGzoHsz", "Y6lssmQDLyXlT0HE1pgVn0UK");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+  
+
+
+</body>
+</html>
