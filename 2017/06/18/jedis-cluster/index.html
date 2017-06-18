@@ -1,0 +1,873 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="en">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="redis-cluster,jedis," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/uploads/avatar.png?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="创建redisClient BinaryJedisCluster我们可以从jedis给出官方的redis-clusterdemo上可以看到通过构造一个BinaryJedisCluster，这个类就是jedis给我们提供的一个与redis-cluster集群交互的一个基本接口类，有了这个类我们就能执行各种查询写入操作了。1234Set&amp;lt;HostAndPort&amp;gt; set = new Ha">
+<meta property="og:type" content="article">
+<meta property="og:title" content="jedis源码分析">
+<meta property="og:url" content="http://yeming.me/2017/06/18/jedis-cluster/index.html">
+<meta property="og:site_name" content="Smartの小明">
+<meta property="og:description" content="创建redisClient BinaryJedisCluster我们可以从jedis给出官方的redis-clusterdemo上可以看到通过构造一个BinaryJedisCluster，这个类就是jedis给我们提供的一个与redis-cluster集群交互的一个基本接口类，有了这个类我们就能执行各种查询写入操作了。1234Set&amp;lt;HostAndPort&amp;gt; set = new Ha">
+<meta property="og:image" content="https://coding.net/u/lightoheaven/p/image2/git/raw/master/201706/jedis-cluster.jpeg">
+<meta property="og:updated_time" content="2017-06-18T15:58:15.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="jedis源码分析">
+<meta name="twitter:description" content="创建redisClient BinaryJedisCluster我们可以从jedis给出官方的redis-clusterdemo上可以看到通过构造一个BinaryJedisCluster，这个类就是jedis给我们提供的一个与redis-cluster集群交互的一个基本接口类，有了这个类我们就能执行各种查询写入操作了。1234Set&amp;lt;HostAndPort&amp;gt; set = new Ha">
+<meta name="twitter:image" content="https://coding.net/u/lightoheaven/p/image2/git/raw/master/201706/jedis-cluster.jpeg">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '6252881861358388000',
+      author: '小明'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yeming.me/2017/06/18/jedis-cluster/"/>
+
+
+
+
+
+  <title> jedis源码分析 | Smartの小明 </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="en">
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">Smartの小明</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle">屌丝搬砖程序猿,码农界的搬运工,哪里需要搬哪里</p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            Categories
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            About
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            Archives
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            Tags
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+  <link itemprop="mainEntityOfPage" href="http://yeming.me/2017/06/18/jedis-cluster/">
+
+  <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <meta itemprop="name" content="Smartの小明">
+    <meta itemprop="description" content="">
+    <meta itemprop="image" content="/uploads/avatar.png">
+  </span>
+
+  <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+    <meta itemprop="name" content="Smartの小明">
+    <span style="display:none" itemprop="logo" itemscope itemtype="http://schema.org/ImageObject">
+      <img style="display:none;" itemprop="url image" alt="Smartの小明" src="">
+    </span>
+  </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                jedis源码分析
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-06-18T23:56:49+08:00">
+                2017-06-18
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+              <span class="post-meta-divider">|</span>
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/技术分享/" itemprop="url" rel="index">
+                    <span itemprop="name">技术分享</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+
+          
+          
+             <span id="/2017/06/18/jedis-cluster/" class="leancloud_visitors" data-flag-title="jedis源码分析">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               <span class="post-meta-item-text">Visitors </span>
+               <span class="leancloud-visitors-count"></span>
+              </span>
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="page-pv"><i class="fa fa-file-o"></i>
+            <span class="busuanzi-value" id="busuanzi_value_page_pv" ></span>
+            </span>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p><img src="https://coding.net/u/lightoheaven/p/image2/git/raw/master/201706/jedis-cluster.jpeg" alt="类图"></p>
+<h2 id="创建redisClient-BinaryJedisCluster"><a href="#创建redisClient-BinaryJedisCluster" class="headerlink" title="创建redisClient BinaryJedisCluster"></a>创建redisClient BinaryJedisCluster</h2><p>我们可以从jedis给出官方的redis-clusterdemo上可以看到通过构造一个BinaryJedisCluster，这个类就是jedis给我们提供的一个与redis-cluster集群交互的一个基本接口类，有了这个类我们就能执行各种查询写入操作了。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">Set&lt;HostAndPort&gt; set = new HashSet&lt;&gt;();</div><div class="line">HostAndPort hostAndPort = new HostAndPort(&quot;127.0.0.1&quot;, 7000);</div><div class="line">set.add(hostAndPort);</div><div class="line">BinaryJedisCluster client = new BinaryJedisCluster(set);</div></pre></td></tr></table></figure></p>
+<a id="more"></a>
+<ul>
+<li>我们从BinaryJedisCluster的构造函数一路debug下去，可以看到这个类有一个JedisClusterConnectionHandler成员变量，在该类的构造函数当中，会去给这个成员变量赋值。进而会调用JedisSlotBasedConnectionHandler类的构造方法，又会调用到父类的构造方法。</li>
+<li>JedisClusterConnectionHandler类中有一个JedisClusterInfoCache成员变量，在该类的构造函数中，会给JedisClusterInfoCache初始化。JedisSlotBasedConnectionHandler这个类是该类的子类，实现了抽象父类的getConnection，getConnectionFromSlot(int)两个方法。</li>
+<li>JedisClusterInfoCache这个类缓存了redis集群的集群分片信息，我们下面来看下。</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div></pre></td><td class="code"><pre><div class="line">abstract class JedisClusterConnectionHandler&#123;</div><div class="line">    protected final JedisClusterInfoCache cache;</div><div class="line">private void initializeSlotsCache(Set&lt;HostAndPort&gt; startNodes, GenericObjectPoolConfig poolConfig, String password) &#123;</div><div class="line">    for (HostAndPort hostAndPort : startNodes) &#123;</div><div class="line">      Jedis jedis = new Jedis(hostAndPort.getHost(), hostAndPort.getPort());</div><div class="line">      try &#123;</div><div class="line">        cache.discoverClusterNodesAndSlots(jedis);</div><div class="line">        break;</div><div class="line">      &#125; catch (JedisConnectionException e) &#123;</div><div class="line">      &#125; finally &#123;</div><div class="line">        if (jedis != null) &#123;</div><div class="line">          jedis.close();</div><div class="line">        &#125;</div><div class="line">      &#125;</div><div class="line">    &#125;</div><div class="line">  &#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line">public class JedisClusterInfoCache &#123;</div><div class="line">    private final Map&lt;String, JedisPool&gt; nodes = new HashMap&lt;String, JedisPool&gt;();</div><div class="line">    private final Map&lt;Integer, JedisPool&gt; slots = new HashMap&lt;Integer, JedisPool&gt;();</div><div class="line">    </div><div class="line">    public void discoverClusterNodesAndSlots(Jedis jedis) &#123;</div><div class="line">        w.lock();</div><div class="line">        try &#123;</div><div class="line">          reset();</div><div class="line">          List&lt;Object&gt; slots = jedis.clusterSlots();</div><div class="line">    </div><div class="line">          for (Object slotInfoObj : slots) &#123;</div><div class="line">            List&lt;Object&gt; slotInfo = (List&lt;Object&gt;) slotInfoObj;</div><div class="line">            if (slotInfo.size() &lt;= MASTER_NODE_INDEX) &#123;</div><div class="line">              continue;</div><div class="line">            &#125;</div><div class="line">            List&lt;Integer&gt; slotNums = getAssignedSlotArray(slotInfo);</div><div class="line">            // hostInfos</div><div class="line">            int size = slotInfo.size();</div><div class="line">            for (int i = MASTER_NODE_INDEX; i &lt; size; i++) &#123;</div><div class="line">              List&lt;Object&gt; hostInfos = (List&lt;Object&gt;) slotInfo.get(i);</div><div class="line">              if (hostInfos.size() &lt;= 0) &#123;</div><div class="line">                continue;</div><div class="line">              &#125;</div><div class="line">              HostAndPort targetNode = generateHostAndPort(hostInfos);</div><div class="line">              setupNodeIfNotExist(targetNode);</div><div class="line">              if (i == MASTER_NODE_INDEX) &#123;</div><div class="line">                assignSlotsToNode(slotNums, targetNode);</div><div class="line">              &#125;</div><div class="line">            &#125;</div><div class="line">          &#125;</div><div class="line">        &#125; finally &#123;</div><div class="line">          w.unlock();</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>可以看到，JedisClusterInfoCache的discoverClusterNodesAndSlots方法通过任意一个jedis实例然后调用jedis.clusterSlots()拿到redis集群分配的slot信息，然后把slot信息以及hostinfo信息缓存到两个对应的JedisPool map里面，这样启动阶段基本完成了。</p>
+<h2 id="通过BinaryJedisCluster与redis-cluster交互"><a href="#通过BinaryJedisCluster与redis-cluster交互" class="headerlink" title="通过BinaryJedisCluster与redis-cluster交互"></a>通过BinaryJedisCluster与redis-cluster交互</h2><p>我们通过以下代码入手<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line">BinaryJedisCluster client = new BinaryJedisCluster(set);</div><div class="line">client.get(&quot;key&quot;.getBytes());</div><div class="line"></div><div class="line">public class BinaryJedisCluster&#123;</div><div class="line">    @Override</div><div class="line">  public byte[] get(final byte[] key) &#123;</div><div class="line">    return new JedisClusterCommand&lt;byte[]&gt;(connectionHandler, maxAttempts) &#123;</div><div class="line">      @Override</div><div class="line">      public byte[] execute(Jedis connection) &#123;</div><div class="line">        return connection.get(key);</div><div class="line">      &#125;</div><div class="line">    &#125;.runBinary(key);</div><div class="line">  &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>上述通过一个简单的get操作，最终会调用到BinaryJedisCluster.runBinary(key)方法。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div></pre></td><td class="code"><pre><div class="line">public abstract class JedisClusterCommand&lt;T&gt; &#123;</div><div class="line">    private T runWithRetries(byte[] key, int attempts, boolean tryRandomNode, boolean asking) &#123;</div><div class="line">    if (attempts &lt;= 0) &#123;</div><div class="line">      throw new JedisClusterMaxRedirectionsException(&quot;Too many Cluster redirections?&quot;);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    Jedis connection = null;</div><div class="line">    try &#123;</div><div class="line"></div><div class="line">      if (asking) &#123;</div><div class="line">        // TODO: Pipeline asking with the original command to make it</div><div class="line">        // faster....</div><div class="line">        connection = askConnection.get();</div><div class="line">        connection.asking();</div><div class="line"></div><div class="line">        // if asking success, reset asking flag</div><div class="line">        asking = false;</div><div class="line">      &#125; else &#123;</div><div class="line">        if (tryRandomNode) &#123;</div><div class="line">          connection = connectionHandler.getConnection();</div><div class="line">        &#125; else &#123;</div><div class="line">          connection = connectionHandler.getConnectionFromSlot(JedisClusterCRC16.getSlot(key));</div><div class="line">        &#125;</div><div class="line">      &#125;</div><div class="line"></div><div class="line">      return execute(connection);</div><div class="line"></div><div class="line">    &#125; catch (JedisNoReachableClusterNodeException jnrcne) &#123;</div><div class="line">      throw jnrcne;</div><div class="line">    &#125; catch (JedisConnectionException jce) &#123;</div><div class="line">      // release current connection before recursion</div><div class="line">      releaseConnection(connection);</div><div class="line">      connection = null;</div><div class="line"></div><div class="line">      if (attempts &lt;= 1) &#123;</div><div class="line">        //We need this because if node is not reachable anymore - we need to finally initiate slots renewing,</div><div class="line">        //or we can stuck with cluster state without one node in opposite case.</div><div class="line">        //But now if maxAttempts = 1 or 2 we will do it too often. For each time-outed request.</div><div class="line">        //TODO make tracking of successful/unsuccessful operations for node - do renewing only</div><div class="line">        //if there were no successful responses from this node last few seconds</div><div class="line">        this.connectionHandler.renewSlotCache();</div><div class="line"></div><div class="line">        //no more redirections left, throw original exception, not JedisClusterMaxRedirectionsException, because it&apos;s not MOVED situation</div><div class="line">        throw jce;</div><div class="line">      &#125;</div><div class="line"></div><div class="line">      return runWithRetries(key, attempts - 1, tryRandomNode, asking);</div><div class="line">    &#125; catch (JedisRedirectionException jre) &#123;</div><div class="line">      // if MOVED redirection occurred,</div><div class="line">      if (jre instanceof JedisMovedDataException) &#123;</div><div class="line">        // it rebuilds cluster&apos;s slot cache</div><div class="line">        // recommended by Redis cluster specification</div><div class="line">        this.connectionHandler.renewSlotCache(connection);</div><div class="line">      &#125;</div><div class="line">      // release current connection before recursion or renewing</div><div class="line">      releaseConnection(connection);</div><div class="line">      connection = null;</div><div class="line"></div><div class="line">      if (jre instanceof JedisAskDataException) &#123;</div><div class="line">        asking = true;</div><div class="line">        askConnection.set(this.connectionHandler.getConnectionFromNode(jre.getTargetNode()));</div><div class="line">      &#125; else if (jre instanceof JedisMovedDataException) &#123;</div><div class="line">      &#125; else &#123;</div><div class="line">        throw new JedisClusterException(jre);</div><div class="line">      &#125;</div><div class="line">      return runWithRetries(key, attempts - 1, false, asking);</div><div class="line">    &#125; finally &#123;</div><div class="line">      releaseConnection(connection);</div><div class="line">    &#125;</div><div class="line">  &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<ul>
+<li>正常情况：上述代码connection=connectionHandler.getConnectionFromSlot(JedisClusterCRC16.getSlot(key));这个是根据key来计算对应的slot，然后根据启动阶段JedisClusterInfoCache的private final Map<integer, jedispool=""> slots = new HashMap<integer,jedispool>()属性来找到该slot对应的JedisPool，然后从pool中获取一个jedis connection，最终执行connection.get(key);</integer,jedispool></integer,></li>
+<li>异常情况1：JedisNoReachableClusterNodeException，显然都没有可以访问的节点了，直接向上层抛出，不做处理。</li>
+<li>异常情况2：JedisConnectionException会进行重试，如果当前已经是最后一次重试，则this.connectionHandler.renewSlotCache()更新slotcache。</li>
+<li>异常情况3：JedisRedirectionException和异常情况2差不多基本也是更新slot，不同是此时jedis是通的，所以可以直接传进renewSlotCache(jedis)，避免renewSlotCache方法内部多余的轮询获取jedis的操作。然后重试。</li>
+</ul>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/redis-cluster/" rel="tag"># redis-cluster</a>
+          
+            <a href="/tags/jedis/" rel="tag"># jedis</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/04/16/springValueAnnotation/" rel="next" title="spring容器启动@Value属性无法注入">
+                <i class="fa fa-chevron-left"></i> spring容器启动@Value属性无法注入
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div id="cloud-tie-wrapper" class="cloud-tie-wrapper"></div>
+      <script>
+        var cloudTieConfig = {
+          url: document.location.href,
+          sourceId: "",
+          productKey: "f6968bd56d71417cad7a11c8df334d35",
+          target: "cloud-tie-wrapper"
+        };
+      </script>
+      <script src="https://img1.cache.netease.com/f2e/tie/yun/sdk/loader.js"></script>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/uploads/avatar.png"
+               alt="Smartの小明" />
+          <p class="site-author-name" itemprop="name">Smartの小明</p>
+          <p class="site-description motion-element" itemprop="description">屌丝搬砖程序猿,码农界的搬运工,哪里需要搬哪里</p>
+        </div>
+
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">19</span>
+              <span class="site-state-item-name">posts</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">4</span>
+                <span class="site-state-item-name">categories</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">17</span>
+                <span class="site-state-item-name">tags</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/q6413260" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/1855404367/profile?rightmod=1&wvr=6&mod=personinfo&is_all=1" target="_blank" title="微博">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  微博
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://www.douban.com/people/142298114/" target="_blank" title="豆瓣">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  豆瓣
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://www.zhihu.com/people/xiaoming1990" target="_blank" title="知乎">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  知乎
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#创建redisClient-BinaryJedisCluster"><span class="nav-number">1.</span> <span class="nav-text">创建redisClient BinaryJedisCluster</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#通过BinaryJedisCluster与redis-cluster交互"><span class="nav-number">2.</span> <span class="nav-text">通过BinaryJedisCluster与redis-cluster交互</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Smartの小明</span>
+</div>
+
+
+<div class="powered-by">
+  Powered by <a class="theme-link" href="https://hexo.io">Hexo</a>
+</div>
+
+<div class="theme-info">
+  Theme -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+
+        
+
+<div class="busuanzi-count">
+
+  <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv"><i class="fa fa-user"></i><span class="busuanzi-value" id="busuanzi_value_site_uv"></span></span>
+  
+
+  
+    <span class="site-pv"><i class="fa fa-eye"></i><span class="busuanzi-value" id="busuanzi_value_site_pv"></span></span>
+  
+  
+</div>
+
+
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.0"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+	
+
+
+
+
+  
+  
+
+  
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.1.js"></script>
+  <script>AV.initialize("Y2lqjwOrlt5p333cMSW3HNxD-gzGzoHsz", "Y6lssmQDLyXlT0HE1pgVn0UK");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+  
+
+
+</body>
+</html>
