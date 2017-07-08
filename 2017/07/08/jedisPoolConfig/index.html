@@ -68,7 +68,7 @@
 <link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
 
 
-  <meta name="keywords" content="个人博客上线," />
+  <meta name="keywords" content="redis-cluster,jedis," />
 
 
 
@@ -84,21 +84,16 @@
 
 
 
-<meta name="description" content="We如你所见，我的个人博客终于搞定了。前前后后大概花了一个多月，经历了种种困难，还好坚持下来了。现在网站既然搞定了，就开始写自己的第一篇博客。主要讲述下创建个人博客的原因、经过以及今后的打算。
-原因大学毕业找工作经历其实从报考交大研究生，由于专业课只考了75分，心有不甘的离开校园。当时就意识到通信专业不太适合我，后来决定当程序员。网上看了各种大神的经验，都说程序员最好要写博客，经常总结一些技术。网">
+<meta name="description" content="最近有些其他业务部门的同学在线上环境redis有出现以下错误Unexpected end of stream，这个错误大致是因为，redis服务器端已经关闭了客户端的连接，而客户端不知道依然拿着原来的连接去访问redis服务器，结果就会报出这个exception。既然我们知道原因是服务器端主动关闭与客户端连接，那么我们下面看下有哪些情况会导致服务器端主动关闭连接。主要在redis.conf中有以下">
 <meta property="og:type" content="article">
-<meta property="og:title" content="第一篇博客">
-<meta property="og:url" content="http://yeming.me/2016/02/20/first-post/index.html">
+<meta property="og:title" content="JedisPool连接池相关配置">
+<meta property="og:url" content="http://yeming.me/2017/07/08/jedisPoolConfig/index.html">
 <meta property="og:site_name" content="Smartの小明">
-<meta property="og:description" content="We如你所见，我的个人博客终于搞定了。前前后后大概花了一个多月，经历了种种困难，还好坚持下来了。现在网站既然搞定了，就开始写自己的第一篇博客。主要讲述下创建个人博客的原因、经过以及今后的打算。
-原因大学毕业找工作经历其实从报考交大研究生，由于专业课只考了75分，心有不甘的离开校园。当时就意识到通信专业不太适合我，后来决定当程序员。网上看了各种大神的经验，都说程序员最好要写博客，经常总结一些技术。网">
-<meta property="og:image" content="https://coding.net/u/lightoheaven/p/image/git/raw/master/posts/201602/first-post/macpro.jpg">
-<meta property="og:updated_time" content="2016-11-28T06:40:16.000Z">
+<meta property="og:description" content="最近有些其他业务部门的同学在线上环境redis有出现以下错误Unexpected end of stream，这个错误大致是因为，redis服务器端已经关闭了客户端的连接，而客户端不知道依然拿着原来的连接去访问redis服务器，结果就会报出这个exception。既然我们知道原因是服务器端主动关闭与客户端连接，那么我们下面看下有哪些情况会导致服务器端主动关闭连接。主要在redis.conf中有以下">
+<meta property="og:updated_time" content="2017-07-08T06:38:59.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="第一篇博客">
-<meta name="twitter:description" content="We如你所见，我的个人博客终于搞定了。前前后后大概花了一个多月，经历了种种困难，还好坚持下来了。现在网站既然搞定了，就开始写自己的第一篇博客。主要讲述下创建个人博客的原因、经过以及今后的打算。
-原因大学毕业找工作经历其实从报考交大研究生，由于专业课只考了75分，心有不甘的离开校园。当时就意识到通信专业不太适合我，后来决定当程序员。网上看了各种大神的经验，都说程序员最好要写博客，经常总结一些技术。网">
-<meta name="twitter:image" content="https://coding.net/u/lightoheaven/p/image/git/raw/master/posts/201602/first-post/macpro.jpg">
+<meta name="twitter:title" content="JedisPool连接池相关配置">
+<meta name="twitter:description" content="最近有些其他业务部门的同学在线上环境redis有出现以下错误Unexpected end of stream，这个错误大致是因为，redis服务器端已经关闭了客户端的连接，而客户端不知道依然拿着原来的连接去访问redis服务器，结果就会报出这个exception。既然我们知道原因是服务器端主动关闭与客户端连接，那么我们下面看下有哪些情况会导致服务器端主动关闭连接。主要在redis.conf中有以下">
 
 
 
@@ -126,13 +121,13 @@
 
 
 
-  <link rel="canonical" href="http://yeming.me/2016/02/20/first-post/"/>
+  <link rel="canonical" href="http://yeming.me/2017/07/08/jedisPoolConfig/"/>
 
 
 
 
 
-  <title> 第一篇博客 | Smartの小明 </title>
+  <title> JedisPool连接池相关配置 | Smartの小明 </title>
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="en">
@@ -263,7 +258,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-  <link itemprop="mainEntityOfPage" href="http://yeming.me/2016/02/20/first-post/">
+  <link itemprop="mainEntityOfPage" href="http://yeming.me/2017/07/08/jedisPoolConfig/">
 
   <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
     <meta itemprop="name" content="Smartの小明">
@@ -287,7 +282,7 @@
             
             
               
-                第一篇博客
+                JedisPool连接池相关配置
               
             
           </h1>
@@ -300,8 +295,8 @@
                 <i class="fa fa-calendar-o"></i>
               </span>
               <span class="post-meta-item-text">Posted on</span>
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2016-02-20T00:00:00+08:00">
-                2016-02-20
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-07-08T14:37:50+08:00">
+                2017-07-08
               </time>
             
 
@@ -319,8 +314,8 @@
               <span class="post-meta-item-text">In</span>
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/随笔/" itemprop="url" rel="index">
-                    <span itemprop="name">随笔</span>
+                  <a href="/categories/技术分享/" itemprop="url" rel="index">
+                    <span itemprop="name">技术分享</span>
                   </a>
                 </span>
 
@@ -338,7 +333,7 @@
 
           
           
-             <span id="/2016/02/20/first-post/" class="leancloud_visitors" data-flag-title="第一篇博客">
+             <span id="/2017/07/08/jedisPoolConfig/" class="leancloud_visitors" data-flag-title="JedisPool连接池相关配置">
                <span class="post-meta-divider">|</span>
                <span class="post-meta-item-icon">
                  <i class="fa fa-eye"></i>
@@ -368,16 +363,27 @@
       
 
       
-        <p>We如你所见，我的个人博客终于搞定了。前前后后大概花了一个多月，经历了种种困难，还好坚持下来了。现在网站既然搞定了，就开始写自己的第一篇博客。主要讲述下创建个人博客的原因、经过以及今后的打算。</p>
-<h2 id="原因"><a href="#原因" class="headerlink" title="原因"></a>原因</h2><h3 id="大学毕业找工作经历"><a href="#大学毕业找工作经历" class="headerlink" title="大学毕业找工作经历"></a>大学毕业找工作经历</h3><p>其实从报考交大研究生，由于专业课只考了75分，心有不甘的离开校园。当时就意识到通信专业不太适合我，后来决定当程序员。网上看了各种大神的经验，都说程序员最好要写博客，经常总结一些技术。网上也确实看到很多个人博客，不光界面很好看，也确实分享了一些相关的技术。从那时起，就有了想搞个人博客的想法。</p>
-<h3 id="陆金所的工作经历"><a href="#陆金所的工作经历" class="headerlink" title="陆金所的工作经历"></a>陆金所的工作经历</h3><p>虽然前不久刚刚递交辞职报告，但我对陆金所还是满怀感激的。在陆金所不光技术得到了不小的提升，更重要的是认识了不少优秀的朋友。其中不得不提到翼祥，我们经常吃完饭就去绕一圈。在路上，他要经常吐槽我党以及我党的一些领导人，恕我不敢说出那些大大的名字。暂且忘掉这些吐槽吧，翼祥对计算机技术也是一个很有追求的人，每次饭后和他交流技术，感觉都有不少收获。后来他建议我买一个macbook，说是开发效率高的一笔。后来在他的再三鼓动下，我决定搞一个mac pro，其实也有我自己想装逼的想法。<br><img src="https://coding.net/u/lightoheaven/p/image/git/raw/master/posts/201602/first-post/macpro.jpg" alt="mac"><br><a id="more"></a></p>
-<h2 id="制作网站的过程"><a href="#制作网站的过程" class="headerlink" title="制作网站的过程"></a>制作网站的过程</h2><h3 id="首先选择一个开源项目"><a href="#首先选择一个开源项目" class="headerlink" title="首先选择一个开源项目"></a>首先选择一个开源项目</h3><p>应该是1月28号macpro到手后，第一件事就是发到朋友圈装逼一下😂，我也是醉了，哈哈😄。后来终于开始决定大干一翻，首先准备研究下spring，结果由于网速的原因（在这里不得不吐槽一下长城宽带）竟然下不动，就去百度尝试各种不同办法从其他渠道去下载。也就是在这个过程中，我看到了很多大神的个人博客，感觉很是高大上，就又产生想法先搞一下前端，就不怎么怎么的想到先去研究下nodejs。我就是这么喜欢折腾（记得大学有一个寝室的门口贴着活着就是折腾）。</p>
-<h3 id="基于nodejs＋socket-io的聊天室"><a href="#基于nodejs＋socket-io的聊天室" class="headerlink" title="基于nodejs＋socket.io的聊天室"></a>基于nodejs＋socket.io的聊天室</h3><p>最先网上看到一个基于nodejs+socket.io的实时聊天，感觉很有意思的样子。说干就干，就踏上了一条不归路啊,春节在家还写过代码,当然有个原因是刚买mac,不是有个说法说用mac的文艺程序员吗😂😂，。话题转回来，虽然项目中用到过js,当时还感觉很有信心的样子，谁知自己写nodejs的时候实在无从下手，什么require，有时候要new，有时候又不用，真是想放弃了。后来搞了3，4天终于搞好了，才发现只有不超过300行代码，又不得不感叹nodejs的开发效率。</p>
-<h3 id="基于nodejs＋mongodb＋mongoose搭建个人博客"><a href="#基于nodejs＋mongodb＋mongoose搭建个人博客" class="headerlink" title="基于nodejs＋mongodb＋mongoose搭建个人博客"></a>基于nodejs＋mongodb＋mongoose搭建个人博客</h3><p>原谅我前面说了一大堆废话，现在终于要讲建博客的经历了。最开始在github上找了一个demo，clone下来后发现问题多多。没办法，就一个个解决。后来有个报错一直说驱动和server不匹配，困扰一天发现是因为当前项目用的是mongoskin的驱动，我下载的mongodb是最新的3.2.6，两者貌似不匹配。接着百度，后来又了解到还有一个叫mongoose的驱动。这下又要学习mongoose了，并且要把所有的dao层代码全部切换过去，醉了。又折腾几天终于搞定了。</p>
-<h3 id="服务器的选择"><a href="#服务器的选择" class="headerlink" title="服务器的选择"></a>服务器的选择</h3><p>这个时候春节假期结束了，本地调试看网站能运行，从阿里云上买了个xiaoming1990.top的域名,回到公司，下一步就是找个服务器挂在网上了。第一方案是选择阿里云服务器，后来一看太贵了，一年最便宜也要1000多，后来翼祥说叫我研究下动态路由，花生壳之类的。后来发现没有mac用的，没法发后来决定还是买阿里云了。我想买阿里云之前，再把界面搞好看点。人丑了没朋友，网站不好看一样没人访问。刚开始还是很有热情调界面的，后来发现由于能力问题，前端的一些东西实在搞不定，就不和他们抢饭碗了。</p>
-<h3 id="hexo带来的希望"><a href="#hexo带来的希望" class="headerlink" title="hexo带来的希望"></a>hexo带来的希望</h3><p>纠结一番后，基于2个原因：界面太丑；需要服务器支持。否定掉了前面基于mongo的个人博客。就又百度看有啥其他方案。后来还是在github上了解到一个基于nodejs的hexo的静态网站。貌似作者还只是一个台湾的大学生，不得不感叹github上牛人太多。后来选择了一个叫NexT的主题，感觉很不错的样子。后来又咨询了一下嘉庆同学，在gitcafe上发布了这个网站，也就是你们现在看到的样子。</p>
-<h2 id="个人博客规划"><a href="#个人博客规划" class="headerlink" title="个人博客规划"></a>个人博客规划</h2><p>从1.28到今天折腾了一个多月，<a href="http://yeming.me">Smartの小明http://yeming.me</a>终于上线了，我给自己打99分，哈哈，还有1分怕我骄傲。今后主要就在这个博客上写一些编程相关的技术的，或者一些生活趣事，另外去年刚买的单反也能发挥作用了，拍出来的照片就直接上传个人博客了，感觉这个规划很科学😄。</p>
-<h2 id="感谢"><a href="#感谢" class="headerlink" title="感谢"></a>感谢</h2><p>在搭建个人博客的过程中，肯定少不了朋友的帮助，除了上文提到的朱翼祥和郑嘉庆同学，还有很多人。尤其要感谢屏幕前面的你们,浪费了你们宝贵时间，坚持到现在，看完了我的第一篇博客😂<br>也许你们是直接拖到最后的,也辛苦你们滑动了不少的屏幕了…</p>
+        <p>最近有些其他业务部门的同学在线上环境redis有出现以下错误Unexpected end of stream，这个错误大致是因为，redis服务器端已经关闭了客户端的连接，而客户端不知道依然拿着原来的连接去访问redis服务器，结果就会报出这个exception。既然我们知道原因是服务器端主动关闭与客户端连接，那么我们下面看下有哪些情况会导致服务器端主动关闭连接。主要在redis.conf中有以下两个参数client-output-buffer-limit、timeout，下面我们分别来介绍下这两个参数的作用。<br><a id="more"></a></p>
+<h2 id="client-output-buffer-limit"><a href="#client-output-buffer-limit" class="headerlink" title="client-output-buffer-limit"></a>client-output-buffer-limit</h2><p>对于Redis服务器的输出（也就是命令的返回值）来说，其大小通常是不可控制的。有可能一个简单的命令，能够产生体积庞大的返回数据。另外也有可能因为执行了太多命令，导致产生返回数据的速率超过了往客户端发送的速率，这是也会导致服务器堆积大量消息，从而导致输出缓冲区越来越大，占用过多内存，甚至导致系统崩溃。redis有以下两种限制来避免出现这种情况，并且不同类型的客户端可以采取不同的配置。</p>
+<ol>
+<li>大小限制:若客户端缓冲区超过某一个设定的值，直接关闭客户端连接。</li>
+<li>持续性限制:若客户端缓冲区连续一定时间内一直超过某个设定的值时，则关闭客户端连接。</li>
+</ol>
+<p>下面是一个配置的demo:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">client-output-buffer-limit normal 0 0 0</div><div class="line">client-output-buffer-limit slave 256mb 64mb 60</div><div class="line">client-output-buffer-limit pubsub 8mb 2mb 60</div></pre></td></tr></table></figure></p>
+<p>redis把客户端分为3种，一种是普通的客户端，比如应用程序获取的jedis连接、普通的redis-cli，上面配置的三个0意思是对于客户端缓冲区无限制；第二种slave客户端，上面配置的3个参数的意思是若缓冲区超过256m则redis服务器直接关闭客户端连接，或者持续60s缓冲区一直超过64m也会关闭客户端连接。第三种是pub/sub客户端配置。</p>
+<p>通过以上几种不同的配置，redis就可以避免客户端缓冲区过大导致占用过大内存引起的问题。后来确认了，其他项目组的同学有一个大key超过了50m(我们配置的是30m)，直接导致redis服务器关闭了连接。但是应用程序还是从jedis连接池中获取到了这个被关闭的连接去get的时候，就抛出了Unexpected end of stream异常。</p>
+<h2 id="timeout配置"><a href="#timeout配置" class="headerlink" title="timeout配置"></a>timeout配置</h2><p>redis为了避免客户端连接数过多，有一个timeout配置，意思是如果连接的空闲时间超过了timeout的值，则关闭连接。默认配置是0，意思是没有超时限制，永远不关闭连接。生产上显然不会配置0，我们生产上配置的是120。这个timeout参数配置，要跟客户端创建的连接池的参数配合起来一起使用。下面我们看下jedis连接池的的一个配置demo。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div></pre></td><td class="code"><pre><div class="line"> JedisPool jedisPool = new JedisPool(getPoolConfig(), &quot;localhost&quot;);</div><div class="line"></div><div class="line">private static GenericObjectPoolConfig getPoolConfig() &#123;</div><div class="line">        GenericObjectPoolConfig conf = new GenericObjectPoolConfig();</div><div class="line">        // 设置获取连接的最大等待时间</div><div class="line">        conf.setMaxWaitMillis(poolWaitMillis);</div><div class="line">        // 设置最大连接数</div><div class="line">        conf.setMaxTotal(poolMaxTotal);</div><div class="line">        // 设置最大空闲连接数</div><div class="line">        conf.setMaxIdle(poolMaxIdle);</div><div class="line">        // 设置最小空闲连接数</div><div class="line">        conf.setMinIdle(poolMinIdle);</div><div class="line">        // 设置获取连接时不进行连接验证(通过 PoolableObjectFactory.validateObject() 验证连接是否有效)</div><div class="line">        conf.setTestOnBorrow(false);</div><div class="line">        // 设置退还连接时不进行连接验证(通过 PoolableObjectFactory.validateObject() 验证连接是否有效)</div><div class="line">        conf.setTestOnReturn(false);</div><div class="line">        // 设置连接空闲时进行连接验证</div><div class="line">        conf.setTestWhileIdle(true);</div><div class="line">        // 设置连接被回收前的最大空闲时间</div><div class="line">        conf.setMinEvictableIdleTimeMillis(5 * 60000);</div><div class="line">        // 设置检测线程的运行时间间隔</div><div class="line">        conf.setTimeBetweenEvictionRunsMillis(60000);</div><div class="line">        // 设置检测线程每次检测的对象数</div><div class="line">        conf.setNumTestsPerEvictionRun(-1);</div><div class="line"></div><div class="line">        return conf;</div><div class="line">    &#125;</div></pre></td></tr></table></figure>
+<p>上述代码构建了一个JedisPool，我们可以看到jedis使用apache common-pool2来创建一个jedis连接池的。创建jedis连接池传入了一个GenericObjectPoolConfig配置参数，我只筛选了其中一些主要的属性来说明，有兴趣的同学可以自己去看common-pool2的源码。我们主要看下最下面的几个参数(第16行到24行)，我们设置了空闲时验证，连接被回收前最大空闲时间为300s，设置检测线程的运行时间间隔是60s，设置线程每次检测的对象数是-1(如果为负数，则检测所有空闲线程)<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">private int getNumTests() &#123;</div><div class="line">        int numTestsPerEvictionRun = this.getNumTestsPerEvictionRun();</div><div class="line">        return numTestsPerEvictionRun &gt;= 0?</div><div class="line">        Math.min(numTestsPerEvictionRun, this.idleObjects.size()):</div><div class="line">        (int)Math.ceil((double)this.idleObjects.size() / Math.abs((double)numTestsPerEvictionRun));</div><div class="line">    &#125;</div></pre></td></tr></table></figure></p>
+<p>我们redis服务端配置了timeout是120s，而我们客户端线程检测间隔是60s，每隔60s就会对所有空闲的连接进行检验，会调用JedisFactory的validateObject方法<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line">class JedisFactory implements PooledObjectFactory&lt;Jedis&gt; &#123;</div><div class="line">    @Override</div><div class="line">  public boolean validateObject(PooledObject&lt;Jedis&gt; pooledJedis) &#123;</div><div class="line">    final BinaryJedis jedis = pooledJedis.getObject();</div><div class="line">    try &#123;</div><div class="line">      HostAndPort hostAndPort = this.hostAndPort.get();</div><div class="line"></div><div class="line">      String connectionHost = jedis.getClient().getHost();</div><div class="line">      int connectionPort = jedis.getClient().getPort();</div><div class="line"></div><div class="line">      return hostAndPort.getHost().equals(connectionHost)</div><div class="line">          &amp;&amp; hostAndPort.getPort() == connectionPort &amp;&amp; jedis.isConnected()</div><div class="line">          &amp;&amp; jedis.ping().equals(&quot;PONG&quot;);</div><div class="line">    &#125; catch (final Exception e) &#123;</div><div class="line">      return false;</div><div class="line">    &#125;</div><div class="line">  &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>可以看到以上代码最后有一个jedis.ping().equals(“PONG”)，这样能保证那些没有被客户端使用的连接每60s之内都能向redis服务端发送心跳，这个时间在我们配置的timeout 120s范围内，redis服务端也就不会关闭这个连接。</p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
+<li><a href="http://www.cnblogs.com/kreo/p/4423362.html" target="_blank" rel="external">redis配置详解</a></li>
+<li><a href="http://bsr1983.iteye.com/blog/2092467" target="_blank" rel="external">common-dbcp2数据库连接池参数说明</a></li>
+<li><a href="http://blog.csdn.net/u011277123/article/details/53943351" target="_blank" rel="external">common-pool2连接池详解与使用</a></li>
+<li><a href="https://github.com/xetorthio/jedis/issues/932" target="_blank" rel="external">jedis Issue 932</a></li>
+<li><a href="https://github.com/xetorthio/jedis/issues/1029" target="_blank" rel="external">jedis Issue 1029</a></li>
+</ul>
 
       
     </div>
@@ -401,7 +407,9 @@
       
         <div class="post-tags">
           
-            <a href="/tags/个人博客上线/" rel="tag"># 个人博客上线</a>
+            <a href="/tags/redis-cluster/" rel="tag"># redis-cluster</a>
+          
+            <a href="/tags/jedis/" rel="tag"># jedis</a>
           
         </div>
       
@@ -410,15 +418,15 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
+              <a href="/2017/06/18/jedis-cluster/" rel="next" title="jedis源码分析">
+                <i class="fa fa-chevron-left"></i> jedis源码分析
+              </a>
+            
           </div>
 
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2016/02/28/nio/" rel="prev" title="Nio学习简单理解">
-                Nio学习简单理解 <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -590,7 +598,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#原因"><span class="nav-number">1.</span> <span class="nav-text">原因</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#大学毕业找工作经历"><span class="nav-number">1.1.</span> <span class="nav-text">大学毕业找工作经历</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#陆金所的工作经历"><span class="nav-number">1.2.</span> <span class="nav-text">陆金所的工作经历</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#制作网站的过程"><span class="nav-number">2.</span> <span class="nav-text">制作网站的过程</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#首先选择一个开源项目"><span class="nav-number">2.1.</span> <span class="nav-text">首先选择一个开源项目</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#基于nodejs＋socket-io的聊天室"><span class="nav-number">2.2.</span> <span class="nav-text">基于nodejs＋socket.io的聊天室</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#基于nodejs＋mongodb＋mongoose搭建个人博客"><span class="nav-number">2.3.</span> <span class="nav-text">基于nodejs＋mongodb＋mongoose搭建个人博客</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#服务器的选择"><span class="nav-number">2.4.</span> <span class="nav-text">服务器的选择</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#hexo带来的希望"><span class="nav-number">2.5.</span> <span class="nav-text">hexo带来的希望</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#个人博客规划"><span class="nav-number">3.</span> <span class="nav-text">个人博客规划</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#感谢"><span class="nav-number">4.</span> <span class="nav-text">感谢</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#client-output-buffer-limit"><span class="nav-number">1.</span> <span class="nav-text">client-output-buffer-limit</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#timeout配置"><span class="nav-number">2.</span> <span class="nav-text">timeout配置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考"><span class="nav-number">3.</span> <span class="nav-text">参考</span></a></li></ol></div>
             
 
           </div>
