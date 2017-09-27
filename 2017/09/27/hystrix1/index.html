@@ -68,7 +68,7 @@
 <link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
 
 
-  <meta name="keywords" content="Spring," />
+  <meta name="keywords" content="Hystrix," />
 
 
 
@@ -84,23 +84,21 @@
 
 
 
-<meta name="description" content="问题一个同事基于Annotation配置了一段代码，结果有一个Configuration类的两个@Value标注的属性值没有注入进来，代码如下:
-1234567891011121314151617181920212223242526@Configuration@PropertySource(&amp;quot;mysql.properties&amp;quot;)public class GroupDataSou">
+<meta name="description" content="去年在看spring cloud系列的时候，当时就已经了解到了hystrix，这个组件和eureka，zuul等组件一样都是netflix公司开源的。当时由于没有太多的精力，只简单了解了下hystrix的一些简单功能。这半年因为工作关系一直接触redis相关的东西，redis相关也看过不少书了，有时候一直搞一件事可能觉得有点枯燥。就偶然又产生了想法，就决定重新看一下hystrix，决定搞一个hys">
 <meta property="og:type" content="article">
-<meta property="og:title" content="spring容器启动@Value属性无法注入">
-<meta property="og:url" content="http://yeming.me/2017/04/16/springValueAnnotation/index.html">
+<meta property="og:title" content="Hystrix初探">
+<meta property="og:url" content="http://yeming.me/2017/09/27/hystrix1/index.html">
 <meta property="og:site_name" content="Smartの小明">
-<meta property="og:description" content="问题一个同事基于Annotation配置了一段代码，结果有一个Configuration类的两个@Value标注的属性值没有注入进来，代码如下:
-1234567891011121314151617181920212223242526@Configuration@PropertySource(&amp;quot;mysql.properties&amp;quot;)public class GroupDataSou">
-<meta property="og:image" content="https://coding.net/u/lightoheaven/p/image/git/raw/master/posts/201604/spring2/refresh.jpg">
-<meta property="og:image" content="https://coding.net/u/lightoheaven/p/image2/git/raw/master/201704/WechatIMG3.jpeg">
-<meta property="og:image" content="https://coding.net/u/lightoheaven/p/image2/git/raw/master/201704/WechatIMG4.jpeg">
-<meta property="og:updated_time" content="2017-04-16T03:27:25.000Z">
+<meta property="og:description" content="去年在看spring cloud系列的时候，当时就已经了解到了hystrix，这个组件和eureka，zuul等组件一样都是netflix公司开源的。当时由于没有太多的精力，只简单了解了下hystrix的一些简单功能。这半年因为工作关系一直接触redis相关的东西，redis相关也看过不少书了，有时候一直搞一件事可能觉得有点枯燥。就偶然又产生了想法，就决定重新看一下hystrix，决定搞一个hys">
+<meta property="og:image" content="https://coding.net/u/lightoheaven/p/image2/git/raw/master/201709/healthy.jpeg">
+<meta property="og:image" content="https://coding.net/u/lightoheaven/p/image2/git/raw/master/201709/unhealthy.jpeg">
+<meta property="og:image" content="https://coding.net/u/lightoheaven/p/image2/git/raw/master/201709/unhealthy2.jpeg">
+<meta property="og:image" content="https://coding.net/u/lightoheaven/p/image2/git/raw/master/201709/network.jpeg">
+<meta property="og:updated_time" content="2017-09-27T12:22:04.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="spring容器启动@Value属性无法注入">
-<meta name="twitter:description" content="问题一个同事基于Annotation配置了一段代码，结果有一个Configuration类的两个@Value标注的属性值没有注入进来，代码如下:
-1234567891011121314151617181920212223242526@Configuration@PropertySource(&amp;quot;mysql.properties&amp;quot;)public class GroupDataSou">
-<meta name="twitter:image" content="https://coding.net/u/lightoheaven/p/image/git/raw/master/posts/201604/spring2/refresh.jpg">
+<meta name="twitter:title" content="Hystrix初探">
+<meta name="twitter:description" content="去年在看spring cloud系列的时候，当时就已经了解到了hystrix，这个组件和eureka，zuul等组件一样都是netflix公司开源的。当时由于没有太多的精力，只简单了解了下hystrix的一些简单功能。这半年因为工作关系一直接触redis相关的东西，redis相关也看过不少书了，有时候一直搞一件事可能觉得有点枯燥。就偶然又产生了想法，就决定重新看一下hystrix，决定搞一个hys">
+<meta name="twitter:image" content="https://coding.net/u/lightoheaven/p/image2/git/raw/master/201709/healthy.jpeg">
 
 
 
@@ -128,13 +126,13 @@
 
 
 
-  <link rel="canonical" href="http://yeming.me/2017/04/16/springValueAnnotation/"/>
+  <link rel="canonical" href="http://yeming.me/2017/09/27/hystrix1/"/>
 
 
 
 
 
-  <title> spring容器启动@Value属性无法注入 | Smartの小明 </title>
+  <title> Hystrix初探 | Smartの小明 </title>
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="en">
@@ -265,7 +263,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-  <link itemprop="mainEntityOfPage" href="http://yeming.me/2017/04/16/springValueAnnotation/">
+  <link itemprop="mainEntityOfPage" href="http://yeming.me/2017/09/27/hystrix1/">
 
   <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
     <meta itemprop="name" content="Smartの小明">
@@ -289,7 +287,7 @@
             
             
               
-                spring容器启动@Value属性无法注入
+                Hystrix初探
               
             
           </h1>
@@ -302,8 +300,8 @@
                 <i class="fa fa-calendar-o"></i>
               </span>
               <span class="post-meta-item-text">Posted on</span>
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-04-16T10:57:40+08:00">
-                2017-04-16
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-09-27T21:00:50+08:00">
+                2017-09-27
               </time>
             
 
@@ -340,7 +338,7 @@
 
           
           
-             <span id="/2017/04/16/springValueAnnotation/" class="leancloud_visitors" data-flag-title="spring容器启动@Value属性无法注入">
+             <span id="/2017/09/27/hystrix1/" class="leancloud_visitors" data-flag-title="Hystrix初探">
                <span class="post-meta-divider">|</span>
                <span class="post-meta-item-icon">
                  <i class="fa fa-eye"></i>
@@ -370,25 +368,54 @@
       
 
       
-        <h2 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h2><p>一个同事基于Annotation配置了一段代码，结果有一个Configuration类的两个@Value标注的属性值没有注入进来，代码如下:</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div></pre></td><td class="code"><pre><div class="line">@Configuration</div><div class="line">@PropertySource(&quot;mysql.properties&quot;)</div><div class="line">public class GroupDataSourceAnatationSample &#123;</div><div class="line">    @Value(&quot;$&#123;zebra.jdbcref&#125;&quot;)</div><div class="line">    private String jdbcRef;</div><div class="line"></div><div class="line">    @Value(&quot;$&#123;zebra.pooltype&#125;&quot;)</div><div class="line">    private String poolType;</div><div class="line"></div><div class="line">    @Bean(destroyMethod = &quot;close&quot;)</div><div class="line">    public DataSource dataSource() &#123;</div><div class="line">        。。。。。。</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    @Bean</div><div class="line">    public ZebraMapperScannerConfigurer mapperScannerConfigurer() &#123;</div><div class="line">        ZebraMapperScannerConfigurer mapperScannerConfigurer = new ZebraMapperScannerConfigurer();</div><div class="line">        mapperScannerConfigurer.setBasePackage(&quot;com.sankuai.flight.flagship.mapper&quot;);</div><div class="line">        return mapperScannerConfigurer;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    @Bean</div><div class="line">    public SqlSessionFactory sqlSessionFactoryBean() throws Exception &#123;</div><div class="line">        。。。。。。</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<a id="more"></a>
-<h2 id="原因"><a href="#原因" class="headerlink" title="原因"></a>原因</h2><p>上面这段代码是基于java Annotation注解配置的zebra-dao的demo，上述存在一个问题，就是Value注解标注的两个属性jdbcType和poolType的值不能被注入进来。这个原因有点复杂，需要对spring容器的加载比较熟悉，之前我有两篇博客已经分析了spring容器加载的源码，有兴趣可以看一下《<a href="http://yeming.me/2016/04/16/spring/">SpringIOC源码分析</a>》《<a href="http://yeming.me/2016/04/26/spring2/">SpringIOC源码分析二(Bean实例化)</a>》。这里稍微提一下。</p>
-<p><img src="https://coding.net/u/lightoheaven/p/image/git/raw/master/posts/201604/spring2/refresh.jpg" alt="spring容器初始化"></p>
-<p>上面这个图是spring容器的加载顺序。ZebraMapperScannerConfigurer这个类实现了BeanDefinitionRegistryPostProcessor，这是一个BeanFactoryPostProcessor可以看到若实现了这个processor，那么会在第5步调用的时候触发这个processor，所以ZebraMapperScannerConfigurer这个类会先初始化。(本来初始化是第完成第6个步骤向spring容器注册了若干个BeanPostProcessor）</p>
-<p><img src="https://coding.net/u/lightoheaven/p/image2/git/raw/master/201704/WechatIMG3.jpeg" alt="注册BeanPostProcessor"></p>
-<p>注意第5个BeanPostProcessor，有了这个processor，才会在bean被实例化的时候调用这个processor来完成对@Value标注属性值的注入)。正因为现在在完成spring容器初始化第5个步骤的时候，由于实现了BeanDefinitionRegistryPostProcessor这个接口，会提前触发对ZebraMapperScannerConfigurer的实例化，可以把ZebraMapperScannerConfigurer看做GroupDataSourceAnatationSample的一个成员属性，所以也会提前触发GroupDataSourceAnatationSample的实例化，因为没有注册上述红框圈出的第5个BeanPostProcessor所以jdbcRef和poorType不会被注入。</p>
-<p><img src="https://coding.net/u/lightoheaven/p/image2/git/raw/master/201704/WechatIMG4.jpeg" alt=""></p>
-<p>这个图是在ZebraMapperScannerConfigurer(singletonObject的第5个属性)初始化过程中debug出来的数据，证明了上述分析。<font color="#08c"><b>所以总结原因，就是因为ZebraMapperScannerConfigurer实现了BeanDefinitionRegistryPostProcessor这个接口造成后续spring容器的执行的一些顺序问题,引起了上述@Value属性不能注入</b></font></p>
-<h2 id="解决问题"><a href="#解决问题" class="headerlink" title="解决问题"></a>解决问题</h2><p>那么我们该怎么解决，我提供以下3种解决方案，下述三种方法都可以解决问题，大家有兴趣可以去尝试一下。</p>
-<h3 id="嵌套Configuration"><a href="#嵌套Configuration" class="headerlink" title="嵌套Configuration"></a>嵌套Configuration</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div></pre></td><td class="code"><pre><div class="line">@Configuration</div><div class="line">@PropertySource(&quot;annotation/mysql.properties&quot;)</div><div class="line">public class GroupDataSourceAnnotationSample &#123;</div><div class="line"></div><div class="line">    @Configuration</div><div class="line">    static class DataSourceConfig&#123;</div><div class="line">        @Value(&quot;$&#123;zebra.jdbcref&#125;&quot;)</div><div class="line">        //@Value(&quot;flagshipbiz_flagship_test&quot;)</div><div class="line">        private String jdbcRef;</div><div class="line"></div><div class="line">        @Value(&quot;$&#123;zebra.pooltype&#125;&quot;)</div><div class="line">        //@Value(&quot;tomcat-jdbc&quot;)</div><div class="line">        private String poolType;</div><div class="line"></div><div class="line">        @Bean(destroyMethod = &quot;close&quot;)</div><div class="line">        public DataSource dataSource() &#123;</div><div class="line">           。。。。。。</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        @Bean</div><div class="line">        public SqlSessionFactory sqlSessionFactoryBean() throws Exception &#123;</div><div class="line">            。。。。。。</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    @Bean</div><div class="line">    public ZebraMapperScannerConfigurer mapperScannerConfigurer() &#123;</div><div class="line">        ZebraMapperScannerConfigurer mapperScannerConfigurer = new ZebraMapperScannerConfigurer();</div><div class="line">        mapperScannerConfigurer.setBasePackage(&quot;com.dianping.zebra.sample.dao&quot;);</div><div class="line">        return mapperScannerConfigurer;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<h3 id="非单例-多例模式"><a href="#非单例-多例模式" class="headerlink" title="非单例(多例模式)"></a>非单例(多例模式)</h3><p>第二种方法@Scope(“protoType”)多例模式(这只是一个纯粹解决问题的方法，线上不推荐这里使用多例，还请注意)</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div></pre></td><td class="code"><pre><div class="line">@Configuration</div><div class="line">@Scope(&quot;protoType&quot;)</div><div class="line">@PropertySource(&quot;mysql.properties&quot;)</div><div class="line">public class GroupDataSourceAnatationSample &#123;</div><div class="line">    @Value(&quot;$&#123;zebra.jdbcref&#125;&quot;)</div><div class="line">    private String jdbcRef;</div><div class="line"></div><div class="line">    @Value(&quot;$&#123;zebra.pooltype&#125;&quot;)</div><div class="line">    private String poolType;</div><div class="line"></div><div class="line">    @Bean(destroyMethod = &quot;close&quot;)</div><div class="line">    public DataSource dataSource() &#123;</div><div class="line">        。。。。。。</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    @Bean</div><div class="line">    public ZebraMapperScannerConfigurer mapperScannerConfigurer() &#123;</div><div class="line">        ZebraMapperScannerConfigurer mapperScannerConfigurer = new ZebraMapperScannerConfigurer();</div><div class="line">        mapperScannerConfigurer.setBasePackage(&quot;com.sankuai.flight.flagship.mapper&quot;);</div><div class="line">        return mapperScannerConfigurer;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    @Bean</div><div class="line">    public SqlSessionFactory sqlSessionFactoryBean() throws Exception &#123;</div><div class="line">        。。。。。。</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<h3 id="拆分配置类"><a href="#拆分配置类" class="headerlink" title="拆分配置类"></a>拆分配置类</h3><p>把ZebraMapperScannerConfigurer这个bean的配置从上述DataSource中抽出来，单独放到另外一个独立的@Configuration类里面。</p>
-<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
-<li><a href="http://yeming.me/2016/04/16/spring/">SpringIOC源码分析</a></li>
-<li><a href="http://yeming.me/2016/04/26/spring2/">SpringIOC源码分析二(Bean实例化)</a></li>
+        <p>去年在看spring cloud系列的时候，当时就已经了解到了hystrix，这个组件和eureka，zuul等组件一样都是netflix公司开源的。当时由于没有太多的精力，只简单了解了下hystrix的一些简单功能。这半年因为工作关系一直接触redis相关的东西，redis相关也看过不少书了，有时候一直搞一件事可能觉得有点枯燥。就偶然又产生了想法，就决定重新看一下hystrix，决定搞一个hystrix系列。在阅读hystrix的代码过程中，刚开始看起来很吃力，里面用到了rxjava(采用函数响应式编程模式写的，感觉看起来很费劲)，发现要学习的东西越来越多。就想从最简单的hystrix介绍到使用最后到源码分析，写一个系列的博客，正好也长时间没有研究一些新的框架了。上面废话了很多，下面进入正题，本文主要从以下几方面简要介绍下hystrix，基本都是一些概念性的(基本都是翻译自github上Hystrix主页)。<br><a id="more"></a></p>
+<blockquote>
+<ul>
+<li>Hystrix是什么</li>
+<li>Hystrix用来做什么</li>
+<li>Hystrix解决了什么问题</li>
+<li>Hystrix设计模式</li>
+<li>Hystrix如何实现它的设计目标</li>
 </ul>
+</blockquote>
+<h2 id="Hystrix是什么"><a href="#Hystrix是什么" class="headerlink" title="Hystrix是什么"></a>Hystrix是什么</h2><p>在一个分布式的系统当中，不可避免的会出现一些对于外部service的依赖调用报错。Hystrix可以添加一些对于延时的容忍和容错性来帮助你控制与这些外部service的交互，Hystrix是通过隔离这些单个的服务(比如把这些外部服务放在单独的线程池里面执行)来避免瀑布式的报错，并且提供了降级fallback方法，以上这些都可以提供系统的可用性。</p>
+<h2 id="Hystrix用来做什么"><a href="#Hystrix用来做什么" class="headerlink" title="Hystrix用来做什么"></a>Hystrix用来做什么</h2><blockquote>
+<ul>
+<li>对于调用外部服务提供容错和超时保护机制</li>
+<li>避免在一个分布式系统中瀑布式报错</li>
+<li>fail fast和及时恢复</li>
+<li>fallback和优雅降级</li>
+<li>近乎实时的监控，报警和运维</li>
+</ul>
+</blockquote>
+<h2 id="Hystrix解决了什么问题"><a href="#Hystrix解决了什么问题" class="headerlink" title="Hystrix解决了什么问题"></a>Hystrix解决了什么问题</h2><p>在一个复杂的分布式系统当中，肯定会存在一系列的外部服务，其中每个服务都可能会在某个时刻发生错误。如果我们的应用不能与这些发生错误的服务隔离，那么我们的应用就有可能被他们拖垮。</p>
+<p>所有外部服务都运行正常的情况下，我们服务是这样的:<br><img src="https://coding.net/u/lightoheaven/p/image2/git/raw/master/201709/healthy.jpeg" alt="服务正常"></p>
+<p>当其中一个外部服务不可用(或者开始出现延时)，就会开始阻塞用户请求<br><img src="https://coding.net/u/lightoheaven/p/image2/git/raw/master/201709/unhealthy.jpeg" alt="服务异常"></p>
+<p>当一个服务开始延时就会慢慢开始影响上游的一系列相关的服务，导致上游也出现延时。并且更糟糕的是，相关联的上游服务如果有一些重试机制就会耗尽线程池，io和一些其他的系统资源，就会在整个系统之间导致瀑布式的错误<br><img src="https://coding.net/u/lightoheaven/p/image2/git/raw/master/201709/unhealthy2.jpeg" alt="瀑布式异常"></p>
+<p>Hystrix采用以下设计原则</p>
+<blockquote>
+<ul>
+<li>避免单个的外部依赖耗尽应用资源(例如tomcat)线程</li>
+<li>通过fail fast机制代替队列来降低负载</li>
+<li>在适当时候提供fallback机制</li>
+<li>通过一些隔离的技术手段(例如bulkhead, swimlane, and circuit breaker patterns)来降低单个外部服务故障造成的影响</li>
+<li>通过近乎实时的监控，报警和运维来更好更实时发现错误</li>
+<li>通过动态的调整一些配置来修改系统运行的参数实时处理系统异常</li>
+<li>提供完整的客户端调用保护机制，并不仅仅是网络调用方面。</li>
+</ul>
+</blockquote>
+<h2 id="Hystrix如何实现它的设计目标"><a href="#Hystrix如何实现它的设计目标" class="headerlink" title="Hystrix如何实现它的设计目标"></a>Hystrix如何实现它的设计目标</h2><blockquote>
+<ul>
+<li>把对外部系统的一些调用包装成HystrixCommand或者HystrixObservableCommand命令在一个单独的线程池里面执行(command pattern)</li>
+<li>可以自己设置超时相关的参数，默认情况超过你设置的最大值就超时，还可以通过设置一些属性，比如设置99.5那么比99.5%的请求慢的就是超时</li>
+<li>对每一个外部调用都创建一个单独的线程池，如果线程池满了，那么就直接拒绝fail fast</li>
+<li>测量所有的成功，失败，超时，thread rejections请求</li>
+<li>如果某个服务的错误百分比超过设置的阈值，则通过手动或自动地中断一个断路器停止某一特定服务的所有请求一段时间。</li>
+<li>当调用失败，超时，reject或者short-circuits时候提供fallback机制</li>
+<li>监控指标和配置变更实时生效</li>
+</ul>
+</blockquote>
+<p>当在一个分布式系统中使用了Hystrix后，所有对于外部的依赖调用都被隔离在一个单独的线程池，单独的服务故障不会影响其他服务。并通过提供fallback机制应对某个服务出现异常情况。<br><img src="https://coding.net/u/lightoheaven/p/image2/git/raw/master/201709/network.jpeg" alt="Hystrix系统"></p>
 
       
     </div>
@@ -412,7 +439,7 @@
       
         <div class="post-tags">
           
-            <a href="/tags/Spring/" rel="tag"># Spring</a>
+            <a href="/tags/Hystrix/" rel="tag"># Hystrix</a>
           
         </div>
       
@@ -421,8 +448,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2017/01/24/elasticJob/" rel="next" title="elastic-job源码分析">
-                <i class="fa fa-chevron-left"></i> elastic-job源码分析
+              <a href="/2017/07/08/jedisPoolConfig/" rel="next" title="JedisPool连接池相关配置">
+                <i class="fa fa-chevron-left"></i> JedisPool连接池相关配置
               </a>
             
           </div>
@@ -430,10 +457,6 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2017/06/18/jedis-cluster/" rel="prev" title="jedis源码分析">
-                jedis源码分析 <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -605,7 +628,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#问题"><span class="nav-number">1.</span> <span class="nav-text">问题</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#原因"><span class="nav-number">2.</span> <span class="nav-text">原因</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#解决问题"><span class="nav-number">3.</span> <span class="nav-text">解决问题</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#嵌套Configuration"><span class="nav-number">3.1.</span> <span class="nav-text">嵌套Configuration</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#非单例-多例模式"><span class="nav-number">3.2.</span> <span class="nav-text">非单例(多例模式)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#拆分配置类"><span class="nav-number">3.3.</span> <span class="nav-text">拆分配置类</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考"><span class="nav-number">4.</span> <span class="nav-text">参考</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Hystrix是什么"><span class="nav-number">1.</span> <span class="nav-text">Hystrix是什么</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Hystrix用来做什么"><span class="nav-number">2.</span> <span class="nav-text">Hystrix用来做什么</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Hystrix解决了什么问题"><span class="nav-number">3.</span> <span class="nav-text">Hystrix解决了什么问题</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Hystrix如何实现它的设计目标"><span class="nav-number">4.</span> <span class="nav-text">Hystrix如何实现它的设计目标</span></a></li></ol></div>
             
 
           </div>
