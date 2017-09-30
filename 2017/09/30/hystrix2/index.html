@@ -1,0 +1,956 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="en">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Hystrix," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/uploads/avatar.png?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="上一篇文章主要讲了Hystrix是什么，用来做什么，解决了什么问题，以及设计模式等，这篇文章主要来讲下Hystrix如何使用。下面我们从最简单的Hello World入手，来讲解下Hystrix的用法。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Hystrix使用">
+<meta property="og:url" content="http://yeming.me/2017/09/30/hystrix2/index.html">
+<meta property="og:site_name" content="Smartの小明">
+<meta property="og:description" content="上一篇文章主要讲了Hystrix是什么，用来做什么，解决了什么问题，以及设计模式等，这篇文章主要来讲下Hystrix如何使用。下面我们从最简单的Hello World入手，来讲解下Hystrix的用法。">
+<meta property="og:updated_time" content="2017-09-30T01:31:26.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Hystrix使用">
+<meta name="twitter:description" content="上一篇文章主要讲了Hystrix是什么，用来做什么，解决了什么问题，以及设计模式等，这篇文章主要来讲下Hystrix如何使用。下面我们从最简单的Hello World入手，来讲解下Hystrix的用法。">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '6252881861358388000',
+      author: '小明'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yeming.me/2017/09/30/hystrix2/"/>
+
+
+
+
+
+  <title> Hystrix使用 | Smartの小明 </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="en">
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">Smartの小明</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle">屌丝搬砖程序猿,码农界的搬运工,哪里需要搬哪里</p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            Categories
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            About
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            Archives
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            Tags
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+  <link itemprop="mainEntityOfPage" href="http://yeming.me/2017/09/30/hystrix2/">
+
+  <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <meta itemprop="name" content="Smartの小明">
+    <meta itemprop="description" content="">
+    <meta itemprop="image" content="/uploads/avatar.png">
+  </span>
+
+  <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+    <meta itemprop="name" content="Smartの小明">
+    <span style="display:none" itemprop="logo" itemscope itemtype="http://schema.org/ImageObject">
+      <img style="display:none;" itemprop="url image" alt="Smartの小明" src="">
+    </span>
+  </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                Hystrix使用
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-09-30T21:00:50+08:00">
+                2017-09-30
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+              <span class="post-meta-divider">|</span>
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/技术分享/" itemprop="url" rel="index">
+                    <span itemprop="name">技术分享</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+
+          
+          
+             <span id="/2017/09/30/hystrix2/" class="leancloud_visitors" data-flag-title="Hystrix使用">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               <span class="post-meta-item-text">Visitors </span>
+               <span class="leancloud-visitors-count"></span>
+              </span>
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="page-pv"><i class="fa fa-file-o"></i>
+            <span class="busuanzi-value" id="busuanzi_value_page_pv" ></span>
+            </span>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>上一篇文章主要讲了Hystrix是什么，用来做什么，解决了什么问题，以及设计模式等，这篇文章主要来讲下Hystrix如何使用。下面我们从最简单的Hello World入手，来讲解下Hystrix的用法。<br><a id="more"></a></p>
+<h2 id="Hello-World"><a href="#Hello-World" class="headerlink" title="Hello World!"></a>Hello World!</h2><p>我们可以继承HystrixCommand(HystrixObservableCommand)来完成一个最简单的Hello World，分别说明。</p>
+<h3 id="HystrixCommand"><a href="#HystrixCommand" class="headerlink" title="HystrixCommand"></a>HystrixCommand</h3><p>HystrixCommand提供了同步和异步两种执行模式。</p>
+<p><b>同步模式</b><br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">CommandHelloWorld</span> <span class="keyword">extends</span> <span class="title">HystrixCommand</span>&lt;<span class="title">String</span>&gt; </span>&#123;</div><div class="line"></div><div class="line">    <span class="keyword">private</span> <span class="keyword">final</span> String name;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="title">CommandHelloWorld</span><span class="params">(String name)</span> </span>&#123;</div><div class="line">        <span class="keyword">super</span>(HystrixCommandGroupKey.Factory.asKey(<span class="string">"ExampleGroup"</span>));</div><div class="line">        <span class="keyword">this</span>.name = name;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">protected</span> String <span class="title">run</span><span class="params">()</span> </span>&#123;</div><div class="line">        <span class="comment">// a real example would do work like a network call here</span></div><div class="line">        <span class="keyword">return</span> <span class="string">"Hello "</span> + name + <span class="string">"!"</span>;</div><div class="line">    &#125;</div><div class="line">    </div><div class="line">    <span class="meta">@Test</span></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">testSynchronous</span><span class="params">()</span> </span>&#123;</div><div class="line">        assertEquals(<span class="string">"Hello World!"</span>, <span class="keyword">new</span> CommandHelloWorld(<span class="string">"World"</span>).execute());</div><div class="line">        assertEquals(<span class="string">"Hello Bob!"</span>, <span class="keyword">new</span> CommandHelloWorld(<span class="string">"Bob"</span>).execute());</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p><b>异步模式</b><br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@Test</span></div><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">testAsynchronous1</span><span class="params">()</span> <span class="keyword">throws</span> Exception </span>&#123;</div><div class="line">    assertEquals(<span class="string">"Hello World!"</span>, <span class="keyword">new</span> CommandHelloWorld(<span class="string">"World"</span>).queue().get());</div><div class="line">    assertEquals(<span class="string">"Hello Bob!"</span>, <span class="keyword">new</span> CommandHelloWorld(<span class="string">"Bob"</span>).queue().get());</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="meta">@Test</span></div><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">testAsynchronous2</span><span class="params">()</span> <span class="keyword">throws</span> Exception </span>&#123;</div><div class="line"></div><div class="line">    Future&lt;String&gt; fWorld = <span class="keyword">new</span> CommandHelloWorld(<span class="string">"World"</span>).queue();</div><div class="line">    Future&lt;String&gt; fBob = <span class="keyword">new</span> CommandHelloWorld(<span class="string">"Bob"</span>).queue();</div><div class="line"></div><div class="line">    assertEquals(<span class="string">"Hello World!"</span>, fWorld.get());</div><div class="line">    assertEquals(<span class="string">"Hello Bob!"</span>, fBob.get());</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>上述通过执行HystrixCommand.execute()实现了Synchronous Execution，通过HystrixCommand.queue()返回一个future实现Asynchronous Execution，下面两种写法是等价的。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">String s1 = <span class="keyword">new</span> CommandHelloWorld(<span class="string">"World"</span>).execute();</div><div class="line">String s2 = <span class="keyword">new</span> CommandHelloWorld(<span class="string">"World"</span>).queue().get();</div></pre></td></tr></table></figure></p>
+<h3 id="HystrixObservableCommand"><a href="#HystrixObservableCommand" class="headerlink" title="HystrixObservableCommand"></a>HystrixObservableCommand</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">This command should be used for a purely non-blocking call pattern. The caller of this command will be subscribed to the Observable&lt;R&gt; returned by the run() method.</div></pre></td></tr></table></figure>
+<p>按照官方注释，这个命令应该只用在非阻塞模式下面</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">CommandHelloWorld</span> <span class="keyword">extends</span> <span class="title">HystrixObservableCommand</span>&lt;<span class="title">String</span>&gt; </span>&#123;</div><div class="line"></div><div class="line">    <span class="keyword">private</span> <span class="keyword">final</span> String name;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="title">CommandHelloWorld</span><span class="params">(String name)</span> </span>&#123;</div><div class="line">        <span class="keyword">super</span>(HystrixCommandGroupKey.Factory.asKey(<span class="string">"ExampleGroup"</span>));</div><div class="line">        <span class="keyword">this</span>.name = name;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">protected</span> Observable&lt;String&gt; <span class="title">construct</span><span class="params">()</span> </span>&#123;</div><div class="line">        <span class="keyword">return</span> Observable.create(<span class="keyword">new</span> Observable.OnSubscribe&lt;String&gt;() &#123;</div><div class="line">            <span class="meta">@Override</span></div><div class="line">            <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">call</span><span class="params">(Subscriber&lt;? <span class="keyword">super</span> String&gt; observer)</span> </span>&#123;</div><div class="line">                <span class="keyword">try</span> &#123;</div><div class="line">                    <span class="keyword">if</span> (!observer.isUnsubscribed()) &#123;</div><div class="line">                        <span class="comment">// a real example would do work like a network call here</span></div><div class="line">                        observer.onNext(<span class="string">"Hello"</span>);</div><div class="line">                        observer.onNext(name + <span class="string">"!"</span>);</div><div class="line">                        observer.onCompleted();</div><div class="line">                    &#125;</div><div class="line">                &#125; <span class="keyword">catch</span> (Exception e) &#123;</div><div class="line">                    observer.onError(e);</div><div class="line">                &#125;</div><div class="line">            &#125;</div><div class="line">         &#125; ).subscribeOn(Schedulers.io());</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>不同于HystrixCommand我们要实现run方法，继承HystrixObservableCommand需要实现construct方法，这个方法返回一个Observable，当我们调用observe()或者toObservable()方法，上述construct方法会被执行。(<font color="red">注意toObservable()是一个延迟命令，真正只有在上述Observable被subscribe时候，construct才会被执行</font>)另外上述代码其实用到了rxjava，一种函数响应式编程模型，大量用在android客户端开发，事实上，Hystrix的源码大量用到了rxjava，有兴趣的可以看一下。这里我们要关注这个construct方法里面运行了两次onNext方法，相当于给订阅者发射了两次事件，如果上述只调用一次observer.onNext(“Hello”)方法，那么下面的操作是等价的。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">HystrixCommand.execute()=HystrixObservableCommand.observe().toBlocking().toFuture().get()</div><div class="line"></div><div class="line">HystrixCommand.queue()=HystrixObservableCommand.observe().toBlocking().toFuture()</div></pre></td></tr></table></figure></p>
+<p>如果有两次observer.onNext方法，则会抛出Sequence contains too many elements异常</p>
+<h3 id="两者区别"><a href="#两者区别" class="headerlink" title="两者区别"></a>两者区别</h3><ul>
+<li>前者的命令逻辑写在run()；后者的命令逻辑写在construct()</li>
+<li>前者的run()是由新创建的线程执行；后者的construct()是由调用程序线程执行</li>
+<li>前者一个实例只能向调用程序发送（emit）单条数据，比如上面例子中run()只能返回一个String结果；后者一个实例可以顺序发送多条数据，比如demo中顺序调用多个onNext()，便实现了向调用程序发送多条数据，甚至还能发送一个范围的数据集。</li>
+</ul>
+<h2 id="响应式-Reactive"><a href="#响应式-Reactive" class="headerlink" title="响应式(Reactive)"></a>响应式(Reactive)</h2><p>你可以通过observe()和toObservable()返回一个可以观察的Observable然后，一旦你subscribe订阅了这个Observable后，就会收到Observable的事件。</p>
+<ul>
+<li>observe()：返回一个 “hot” Observable，会立即执行HystrixCommand的run方法(或者HystrixObservableCommand的construct方法)</li>
+<li>toObservable()：返回一个“code” Observable，直到你subscribe订阅了这个Observable才会执行run()或者construct()</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@Test</span></div><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">testObservable</span><span class="params">()</span> <span class="keyword">throws</span> Exception </span>&#123;</div><div class="line"></div><div class="line">    Observable&lt;String&gt; fWorld = <span class="keyword">new</span> CommandHelloWorld(<span class="string">"World"</span>).observe();</div><div class="line">    Observable&lt;String&gt; fBob = <span class="keyword">new</span> CommandHelloWorld(<span class="string">"Bob"</span>).observe();</div><div class="line"></div><div class="line">    <span class="comment">// blocking</span></div><div class="line">    assertEquals(<span class="string">"Hello World!"</span>, fWorld.toBlockingObservable().single());</div><div class="line">    assertEquals(<span class="string">"Hello Bob!"</span>, fBob.toBlockingObservable().single());</div><div class="line"></div><div class="line">    <span class="comment">// non-blocking </span></div><div class="line">    <span class="comment">// - this is a verbose anonymous inner-class approach and doesn't do assertions</span></div><div class="line">    fWorld.subscribe(<span class="keyword">new</span> Observer&lt;String&gt;() &#123;</div><div class="line"></div><div class="line">        <span class="meta">@Override</span></div><div class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onCompleted</span><span class="params">()</span> </span>&#123;</div><div class="line">            <span class="comment">// nothing needed here</span></div><div class="line">        &#125;</div><div class="line"></div><div class="line">        <span class="meta">@Override</span></div><div class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onError</span><span class="params">(Throwable e)</span> </span>&#123;</div><div class="line">            e.printStackTrace();</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        <span class="meta">@Override</span></div><div class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onNext</span><span class="params">(String v)</span> </span>&#123;</div><div class="line">            System.out.println(<span class="string">"onNext: "</span> + v);</div><div class="line">        &#125;</div><div class="line"></div><div class="line">    &#125;);</div><div class="line"></div><div class="line">    <span class="comment">// non-blocking</span></div><div class="line">    <span class="comment">// - also verbose anonymous inner-class</span></div><div class="line">    <span class="comment">// - ignore errors and onCompleted signal</span></div><div class="line">    fBob.subscribe(<span class="keyword">new</span> Action1&lt;String&gt;() &#123;</div><div class="line"></div><div class="line">        <span class="meta">@Override</span></div><div class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">call</span><span class="params">(String v)</span> </span>&#123;</div><div class="line">            System.out.println(<span class="string">"onNext: "</span> + v);</div><div class="line">        &#125;</div><div class="line"></div><div class="line">    &#125;);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>如果是java8使用lambda表达式，会更简洁(<font color="red">作为一个写代码能少就少的码农，这里吐槽下国内的项目一般都用的是java6和java7，感觉lambda写起来很爽很屌</font>)<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">fWorld.subscribe((v) -&gt; &#123;</div><div class="line">        System.out.println(<span class="string">"onNext: "</span> + v);</div><div class="line">    &#125;)</div><div class="line">    </div><div class="line">    <span class="comment">// - or while also including error handling</span></div><div class="line">    </div><div class="line">    fWorld.subscribe((v) -&gt; &#123;</div><div class="line">        System.out.println(<span class="string">"onNext: "</span> + v);</div><div class="line">    &#125;, (exception) -&gt; &#123;</div><div class="line">        exception.printStackTrace();</div><div class="line">    &#125;)</div></pre></td></tr></table></figure></p>
+<h2 id="Command-Name-Group-Thread-pool"><a href="#Command-Name-Group-Thread-pool" class="headerlink" title="Command Name/Group/Thread-pool"></a>Command Name/Group/Thread-pool</h2><h3 id="Command-Name"><a href="#Command-Name" class="headerlink" title="Command Name"></a>Command Name</h3><p>默认情况CommandName=getClass().getSimpleName()，当然你可以通过HystrixCommand或者HystrixObservableCommand的构造方法显示的指定CommandName</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">public</span> <span class="title">CommandHelloWorld</span><span class="params">(String name)</span> </span>&#123;</div><div class="line">       <span class="keyword">super</span>(Setter.withGroupKey(HystrixCommandGroupKey.Factory.asKey(<span class="string">"ExampleGroup"</span>))</div><div class="line">               .andCommandKey(HystrixCommandKey.Factory.asKey(<span class="string">"HelloWorld"</span>)));</div><div class="line">       <span class="keyword">this</span>.name = name;</div><div class="line">   &#125;</div></pre></td></tr></table></figure>
+<p>我们在创建自己的HystrixCommand(HystrixObservableCommand)，需要在构造方法中调用父类的构造方法，其中可以传入一个Setter对象，这其实就是Hystrix给我提供的一个builder模式构造对象，里面可以设置很多需要的属性(HystrixCommandProperties也可以在这里面设置，当然你不设置Hystrix对与这些属性也会有默认设置)。这里我们通过HystrixCommandKey.Factory.asKey(“HelloWorld”))方法设置commandName=’HelloWorld’</p>
+<h3 id="Command-Group"><a href="#Command-Group" class="headerlink" title="Command Group"></a>Command Group</h3><p>和上面的Command Name一样，我们可以通过下面方法设置Goup Name<br>HystrixCommandGroupKey.Factory.asKey(“ExampleGroup”)</p>
+<p>Hystrix使用了group key把一些命令放在同一个组里面(比如我们系统依赖了外部的Service A和Service B，我们可以创建两个Command Group A、Command Group B，其中A服务又有m1，m2方法，那么Command Group A又包括了Command Name m1 和Command Name m2)，然后以组为维度上传监控数据，提供监控大盘，报警。<br>另外，默认情况下，同一个Command Group下的Command使用相同的Thread-pool，除非某些Command单独指定了线程池。</p>
+<h3 id="Command-Thread-pool"><a href="#Command-Thread-pool" class="headerlink" title="Command Thread-pool"></a>Command Thread-pool</h3><p>Thread-pool key代表了用来执行用户业务逻辑的一个线程池HystrixThreadPool(注意，hystrix为了failfast，实现的线程池没有用队列缓存，如果没有可用线程，直接抛出异常)。如果你创建的HystrixCommand没有显示的指定thread-pool key，那么默认情况下就会使用HystrixCommandGroupKey。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">public</span> <span class="title">CommandHelloWorld</span><span class="params">(String name)</span> </span>&#123;</div><div class="line">    <span class="keyword">super</span>(Setter.withGroupKey(HystrixCommandGroupKey.Factory.asKey(<span class="string">"ExampleGroup"</span>))</div><div class="line">            .andCommandKey(HystrixCommandKey.Factory.asKey(<span class="string">"HelloWorld"</span>))</div><div class="line">            .andThreadPoolKey(HystrixThreadPoolKey.Factory.asKey(<span class="string">"HelloWorldPool"</span>)));</div><div class="line">    <span class="keyword">this</span>.name = name;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>你可以下使用HystrixThreadPoolKey.Factory.asKey(“HelloWorldPool”)来指定某个command特有的线程池，我们之所以不用一个新的Command Group而使用<br>HystrixThreadPoolKey是有原因的：我们有若干个Commands属于一个group，但是某些情况下，有部分command发生异常需要被隔离例如:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">two commands used to access User metadata</div><div class="line">group name is “userGroup”</div><div class="line">command A fetch userName</div><div class="line">command B fetch userAge</div><div class="line">command A依赖的服务挂了不应该影响commadn B的服务。</div></pre></td></tr></table></figure>
+<p>逻辑上Command A和B都依赖于外部的user service所以让他们属于同一个组userGroup，但是为了避免Command A挂了影响Command B，我们可以给A指定一个单独的HystrixThreadPoolKey。</p>
+<h2 id="Fallback降级"><a href="#Fallback降级" class="headerlink" title="Fallback降级"></a>Fallback降级</h2><p>如果你的系统依赖的外部服务出现故障，Hystrix给我们提供了优雅的降级方案，你只需要实现getFallBack方法，这样当调用失败，超时，reject或者short-circuits时候会回调你的fallback方法可以返回一个默认值给调用方。当然以下情况可能fallback方法可能没啥作用，可以注意下:</p>
+<ul>
+<li>如果你是调用一个写命令，这种情况多数都是返回void，这种情况一般是希望报错尽快能通知到调用者(比如抛异常，默认不实现抛出UnsupportedOperationException)，这个时候实现这个fallback方法可能意义不大。</li>
+<li>批量作业或者离线计算，这个时候也一般希望错误能尽快传给调用者</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">CommandHelloFailure</span> <span class="keyword">extends</span> <span class="title">HystrixCommand</span>&lt;<span class="title">String</span>&gt; </span>&#123;</div><div class="line"></div><div class="line">    <span class="keyword">private</span> <span class="keyword">final</span> String name;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="title">CommandHelloFailure</span><span class="params">(String name)</span> </span>&#123;</div><div class="line">        <span class="keyword">super</span>(HystrixCommandGroupKey.Factory.asKey(<span class="string">"ExampleGroup"</span>));</div><div class="line">        <span class="keyword">this</span>.name = name;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">protected</span> String <span class="title">run</span><span class="params">()</span> </span>&#123;</div><div class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> RuntimeException(<span class="string">"this command always fails"</span>);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">protected</span> String <span class="title">getFallback</span><span class="params">()</span> </span>&#123;</div><div class="line">        <span class="keyword">return</span> <span class="string">"Hello Failure "</span> + name + <span class="string">"!"</span>;</div><div class="line">    &#125;</div><div class="line">    </div><div class="line">     <span class="meta">@Test</span></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">testSynchronous</span><span class="params">()</span> </span>&#123;</div><div class="line">        assertEquals(<span class="string">"Hello Failure World!"</span>, <span class="keyword">new</span> CommandHelloFailure(<span class="string">"World"</span>).execute());</div><div class="line">        assertEquals(<span class="string">"Hello Failure Bob!"</span>, <span class="keyword">new</span> CommandHelloFailure(<span class="string">"Bob"</span>).execute());</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>另外不是所有的异常都会回调fallback方法，下面有个表格</p>
+<table>
+<thead>
+<tr>
+<th>Failure Type</th>
+<th style="text-align:right">Exception class</th>
+<th style="text-align:center">Exception.cause</th>
+<th style="text-align:center">subject to fallback</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>FAILURE</td>
+<td style="text-align:right">HystrixRuntimeException</td>
+<td style="text-align:center">underlying exception (user-controlled)</td>
+<td style="text-align:center">YES</td>
+</tr>
+<tr>
+<td>TIMEOUT</td>
+<td style="text-align:right">HystrixRuntimeException</td>
+<td style="text-align:center">j.u.c.TimeoutException</td>
+<td style="text-align:center">YES</td>
+</tr>
+<tr>
+<td>SHORT_CIRCUITED</td>
+<td style="text-align:right">HystrixRuntimeException</td>
+<td style="text-align:center">j.l.RuntimeException</td>
+<td style="text-align:center">YES</td>
+</tr>
+<tr>
+<td>THREAD_POOL_REJECTED</td>
+<td style="text-align:right">HystrixRuntimeException</td>
+<td style="text-align:center">j.u.c.RejectedExecutionException</td>
+<td style="text-align:center">YES</td>
+</tr>
+<tr>
+<td>SEMAPHORE_REJECTED</td>
+<td style="text-align:right">HystrixRuntimeException</td>
+<td style="text-align:center">j.l.RuntimeException</td>
+<td style="text-align:center">YES</td>
+</tr>
+<tr>
+<td>BAD_REQUEST</td>
+<td style="text-align:right">HystrixRuntimeException</td>
+<td style="text-align:center">underlying exception (user-controlled)</td>
+<td style="text-align:center">NO</td>
+</tr>
+</tbody>
+</table>
+<font color="red">HystrixBadRequestException主要用来处理非法参数和一些非系统错误问题，所以不会触发fallback方法</font>
+
+<p>HystrixObservableCommand就需要实现resumeWithFallback方法，如果你用HystrixObservableCommand emit发射了多个事件，那么你可能更希望知道是哪个事件发生了错误，下面有个demo可以参考一下。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@Override</span></div><div class="line"><span class="function"><span class="keyword">protected</span> Observable&lt;Integer&gt; <span class="title">construct</span><span class="params">()</span> </span>&#123;</div><div class="line">    <span class="keyword">return</span> Observable.just(<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>)</div><div class="line">            .concatWith(Observable.&lt;Integer&gt; error(<span class="keyword">new</span> RuntimeException(<span class="string">"forced error"</span>)))</div><div class="line">            .doOnNext(<span class="keyword">new</span> Action1&lt;Integer&gt;() &#123;</div><div class="line">                <span class="meta">@Override</span></div><div class="line">                <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">call</span><span class="params">(Integer t1)</span> </span>&#123;</div><div class="line">                    lastSeen = t1;</div><div class="line">                &#125;</div><div class="line">                </div><div class="line">            &#125;)</div><div class="line">            .subscribeOn(Schedulers.computation());</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="meta">@Override</span></div><div class="line"><span class="function"><span class="keyword">protected</span> Observable&lt;Integer&gt; <span class="title">resumeWithFallback</span><span class="params">()</span> </span>&#123;</div><div class="line">    <span class="keyword">if</span> (lastSeen &lt; <span class="number">4</span>) &#123;</div><div class="line">        <span class="keyword">return</span> Observable.range(lastSeen + <span class="number">1</span>, <span class="number">4</span> - lastSeen);</div><div class="line">    &#125; <span class="keyword">else</span> &#123;</div><div class="line">        <span class="keyword">return</span> Observable.empty();</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>上述也是用到了rxjava，这里简单提一下，不然可能很多人看不懂。</p>
+<ul>
+<li>Observable.just(1, 2, 3):这个Observable会依次发送1，2，3三个事件</li>
+<li>Observable.concatWith(Exception):这个相当于在(1,2,3)后面又发送了一个Exception事件</li>
+<li>Observable.doOnNext:每次在调用订阅者Observer的消费(onNext)方法之前都会调用这个doOnNext方法</li>
+<li>Observable.subscribeOn:指定产生订阅事件发生在Schedulers.computation()线程池里面</li>
+<li>Observable.range(start,count):发射从start开始依次递增加一 count个事件</li>
+</ul>
+<p>知道了上述意思后，我们就不难搞懂上述代码是每次都把执行的事件通过一个中间变量记录下来，这样就知道Observable发射的多个事件到底是哪个报错。</p>
+<h2 id="Request-Cache"><a href="#Request-Cache" class="headerlink" title="Request Cache"></a>Request Cache</h2><p>可以实现getCacheKey()方法来达到缓存请求的目的，这样在同一个上下文档中，如果有相同的请求，就可以使用缓存中的值。<font color="red">注意这里我强调了同一个上下文，只有同一个上下文当中缓存才有效</font></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line">public class CommandUsingRequestCache extends HystrixCommand&lt;Boolean&gt; &#123;</div><div class="line"></div><div class="line">    private final int value;</div><div class="line"></div><div class="line">    protected CommandUsingRequestCache(int value) &#123;</div><div class="line">        super(HystrixCommandGroupKey.Factory.asKey(&quot;ExampleGroup&quot;));</div><div class="line">        this.value = value;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    @Override</div><div class="line">    protected Boolean run() &#123;</div><div class="line">        return value == 0 || value % 2 == 0;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    @Override</div><div class="line">    protected String getCacheKey() &#123;</div><div class="line">        return String.valueOf(value);</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@Test</span></div><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">testWithCacheHits</span><span class="params">()</span> </span>&#123;</div><div class="line">    HystrixRequestContext context = HystrixRequestContext.initializeContext();</div><div class="line">    <span class="keyword">try</span> &#123;</div><div class="line">        CommandUsingRequestCache command2a = <span class="keyword">new</span> CommandUsingRequestCache(<span class="number">2</span>);</div><div class="line">        CommandUsingRequestCache command2b = <span class="keyword">new</span> CommandUsingRequestCache(<span class="number">2</span>);</div><div class="line"></div><div class="line">        assertTrue(command2a.execute());</div><div class="line">        <span class="comment">// 第一次执行cacheKey=2，缓存还没有，所以false</span></div><div class="line">        assertFalse(command2a.isResponseFromCache());</div><div class="line"></div><div class="line">        assertTrue(command2b.execute());</div><div class="line">        <span class="comment">// 第二次执行cacheKey=2，缓存已经有了，所以true</span></div><div class="line">        assertTrue(command2b.isResponseFromCache());</div><div class="line">    &#125; <span class="keyword">finally</span> &#123;</div><div class="line">        context.shutdown();</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="comment">// start a new request context</span></div><div class="line">    context = HystrixRequestContext.initializeContext();</div><div class="line">    <span class="keyword">try</span> &#123;</div><div class="line">        CommandUsingRequestCache command3b = <span class="keyword">new</span> CommandUsingRequestCache(<span class="number">2</span>);</div><div class="line">        assertTrue(command3b.execute());</div><div class="line">        <span class="comment">// 因为是开启了一个新的context，所以尽管cacheKey=2，但是还是没有用到缓存</span></div><div class="line">        assertFalse(command3b.isResponseFromCache());</div><div class="line">    &#125; <span class="keyword">finally</span> &#123;</div><div class="line">        context.shutdown();</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h2 id="Request-Context-Setup"><a href="#Request-Context-Setup" class="headerlink" title="Request Context Setup"></a>Request Context Setup</h2><p>如果你想用到上述的reqeust cache(还有Hystrix其他的request collapsing, request log)功能，我们可以看到你需要创建一个context，如果每次都在代码里面new 一个太繁琐了。现在我们一般应用都是部署在一个web环境下，我们可以使用Servlet Filter来实现这个上下文<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">HystrixRequestContextServletFilter</span> <span class="keyword">implements</span> <span class="title">Filter</span> </span>&#123;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">doFilter</span><span class="params">(ServletRequest request, ServletResponse response, FilterChain chain)</span> </span></div><div class="line">     <span class="keyword">throws</span> IOException, ServletException &#123;</div><div class="line">        HystrixRequestContext context = HystrixRequestContext.initializeContext();</div><div class="line">        <span class="keyword">try</span> &#123;</div><div class="line">            chain.doFilter(request, response);</div><div class="line">        &#125; <span class="keyword">finally</span> &#123;</div><div class="line">            context.shutdown();</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">filter</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="name">display-name</span>&gt;</span>HystrixRequestContextServletFilter<span class="tag">&lt;/<span class="name">display-name</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="name">filter-name</span>&gt;</span>HystrixRequestContextServletFilter<span class="tag">&lt;/<span class="name">filter-name</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="name">filter-class</span>&gt;</span>com.netflix.hystrix.contrib.requestservlet.HystrixRequestContextServletFilter<span class="tag">&lt;/<span class="name">filter-class</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">filter</span>&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">filter-mapping</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="name">filter-name</span>&gt;</span>HystrixRequestContextServletFilter<span class="tag">&lt;/<span class="name">filter-name</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="name">url-pattern</span>&gt;</span>/*<span class="tag">&lt;/<span class="name">url-pattern</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">filter-mapping</span>&gt;</span></div></pre></td></tr></table></figure>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Hystrix/" rel="tag"># Hystrix</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/09/27/hystrix1/" rel="next" title="Hystrix初探">
+                <i class="fa fa-chevron-left"></i> Hystrix初探
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div id="cloud-tie-wrapper" class="cloud-tie-wrapper"></div>
+      <script>
+        var cloudTieConfig = {
+          url: document.location.href,
+          sourceId: "",
+          productKey: "f6968bd56d71417cad7a11c8df334d35",
+          target: "cloud-tie-wrapper"
+        };
+      </script>
+      <script src="https://img1.cache.netease.com/f2e/tie/yun/sdk/loader.js"></script>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/uploads/avatar.png"
+               alt="Smartの小明" />
+          <p class="site-author-name" itemprop="name">Smartの小明</p>
+          <p class="site-description motion-element" itemprop="description">屌丝搬砖程序猿,码农界的搬运工,哪里需要搬哪里</p>
+        </div>
+
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">22</span>
+              <span class="site-state-item-name">posts</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">4</span>
+                <span class="site-state-item-name">categories</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">18</span>
+                <span class="site-state-item-name">tags</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/q6413260" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/1855404367/profile?rightmod=1&wvr=6&mod=personinfo&is_all=1" target="_blank" title="微博">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  微博
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://www.douban.com/people/142298114/" target="_blank" title="豆瓣">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  豆瓣
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://www.zhihu.com/people/xiaoming1990" target="_blank" title="知乎">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  知乎
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Hello-World"><span class="nav-number">1.</span> <span class="nav-text">Hello World!</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#HystrixCommand"><span class="nav-number">1.1.</span> <span class="nav-text">HystrixCommand</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#HystrixObservableCommand"><span class="nav-number">1.2.</span> <span class="nav-text">HystrixObservableCommand</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#两者区别"><span class="nav-number">1.3.</span> <span class="nav-text">两者区别</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#响应式-Reactive"><span class="nav-number">2.</span> <span class="nav-text">响应式(Reactive)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Command-Name-Group-Thread-pool"><span class="nav-number">3.</span> <span class="nav-text">Command Name/Group/Thread-pool</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Command-Name"><span class="nav-number">3.1.</span> <span class="nav-text">Command Name</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Command-Group"><span class="nav-number">3.2.</span> <span class="nav-text">Command Group</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Command-Thread-pool"><span class="nav-number">3.3.</span> <span class="nav-text">Command Thread-pool</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Fallback降级"><span class="nav-number">4.</span> <span class="nav-text">Fallback降级</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Request-Cache"><span class="nav-number">5.</span> <span class="nav-text">Request Cache</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Request-Context-Setup"><span class="nav-number">6.</span> <span class="nav-text">Request Context Setup</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Smartの小明</span>
+</div>
+
+
+<div class="powered-by">
+  Powered by <a class="theme-link" href="https://hexo.io">Hexo</a>
+</div>
+
+<div class="theme-info">
+  Theme -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+
+        
+
+<div class="busuanzi-count">
+
+  <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv"><i class="fa fa-user"></i><span class="busuanzi-value" id="busuanzi_value_site_uv"></span></span>
+  
+
+  
+    <span class="site-pv"><i class="fa fa-eye"></i><span class="busuanzi-value" id="busuanzi_value_site_pv"></span></span>
+  
+  
+</div>
+
+
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.0"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+	
+
+
+
+
+  
+  
+
+  
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.1.js"></script>
+  <script>AV.initialize("Y2lqjwOrlt5p333cMSW3HNxD-gzGzoHsz", "Y6lssmQDLyXlT0HE1pgVn0UK");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+  
+
+
+</body>
+</html>

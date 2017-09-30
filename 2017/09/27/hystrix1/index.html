@@ -94,7 +94,7 @@
 <meta property="og:image" content="https://coding.net/u/lightoheaven/p/image2/git/raw/master/201709/unhealthy.jpeg">
 <meta property="og:image" content="https://coding.net/u/lightoheaven/p/image2/git/raw/master/201709/unhealthy2.jpeg">
 <meta property="og:image" content="https://coding.net/u/lightoheaven/p/image2/git/raw/master/201709/network.jpeg">
-<meta property="og:updated_time" content="2017-09-27T12:22:04.000Z">
+<meta property="og:updated_time" content="2017-09-30T01:30:57.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Hystrix初探">
 <meta name="twitter:description" content="去年在看spring cloud系列的时候，当时就已经了解到了hystrix，这个组件和eureka，zuul等组件一样都是netflix公司开源的。当时由于没有太多的精力，只简单了解了下hystrix的一些简单功能。这半年因为工作关系一直接触redis相关的东西，redis相关也看过不少书了，有时候一直搞一件事可能觉得有点枯燥。就偶然又产生了想法，就决定重新看一下hystrix，决定搞一个hys">
@@ -392,8 +392,7 @@
 <p>所有外部服务都运行正常的情况下，我们服务是这样的:<br><img src="https://coding.net/u/lightoheaven/p/image2/git/raw/master/201709/healthy.jpeg" alt="服务正常"></p>
 <p>当其中一个外部服务不可用(或者开始出现延时)，就会开始阻塞用户请求<br><img src="https://coding.net/u/lightoheaven/p/image2/git/raw/master/201709/unhealthy.jpeg" alt="服务异常"></p>
 <p>当一个服务开始延时就会慢慢开始影响上游的一系列相关的服务，导致上游也出现延时。并且更糟糕的是，相关联的上游服务如果有一些重试机制就会耗尽线程池，io和一些其他的系统资源，就会在整个系统之间导致瀑布式的错误<br><img src="https://coding.net/u/lightoheaven/p/image2/git/raw/master/201709/unhealthy2.jpeg" alt="瀑布式异常"></p>
-<p>Hystrix采用以下设计原则</p>
-<blockquote>
+<h2 id="Hystrix采用以下设计原则"><a href="#Hystrix采用以下设计原则" class="headerlink" title="Hystrix采用以下设计原则"></a>Hystrix采用以下设计原则</h2><blockquote>
 <ul>
 <li>避免单个的外部依赖耗尽应用资源(例如tomcat)线程</li>
 <li>通过fail fast机制代替队列来降低负载</li>
@@ -457,6 +456,10 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/09/30/hystrix2/" rel="prev" title="Hystrix使用">
+                Hystrix使用 <i class="fa fa-chevron-right"></i>
+              </a>
             
           </div>
         </div>
@@ -536,7 +539,7 @@
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">21</span>
+              <span class="site-state-item-count">22</span>
               <span class="site-state-item-name">posts</span>
             </a>
           </div>
@@ -628,7 +631,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Hystrix是什么"><span class="nav-number">1.</span> <span class="nav-text">Hystrix是什么</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Hystrix用来做什么"><span class="nav-number">2.</span> <span class="nav-text">Hystrix用来做什么</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Hystrix解决了什么问题"><span class="nav-number">3.</span> <span class="nav-text">Hystrix解决了什么问题</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Hystrix如何实现它的设计目标"><span class="nav-number">4.</span> <span class="nav-text">Hystrix如何实现它的设计目标</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Hystrix是什么"><span class="nav-number">1.</span> <span class="nav-text">Hystrix是什么</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Hystrix用来做什么"><span class="nav-number">2.</span> <span class="nav-text">Hystrix用来做什么</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Hystrix解决了什么问题"><span class="nav-number">3.</span> <span class="nav-text">Hystrix解决了什么问题</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Hystrix采用以下设计原则"><span class="nav-number">4.</span> <span class="nav-text">Hystrix采用以下设计原则</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Hystrix如何实现它的设计目标"><span class="nav-number">5.</span> <span class="nav-text">Hystrix如何实现它的设计目标</span></a></li></ol></div>
             
 
           </div>
