@@ -1,0 +1,937 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="en">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="数据库访问层DAL," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/uploads/avatar.png?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="zebra是一个基于JDBC API协议上开发出的高可用、高性能的数据库访问层解决方案。类似阿里的tddl，zebra是一个smart客户端，提供了诸如动态配置、监控、读写分离、分库分表等功能。下图是zebra的整体架构图
+zebra整体架构">
+<meta property="og:type" content="article">
+<meta property="og:title" content="数据库访问层中间件Zebra">
+<meta property="og:url" content="http://yeming.me/2017/11/29/zebra/index.html">
+<meta property="og:site_name" content="Smartの小明">
+<meta property="og:description" content="zebra是一个基于JDBC API协议上开发出的高可用、高性能的数据库访问层解决方案。类似阿里的tddl，zebra是一个smart客户端，提供了诸如动态配置、监控、读写分离、分库分表等功能。下图是zebra的整体架构图
+zebra整体架构">
+<meta property="og:image" content="https://coding.net/u/lightoheaven/p/image2/git/raw/master/201711/zebra.jpeg">
+<meta property="og:image" content="https://coding.net/u/lightoheaven/p/image2/git/raw/master/201711/dataSource.jpeg">
+<meta property="og:image" content="https://coding.net/u/lightoheaven/p/image2/git/raw/master/201711/singleDataSource.jpeg">
+<meta property="og:image" content="https://coding.net/u/lightoheaven/p/image2/git/raw/master/201711/groupDataSource.jpeg">
+<meta property="og:image" content="https://coding.net/u/lightoheaven/p/image2/git/raw/master/201711/groupDataSourceInit.jpeg">
+<meta property="og:image" content="https://coding.net/u/lightoheaven/p/image2/git/raw/master/201711/shardDataSource.jpeg">
+<meta property="og:image" content="https://coding.net/u/lightoheaven/p/image2/git/raw/master/201711/sql.jpeg">
+<meta property="og:image" content="https://coding.net/u/lightoheaven/p/image2/git/raw/master/201711/ha.jpeg">
+<meta property="og:image" content="https://coding.net/u/lightoheaven/p/image2/git/raw/master/201711/mha.jpeg">
+<meta property="og:image" content="https://coding.net/u/lightoheaven/p/image2/git/raw/master/201711/slaveha.jpeg">
+<meta property="og:updated_time" content="2017-11-29T13:54:43.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="数据库访问层中间件Zebra">
+<meta name="twitter:description" content="zebra是一个基于JDBC API协议上开发出的高可用、高性能的数据库访问层解决方案。类似阿里的tddl，zebra是一个smart客户端，提供了诸如动态配置、监控、读写分离、分库分表等功能。下图是zebra的整体架构图
+zebra整体架构">
+<meta name="twitter:image" content="https://coding.net/u/lightoheaven/p/image2/git/raw/master/201711/zebra.jpeg">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '6252881861358388000',
+      author: '小明'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yeming.me/2017/11/29/zebra/"/>
+
+
+
+
+
+  <title> 数据库访问层中间件Zebra | Smartの小明 </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="en">
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">Smartの小明</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle">屌丝搬砖程序猿,码农界的搬运工,哪里需要搬哪里</p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            Categories
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            About
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            Archives
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            Tags
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+  <link itemprop="mainEntityOfPage" href="http://yeming.me/2017/11/29/zebra/">
+
+  <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <meta itemprop="name" content="Smartの小明">
+    <meta itemprop="description" content="">
+    <meta itemprop="image" content="/uploads/avatar.png">
+  </span>
+
+  <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+    <meta itemprop="name" content="Smartの小明">
+    <span style="display:none" itemprop="logo" itemscope itemtype="http://schema.org/ImageObject">
+      <img style="display:none;" itemprop="url image" alt="Smartの小明" src="">
+    </span>
+  </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                数据库访问层中间件Zebra
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-11-29T21:00:50+08:00">
+                2017-11-29
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+              <span class="post-meta-divider">|</span>
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/技术分享/" itemprop="url" rel="index">
+                    <span itemprop="name">技术分享</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+
+          
+          
+             <span id="/2017/11/29/zebra/" class="leancloud_visitors" data-flag-title="数据库访问层中间件Zebra">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               <span class="post-meta-item-text">Visitors </span>
+               <span class="leancloud-visitors-count"></span>
+              </span>
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="page-pv"><i class="fa fa-file-o"></i>
+            <span class="busuanzi-value" id="busuanzi_value_page_pv" ></span>
+            </span>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>zebra是一个基于JDBC API协议上开发出的高可用、高性能的数据库访问层解决方案。类似阿里的tddl，zebra是一个smart客户端，提供了诸如动态配置、监控、读写分离、分库分表等功能。下图是zebra的整体架构图</p>
+<h2 id="zebra整体架构"><a href="#zebra整体架构" class="headerlink" title="zebra整体架构"></a>zebra整体架构</h2><p><img src="https://coding.net/u/lightoheaven/p/image2/git/raw/master/201711/zebra.jpeg" alt="zebra整体架构"><br><a id="more"></a></p>
+<ul>
+<li>zookeeper中存储着每一个数据库的路由信息、用户名密码等信息</li>
+<li>zebra客户端启动时会从zookeeper拉取数据库的信息，然后直连数据库。进行读写分离和分库分表。</li>
+<li>MHA组件是一个开源组件，主要负责数据库集群的主库的高可用。一旦发生主库故障，MHA会保证切换到某个从库上并把数据库保证一致性。</li>
+<li>从库监控服务是一个自研的服务，主要负责数据库集群的从库的高可用。一旦发生从库故障，该服务会把该从库自动摘除。</li>
+<li>RDS是一个DBA一站式管理平台，负责数据库的创建、维护、扩容，以及最重要的zebra的配置信息的维护。</li>
+</ul>
+<h2 id="zebra客户端"><a href="#zebra客户端" class="headerlink" title="zebra客户端"></a>zebra客户端</h2><p>zebra中主要包括三个实现了JDBC协议的数据源，分别是：</p>
+<ul>
+<li>ShardDataSource：负责分库分表的连接池，它主要判断SQL的落到哪个分片上，然后把相应的SQL经过处理后发送给GroupDataSource。它负责连接多个数据库集群，因此它会包含若干个GroupDataSource。</li>
+<li>GroupDataSource：负责读写分离的连接池，它主要负责判断SQL的读写操作，然后把相应的SQL发送给SingleDataSource。它负责连接一个数据库集群，因此它会包含若干个SingleDataSource。</li>
+<li>SingleDataSource：负责抽象底层使用的连接池类型（c3p0,druid,tomcat-jdbc等），然后直连每一个数据库实例。在上图中，每一个Master或者Slave，都对应一个SingleDataSource。</li>
+</ul>
+<p><img src="https://coding.net/u/lightoheaven/p/image2/git/raw/master/201711/dataSource.jpeg" alt="zebra dataSource"></p>
+<h3 id="客户端源码分析"><a href="#客户端源码分析" class="headerlink" title="客户端源码分析"></a>客户端源码分析</h3><p>客户端源码主要包括两个部分启动阶段的初始化和sql请求的处理</p>
+<ul>
+<li>初始化：主要是应用启动阶段，对上述3个dataSource实例化，初始化相关配置，主要包括初始化上述3个dataSource的关系，建立与物理数据库之间的连接，添加一些配置变更的listener(通过zk监听配置，failover时候重建本地数据源，限流，流量路由)</li>
+<li>sql处理：主要包括sql解析，路由，改写，执行，结果合并几个步骤</li>
+</ul>
+<h3 id="初始化"><a href="#初始化" class="headerlink" title="初始化"></a>初始化</h3><h4 id="SingleDataSource初始化"><a href="#SingleDataSource初始化" class="headerlink" title="SingleDataSource初始化"></a>SingleDataSource初始化</h4><p><img src="https://coding.net/u/lightoheaven/p/image2/git/raw/master/201711/singleDataSource.jpeg" alt="SingleDataSource配置"><br>上图是一个SingDataSource的xml配置，最开始的jdbcUrl，password，user，driver这个是连接mysql服务端需要的，后面的一些参数就是配置数据库连接池(c3p0,tomcat-jdbc,dbcp,druid)的一些通用的参数配置</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div></pre></td><td class="code"><pre><div class="line">public synchronized void init() &#123;</div><div class="line">    if (!init) &#123;</div><div class="line">        mergeDataSourceConfig();</div><div class="line">    </div><div class="line">        this.withDefalutValue = false;</div><div class="line">        if (this.getClass().isAssignableFrom(SingleDataSource.class)) &#123;</div><div class="line">            if (!this.poolType.equals(Constants.CONNECTION_POOL_TYPE_C3P0)) &#123;</div><div class="line">                this.withDefalutValue = true;</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line">    </div><div class="line">        this.dataSourcePool = DataSourcePoolFactory.buildDataSourcePool(this.config);</div><div class="line">        this.filters = FilterManagerFactory.getFilterManager().loadFilters(&quot;cat,mtrace,tablerewrite,sqlrewrite&quot;,</div><div class="line">                configManagerType);</div><div class="line">    </div><div class="line">        initDataSourceWithFilters(this.config);</div><div class="line">    </div><div class="line">        init = true;</div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line">private DataSource initDataSourceWithFilters(final DataSourceConfig value) &#123;</div><div class="line">    if (filters != null &amp;&amp; filters.size() &gt; 0) &#123;</div><div class="line">        JdbcFilter chain = new DefaultJdbcFilterChain(filters) &#123;</div><div class="line">            @Override</div><div class="line">            public DataSource initSingleDataSource(SingleDataSource source, JdbcFilter chain) &#123;</div><div class="line">                if (index &lt; filters.size()) &#123;</div><div class="line">                    return filters.get(index++).initSingleDataSource(source, chain);</div><div class="line">                &#125; else &#123;</div><div class="line">                    return source.initDataSourceOrigin(value);</div><div class="line">                &#125;</div><div class="line">            &#125;</div><div class="line">        &#125;;</div><div class="line">        return chain.initSingleDataSource(this, chain);</div><div class="line">    &#125; else &#123;</div><div class="line">        return initDataSourceOrigin(value);</div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line">private DataSource initDataSourceOrigin(DataSourceConfig value) &#123;</div><div class="line">    DataSource result = this.dataSourcePool.build(value, withDefalutValue);</div><div class="line">    </div><div class="line">    if (!this.lazyInit) &#123;</div><div class="line">        Connection conn = null;</div><div class="line">        try &#123;</div><div class="line">            conn = result.getConnection();</div><div class="line">            logger.info(String.format(&quot;dataSource [%s] init pool finish&quot;, value.getId()));</div><div class="line">        &#125; catch (SQLException e) &#123;</div><div class="line">            logger.error(String.format(&quot;dataSource [%s] init pool fail&quot;, value.getId()), e);</div><div class="line">        &#125; finally &#123;</div><div class="line">            try &#123;</div><div class="line">                if (conn != null) &#123;</div><div class="line">                    conn.close();</div><div class="line">                &#125;</div><div class="line">            &#125; catch (SQLException e) &#123;</div><div class="line">                logger.error(String.format(&quot;dataSource [%s] init pool fail&quot;, value.getId()));</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">    </div><div class="line">    return result;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>上面的代码init方法中的this.dataSourcePool = DataSourcePoolFactory.buildDataSourcePool(this.config);这里是通过xml中的参数创建一个对应的数据库连接池(c3p0,tomcat-jdbc,dbcp,druid)，然后最后一个initDataSourceOrigin方法，判断是否是lazyInit；如果不是，直接建立一个与mysql服务端的一个长连接。<font color="red">所以SingleDataSource初始化主要是创建一个真实的数据库连接池dataSourcePool，后续从SingleDataSource获取连接其实都是从dataSourcePool获取一个Connection</font></p>
+<h4 id="GroupDataSource初始化"><a href="#GroupDataSource初始化" class="headerlink" title="GroupDataSource初始化"></a>GroupDataSource初始化</h4><p>负责读写分离的连接池，它主要负责判断SQL的读写操作，然后把相应的SQL发送给SingleDataSource。它负责连接一个数据库集群，因此它会包含若干个SingleDataSource</p>
+<p><img src="https://coding.net/u/lightoheaven/p/image2/git/raw/master/201711/groupDataSource.jpeg" alt="GroupDataSource配置"><br>上图里面我们要说明下jdbcRef，如果要使用读写分离功能，需要在我们管理平台RDS上申请一组读写数据库，比如DB-1-WRITE,DB-1-REDAD,DB-2-READ，这里DB-1负责所有写请求，DB-1和DB-2共同负责读请求(流量可以配置)。以上2个数据库会关联一个jdbcRef保存在zk上面，所以上述xml里面直接配置了jdbcRef，启动时候从zk获取对应的主从结构。</p>
+<p><img src="https://coding.net/u/lightoheaven/p/image2/git/raw/master/201711/groupDataSourceInit.jpeg" alt="GroupDataSource初始化"></p>
+<font color="red">GroupDataSource初始化从先从zk获取group相关的配置，主要是读写分离，路由负载均衡策略，限流熔断策略，并注册对这些配置的实时监听，然后从zk获取jdbc对应的若干个SingleDataSource并分别初始化</font>
+
+<h4 id="ShardDataSource初始化"><a href="#ShardDataSource初始化" class="headerlink" title="ShardDataSource初始化"></a>ShardDataSource初始化</h4><p>负责分库分表的连接池，它主要判断SQL的落到哪个分片上，然后把相应的SQL经过处理后发送给GroupDataSource。它负责连接多个数据库集群，因此它会包含若干个GroupDataSource(或者直接多个SingDataSource)</p>
+<p><img src="https://coding.net/u/lightoheaven/p/image2/git/raw/master/201711/shardDataSource.jpeg" alt="ShardDataSource配置"></p>
+<p>上面的配置稍微解释下</p>
+<ul>
+<li>ruleName：分表分表规则，集中式配置在zk上面</li>
+<li>dataSourcePool：配置若干个GroupDataSource或者SingleDataSource</li>
+<li>routerFactory：本地分表规则，先获取本地分库分表规则，如果没有配置，则从zk上获取ruleName分库分表规则</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">router-local-rule.xml</div><div class="line"></div><div class="line">&lt;router-rule&gt;</div><div class="line">    &lt;table-shard-rule table=&quot;Feed&quot; generatedPK=&quot;id&quot;&gt;</div><div class="line">        &lt;shard-dimension dbRule=&quot;(#id#.intValue() % 8).intdiv(2)&quot; </div><div class="line">            dbIndexes=&quot;id[0-3]&quot;</div><div class="line">            tbRule=&quot;#id#.intValue() % 2&quot; </div><div class="line">            tbSuffix=&quot;alldb:[0,7]&quot;</div><div class="line">            isMaster=&quot;true&quot;&gt;</div><div class="line">        &lt;/shard-dimension&gt;</div><div class="line">    &lt;/table-shard-rule&gt;</div><div class="line">&lt;/router-rule&gt;</div></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div></pre></td><td class="code"><pre><div class="line">public void init() &#123;</div><div class="line">    if (StringUtils.isNotBlank(ruleName)) &#123;</div><div class="line">        if (configService == null) &#123;</div><div class="line">            configService = ConfigServiceFactory.getConfigService(configManagerType, ruleName);</div><div class="line">        &#125;</div><div class="line">    </div><div class="line">        if (routerFactory == null) &#123;</div><div class="line">            routerFactory = new LionRouterBuilder(ruleName, defaultDatasource);</div><div class="line">        &#125;</div><div class="line">    &#125; else &#123;</div><div class="line">        if (dataSourcePool == null || dataSourcePool.isEmpty()) &#123;</div><div class="line">            throw new IllegalArgumentException(&quot;dataSourcePool is required.&quot;);</div><div class="line">        &#125;</div><div class="line">    </div><div class="line">        if (routerFactory == null) &#123;</div><div class="line">            throw new IllegalArgumentException(&quot;routerRuleFile must be set.&quot;);</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">    </div><div class="line">    this.initFilters();</div><div class="line">    initInternal();</div><div class="line">&#125;</div><div class="line"></div><div class="line">private void initInternal() &#123;</div><div class="line">    this.router = routerFactory.build();</div><div class="line">    </div><div class="line">    if (dataSourceRepository == null) &#123;</div><div class="line">        dataSourceRepository = DataSourceRepository.getInstance();</div><div class="line">    &#125;</div><div class="line">    </div><div class="line">    if (dataSourcePool != null) &#123;</div><div class="line">        dataSourceRepository.init(dataSourcePool);</div><div class="line">    &#125; else &#123;</div><div class="line">        this.shardDataSourceCustomConfig.setDsConfigProperties(this.dsConfigProperties);</div><div class="line">        dataSourceRepository.init(this.router.getRouterRule(), this.shardDataSourceCustomConfig);</div><div class="line">    &#125;</div><div class="line">    </div><div class="line">    // init thread pool</div><div class="line">    SQLThreadPoolExecutor.getInstance();</div><div class="line">    </div><div class="line">    // init SQL Parser</div><div class="line">    SQLParser.init();</div><div class="line">    </div><div class="line">    if (ruleName != null) &#123;</div><div class="line">        logger.info(String.format(&quot;ShardDataSource(%s) successfully initialized.&quot;, ruleName));</div><div class="line">    &#125; else &#123;</div><div class="line">        logger.info(&quot;ShardDataSource successfully initialized.&quot;);</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>dataSourcePool包含若干个GroupDataSource或者SingleDataSource，先依赖这些DataSource的初始化。<br>routerFactory是本息xml配置的分库分表规则，如果没有配置，则从zk上获取分库分表配置，规则引擎是基于groovy的脚本，可以动态变更。</p>
+<h3 id="sql处理"><a href="#sql处理" class="headerlink" title="sql处理"></a>sql处理</h3><p>sql处理主要包括，从连接池获取连接，创建preparedStatement，然后sql解析，路由，改写，执行，结果合并(路由，改写，结果合并是读写分离和分库分表才有的)</p>
+<h4 id="mybatis-jdbc知识储备"><a href="#mybatis-jdbc知识储备" class="headerlink" title="mybatis,jdbc知识储备"></a>mybatis,jdbc知识储备</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">@Test</div><div class="line">public void test() throws IOException &#123;</div><div class="line">    Connection conn = null;</div><div class="line">    Statement stmt = null;</div><div class="line">    ResultSet rs = null;</div><div class="line">    conn = ds.getConnection();</div><div class="line">    stmt = conn.createStatement();</div><div class="line">    rs = stmt.executeQuery(&quot;SELECT * From Cluster&quot;);</div><div class="line"></div><div class="line">    while (rs.next()) &#123;</div><div class="line">        System.out.println(rs.getString(2));</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>以上是jdbc处理一条sql的，主要包括获取连接，创建preparedStatement，执行</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div></pre></td><td class="code"><pre><div class="line">SimpleExecutor</div><div class="line"></div><div class="line">public &lt;E&gt; List&lt;E&gt; doQuery(MappedStatement ms, Object parameter, RowBounds rowBounds, ResultHandler resultHandler, BoundSql boundSql) throws SQLException &#123;</div><div class="line">    Statement stmt = null;</div><div class="line">    try &#123;</div><div class="line">      Configuration configuration = ms.getConfiguration();</div><div class="line">      StatementHandler handler = configuration.newStatementHandler(this, ms, parameter, rowBounds, resultHandler, boundSql);</div><div class="line">      stmt = prepareStatement(handler, ms.getStatementLog());</div><div class="line">      return handler.&lt;E&gt;query(stmt, resultHandler);</div><div class="line">    &#125; finally &#123;</div><div class="line">      closeStatement(stmt);</div><div class="line">    &#125;</div><div class="line">  &#125;</div><div class="line">  </div><div class="line">private Statement prepareStatement(StatementHandler handler, Log statementLog) throws SQLException &#123;</div><div class="line">    Statement stmt;</div><div class="line">    Connection connection = getConnection(statementLog);</div><div class="line">    stmt = handler.prepare(connection);</div><div class="line">    handler.parameterize(stmt);</div><div class="line">    return stmt;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>上述是mybatis中的SimpleExecutor类封装好了jdbc的操作。上述的Connection connection = getConnection(statementLog);最终会调用上述初始化的DataSource的getConnection方法。</p>
+<h4 id="sql解析，路由，改写，执行，结果合并"><a href="#sql解析，路由，改写，执行，结果合并" class="headerlink" title="sql解析，路由，改写，执行，结果合并"></a>sql解析，路由，改写，执行，结果合并</h4><p><img src="https://coding.net/u/lightoheaven/p/image2/git/raw/master/201711/sql.jpeg" alt="获取conn"></p>
+<p>最终调用ShardPreparedStatement的execute方法<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line">public boolean execute() throws SQLException &#123;</div><div class="line">    SqlType sqlType = getSqlType(sql);</div><div class="line">    </div><div class="line">    if (sqlType == SqlType.SELECT || sqlType == SqlType.SELECT_FOR_UPDATE) &#123;</div><div class="line">        executeQuery();</div><div class="line">    </div><div class="line">        return true;</div><div class="line">    &#125; else if (sqlType == SqlType.INSERT || sqlType == SqlType.UPDATE || sqlType == SqlType.DELETE</div><div class="line">            || sqlType == SqlType.REPLACE) &#123;	// add for replace</div><div class="line">        executeUpdate();</div><div class="line">    </div><div class="line">        return false;</div><div class="line">    &#125; else &#123;</div><div class="line">        throw new SQLException(&quot;only select, insert, update, delete, replace sql is supported&quot;);</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>这里可以看到对于查询和更新的流程是不一样的，查询流程要比更新流程复杂，因为查询操作不需要传分表字段值，而更新操作必须要传分表字段值，下面我们来看下查询操作。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div></pre></td><td class="code"><pre><div class="line">private ResultSet executeQueryWithFilter() throws SQLException &#123;</div><div class="line">    ResultSet specRS = beforeQuery(sql);</div><div class="line">    if (specRS != null) &#123;</div><div class="line">        this.results = specRS;</div><div class="line">        this.updateCount = -1;</div><div class="line">        attachedResultSets.add(specRS);</div><div class="line">    </div><div class="line">        return this.results;</div><div class="line">    &#125;</div><div class="line">    </div><div class="line">    RouterResult routerTarget = routingAndCheck(sql, getParams());</div><div class="line">    rewriteAndMergeParms(routerTarget.getParams());</div><div class="line">    ShardResultSet rs = new ShardResultSet();</div><div class="line">    rs.setStatement(this);</div><div class="line">    rs.setRouterTarget(routerTarget);</div><div class="line">    attachedResultSets.add(rs);</div><div class="line">    this.results = rs;</div><div class="line">    this.updateCount = -1;</div><div class="line">    </div><div class="line">    MergeContext context = routerTarget.getMergeContext();</div><div class="line">    </div><div class="line">    // 有orderby和limit的单个查询用切分成多个的方式进行数据获取</div><div class="line">    if (context.isOrderBySplitSql()) &#123;</div><div class="line">        executeOrderyByLimitQuery(rs, sql, routerTarget);</div><div class="line">    &#125; else &#123;</div><div class="line">        normalSelectExecute(rs, sql, routerTarget);</div><div class="line">    &#125;</div><div class="line">    </div><div class="line">    return this.results;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<ul>
+<li>sql解析：用的是druid的sql解析</li>
+<li>sql改写：RouterResult routerTarget = routingAndCheck(sql, getParams())这里对客户端的sql(一般是mybatis mapper中的sql)改写，将表名改写为物理上真实的表名，并关联对应表名的数据库</li>
+<li>sql执行：如果改写后的sql对应多条物理db的sql，那么后台创建多个任务提交到线程池并行的去执行，若只有一条sql则直接执行</li>
+<li>结果合并：将上述sql执行的结果根据指定条件合并返回</li>
+</ul>
+<h2 id="zebra高可用"><a href="#zebra高可用" class="headerlink" title="zebra高可用"></a>zebra高可用</h2><h3 id="基本架构"><a href="#基本架构" class="headerlink" title="基本架构"></a>基本架构</h3><p><img src="https://coding.net/u/lightoheaven/p/image2/git/raw/master/201711/ha.jpeg" alt="zebra高可用"><br>其中MHA负责主库切换，从库监控服务负责从库切换。<br>主库和从库均使用实体IP。</p>
+<h3 id="主库的高可用"><a href="#主库的高可用" class="headerlink" title="主库的高可用"></a>主库的高可用</h3><p>利用MHA进行master节点的可用性监控，在发生故障，master节点不可用时，MHA进行mysql层的主从切换，切换成功后通知zebra新master节点的IP，由zebra负责应用访问层的切换。切换流程如下：</p>
+<p><img src="https://coding.net/u/lightoheaven/p/image2/git/raw/master/201711/mha.jpeg" alt="mha"></p>
+<ul>
+<li>MHA对MySQL集群进行监控管理</li>
+<li>当主库发生故障时，MHA通知zebra对主库的写进行关闭，并进行MySQL集群的主从切换（切换期间应用无法写数据）</li>
+<li>zebra禁止掉对故障集群的写操作</li>
+<li>MHA切换成功，通知zebra新的写数据IP</li>
+<li>zebra用新的写IP替换老IP，开放应用访问。</li>
+</ul>
+<h3 id="从库的高可用"><a href="#从库的高可用" class="headerlink" title="从库的高可用"></a>从库的高可用</h3><p>由zebra-monitor的监控服务负责，时时监控线上MySQL从库的健康状况，如果出现从库“故障”，将会通知zebra将读流量转移到其他可读节点，实现从库的“故障”转移。</p>
+<h4 id="分配粒度"><a href="#分配粒度" class="headerlink" title="分配粒度"></a>分配粒度</h4><p>根据集群进行分配 同一个集群上的所有实例在一台机器上监控</p>
+<h4 id="负载方式"><a href="#负载方式" class="headerlink" title="负载方式"></a>负载方式</h4><p>根据机房位置进行分配： 北京侧集群由北京侧机器监控，上海侧集群由上海侧机器监控。<br>(同侧集群id%监控机器数)结果为当前机器所需监控的集群，保存在数据库中，如果有新机器上线则对数据库中的数据进行刷新并通知所有活跃机器重新加载监控集群。加载集群的同时加载对应集群上的所有实例，实例信息由单独线程动态更新，刷新频率为10min。</p>
+<h4 id="监控逻辑"><a href="#监控逻辑" class="headerlink" title="监控逻辑"></a>监控逻辑</h4><p><img src="https://coding.net/u/lightoheaven/p/image2/git/raw/master/201711/slaveha.jpeg" alt="mha"></p>
+<p>监控首先使用’select 1’ 测试是否可以连通数据库， 连接没有问题则使用 ‘show slave status’ 获取到’second_behind_master’字段来得到该从库上的延迟，从而做出判断。</p>
+<p>markdown的场景<br>(1)30s内从库连续ping不通。 (从库宕机)<br>(2)30s内 second_behind_master取到的延迟为null。 (主从同步中断)<br>(3)延迟超过阈值。（可根据每个库的敏感程度进行个性化配置，需要进行另外配置）<br>markup的场景<br>30s内能够连续ping通并且主从延迟为0.</p>
+<h4 id="使用情况"><a href="#使用情况" class="headerlink" title="使用情况"></a>使用情况</h4><p>从库被markdown之后，zebra客户端会收到zk的通知进行动态刷新，重建本地数据源配置，新的流量会导入到正常的从库上。老的数据源会在全部sql执行完成后被close。<br>目前以实例为单位进行配置，即如果一个实例延迟到达阈值，则该实例上所有从库都会被markdown。<br>但是考虑到每个库对延迟的敏感程度不同，我们支持库级的配置，一个实例上的不同库可以有不同的延迟阈值。</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/数据库访问层DAL/" rel="tag"># 数据库访问层DAL</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/11/27/lion/" rel="next" title="配置中心Lion">
+                <i class="fa fa-chevron-left"></i> 配置中心Lion
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div id="cloud-tie-wrapper" class="cloud-tie-wrapper"></div>
+      <script>
+        var cloudTieConfig = {
+          url: document.location.href,
+          sourceId: "",
+          productKey: "f6968bd56d71417cad7a11c8df334d35",
+          target: "cloud-tie-wrapper"
+        };
+      </script>
+      <script src="https://img1.cache.netease.com/f2e/tie/yun/sdk/loader.js"></script>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/uploads/avatar.png"
+               alt="Smartの小明" />
+          <p class="site-author-name" itemprop="name">Smartの小明</p>
+          <p class="site-description motion-element" itemprop="description">屌丝搬砖程序猿,码农界的搬运工,哪里需要搬哪里</p>
+        </div>
+
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">25</span>
+              <span class="site-state-item-name">posts</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">4</span>
+                <span class="site-state-item-name">categories</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">20</span>
+                <span class="site-state-item-name">tags</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/q6413260" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/1855404367/profile?rightmod=1&wvr=6&mod=personinfo&is_all=1" target="_blank" title="微博">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  微博
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://www.douban.com/people/142298114/" target="_blank" title="豆瓣">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  豆瓣
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://www.zhihu.com/people/xiaoming1990" target="_blank" title="知乎">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  知乎
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#zebra整体架构"><span class="nav-number">1.</span> <span class="nav-text">zebra整体架构</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#zebra客户端"><span class="nav-number">2.</span> <span class="nav-text">zebra客户端</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#客户端源码分析"><span class="nav-number">2.1.</span> <span class="nav-text">客户端源码分析</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#初始化"><span class="nav-number">2.2.</span> <span class="nav-text">初始化</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#SingleDataSource初始化"><span class="nav-number">2.2.1.</span> <span class="nav-text">SingleDataSource初始化</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#GroupDataSource初始化"><span class="nav-number">2.2.2.</span> <span class="nav-text">GroupDataSource初始化</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#ShardDataSource初始化"><span class="nav-number">2.2.3.</span> <span class="nav-text">ShardDataSource初始化</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#sql处理"><span class="nav-number">2.3.</span> <span class="nav-text">sql处理</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#mybatis-jdbc知识储备"><span class="nav-number">2.3.1.</span> <span class="nav-text">mybatis,jdbc知识储备</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#sql解析，路由，改写，执行，结果合并"><span class="nav-number">2.3.2.</span> <span class="nav-text">sql解析，路由，改写，执行，结果合并</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#zebra高可用"><span class="nav-number">3.</span> <span class="nav-text">zebra高可用</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#基本架构"><span class="nav-number">3.1.</span> <span class="nav-text">基本架构</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#主库的高可用"><span class="nav-number">3.2.</span> <span class="nav-text">主库的高可用</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#从库的高可用"><span class="nav-number">3.3.</span> <span class="nav-text">从库的高可用</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#分配粒度"><span class="nav-number">3.3.1.</span> <span class="nav-text">分配粒度</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#负载方式"><span class="nav-number">3.3.2.</span> <span class="nav-text">负载方式</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#监控逻辑"><span class="nav-number">3.3.3.</span> <span class="nav-text">监控逻辑</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#使用情况"><span class="nav-number">3.3.4.</span> <span class="nav-text">使用情况</span></a></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Smartの小明</span>
+</div>
+
+
+<div class="powered-by">
+  Powered by <a class="theme-link" href="https://hexo.io">Hexo</a>
+</div>
+
+<div class="theme-info">
+  Theme -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+
+        
+
+<div class="busuanzi-count">
+
+  <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv"><i class="fa fa-user"></i><span class="busuanzi-value" id="busuanzi_value_site_uv"></span></span>
+  
+
+  
+    <span class="site-pv"><i class="fa fa-eye"></i><span class="busuanzi-value" id="busuanzi_value_site_pv"></span></span>
+  
+  
+</div>
+
+
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.0"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+	
+
+
+
+
+  
+  
+
+  
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.1.js"></script>
+  <script>AV.initialize("Y2lqjwOrlt5p333cMSW3HNxD-gzGzoHsz", "Y6lssmQDLyXlT0HE1pgVn0UK");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+  
+
+
+</body>
+</html>
