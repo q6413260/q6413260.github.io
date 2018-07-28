@@ -259,6 +259,161 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+  <link itemprop="mainEntityOfPage" href="http://yeming.me/2018/07/28/dubbo2/">
+
+  <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <meta itemprop="name" content="Smartの小明">
+    <meta itemprop="description" content="">
+    <meta itemprop="image" content="/uploads/avatar.png">
+  </span>
+
+  <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+    <meta itemprop="name" content="Smartの小明">
+    <span style="display:none" itemprop="logo" itemscope itemtype="http://schema.org/ImageObject">
+      <img style="display:none;" itemprop="url image" alt="Smartの小明" src="">
+    </span>
+  </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                
+                <a class="post-title-link" href="/2018/07/28/dubbo2/" itemprop="url">
+                  Dubbo源码学习二(服务注册)
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-07-28T11:58:46+08:00">
+                2018-07-28
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+              <span class="post-meta-divider">|</span>
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/技术分享/" itemprop="url" rel="index">
+                    <span itemprop="name">技术分享</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+
+          
+          
+             <span id="/2018/07/28/dubbo2/" class="leancloud_visitors" data-flag-title="Dubbo源码学习二(服务注册)">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               <span class="post-meta-item-text">Visitors </span>
+               <span class="leancloud-visitors-count"></span>
+              </span>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          <p>我们知道Dubbo逻辑上由以下几个模块组成(不考虑Monitor和Container)<br><img src="https://coding.net/u/lightoheaven/p/image2/git/raw/master/201807/dubboArch.jpeg" alt="Dubbo架构图"></p>
+<ul>
+<li>Provider：服务提供方</li>
+<li>Consumer：服务消费方</li>
+<li>Registry：服务注册与发现的注册中心</li>
+</ul>
+<p>稍微解释下Provider和Consumer只是Dubbo逻辑上的概念，对于一个业务应用，很有可能作为Provider提供服务，又作为Consumer消费服务。<br>Registry是服务注册中心，业内一般都用zk作为注册中心。服务提供方在启动时候把本机的ip和提供服务的名称注册到注册中心。节点名称是服务名称，节点内容是机器ip。这样如果有多个服务提供者，节点内容就会是机器ip列表。服务消费者在启动时候向注册中心订阅自己需要的服务名称，注册中心返回提供该服务的一些机器ip列表。消费者拿到ip列表根据一定的路由策略选择一台机器进行远程调用。当然服务消费者和提供者都必须与注册中心保持一个长连接，如果服务提供方宕机，注册中心会把该机器从ip列表中摘掉，并通知消费者更新服务ip列表。</p>
+<p>本文我们主要来看下服务提供方是如何将服务注册到注册中心的。<br>
+          <!--noindex-->
+          <div class="post-more-link text-center">
+            <a class="btn" href="/2018/07/28/dubbo2/#more" rel="contents">
+              Read more &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
   <link itemprop="mainEntityOfPage" href="http://yeming.me/2018/07/25/dubbo1/">
 
   <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -365,7 +520,7 @@
         
           <p>之前其实已经粗略看过Dubbo的源码，最近一个月在公司连续写了nodejs和go语言的redis cluster客户端之后，稍微有点空余时间就准备找个开源的java项目学习下。正好阿里准备对Dubbo重启开发3.0，就决定重新学习下Dubbo。</p>
 <p>Dubbo是一款高性能、轻量级的开源Java RPC框架，它提供了三大核心能力：面向接口的远程方法调用，智能容错和负载均衡，以及服务自动注册和发现。</p>
-<p>个人认为Dubbo之所以能让这么多人和公司关注，它的一些设计模式确实很值得学习。我们都知道java有七大设计原则，说下开闭原则OCP，对扩展开放，对修改关闭。Dubbo设计上Dubbo被那么多人和公司使用，可能每个公司都会根据自身的需求对Dubbo做些修改。Dubbo一开始就留了一些扩展点，对于一些常用的模块像注册中心，通信协议，路由等模块都提供了多种不同的实现。如果还不能满足需求的话，用户还可以自行定制。Dubbo一开始就留了一些扩展点，让参与者尽量黑盒扩展，而不是白盒去修改代码。</p>
+<p>个人认为Dubbo之所以能让这么多人和公司关注，它的一些设计模式确实很值得学习。我们都知道java有七大设计原则，说下开闭原则OCP，对扩展开放，对修改关闭。Dubbo被那么多人和公司使用，可能每个公司都会根据自身的需求对Dubbo做些修改。Dubbo一开始就留了一些扩展点，对于一些常用的模块像注册中心，通信协议，路由等模块都提供了多种不同的实现。如果还不能满足需求的话，用户还可以自行定制。让参与者尽量黑盒扩展，而不是白盒去修改代码。</p>
 <p>Dubbo即然要扩展，扩展点的加载方式，首先要统一，微核心+插件式，是比较能达到 OCP 原则的思路。由一个插件生命周期管理容器，构成微核心，核心不包括任何功能，这样可以确保所有功能都能被替换，并且，框架作者能做到的功能，扩展者也一定要能做到，以保证平等对待第三方，所以，框架自身的功能也要用插件的方式实现，不能有任何硬编码。</p>
 <p>Dubbo参考了JDK标准的SPI机制，参见：java.util.ServiceLoader，开发了一套ExtensionLoader加载机制，所有需要扩展的模块都由ExtensionLoader来动态加载。<br>
           <!--noindex-->
@@ -849,154 +1004,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-  <link itemprop="mainEntityOfPage" href="http://yeming.me/2017/09/30/hystrix2/">
-
-  <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
-    <meta itemprop="name" content="Smartの小明">
-    <meta itemprop="description" content="">
-    <meta itemprop="image" content="/uploads/avatar.png">
-  </span>
-
-  <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-    <meta itemprop="name" content="Smartの小明">
-    <span style="display:none" itemprop="logo" itemscope itemtype="http://schema.org/ImageObject">
-      <img style="display:none;" itemprop="url image" alt="Smartの小明" src="">
-    </span>
-  </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                
-                <a class="post-title-link" href="/2017/09/30/hystrix2/" itemprop="url">
-                  Hystrix使用
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-09-30T21:00:50+08:00">
-                2017-09-30
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-              <span class="post-meta-divider">|</span>
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">In</span>
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/技术分享/" itemprop="url" rel="index">
-                    <span itemprop="name">技术分享</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-
-          
-          
-             <span id="/2017/09/30/hystrix2/" class="leancloud_visitors" data-flag-title="Hystrix使用">
-               <span class="post-meta-divider">|</span>
-               <span class="post-meta-item-icon">
-                 <i class="fa fa-eye"></i>
-               </span>
-               <span class="post-meta-item-text">Visitors </span>
-               <span class="leancloud-visitors-count"></span>
-              </span>
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          <p>上一篇文章主要讲了Hystrix是什么，用来做什么，解决了什么问题，以及设计模式等，这篇文章主要来讲下Hystrix如何使用。下面我们从最简单的Hello World入手，来讲解下Hystrix的用法。<br>
-          <!--noindex-->
-          <div class="post-more-link text-center">
-            <a class="btn" href="/2017/09/30/hystrix2/#more" rel="contents">
-              Read more &raquo;
-            </a>
-          </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
   </section>
 
   
@@ -1043,7 +1050,7 @@
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">26</span>
+              <span class="site-state-item-count">27</span>
               <span class="site-state-item-name">posts</span>
             </a>
           </div>
@@ -1060,7 +1067,7 @@
           
             <div class="site-state-item site-state-tags">
               <a href="/tags">
-                <span class="site-state-item-count">21</span>
+                <span class="site-state-item-count">23</span>
                 <span class="site-state-item-name">tags</span>
               </a>
             </div>
