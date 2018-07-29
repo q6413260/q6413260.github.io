@@ -103,7 +103,7 @@ Registry：服务注册与发现的注册中心
 
 稍微解释下Provider和Consumer只是Dubbo逻辑上的概念，对于一个业务应用，很有可能作为Provider提供服务，又作为Consumer消费服务。Registry是服务注册中心，业内一般都用">
 <meta property="og:image" content="https://coding.net/u/lightoheaven/p/image2/git/raw/master/201807/dubboArch.jpeg">
-<meta property="og:updated_time" content="2018-07-28T03:59:41.000Z">
+<meta property="og:updated_time" content="2018-07-28T15:12:46.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Dubbo源码学习二(服务注册)">
 <meta name="twitter:description" content="我们知道Dubbo逻辑上由以下几个模块组成(不考虑Monitor和Container)
@@ -413,8 +413,8 @@ Registry：服务注册与发现的注册中心
 <p>上述方法主要包含3个流程</p>
 <ul>
 <li>公开本地服务，配置文件配置的是Dubbo通信协议，实际上会使用Netty4作为通信协议，暴露20880端口并监听，接受客户端传来的各种请求</li>
-<li>向注册中心注册该服务，最终向zk<br>/dubbo/org.apache.dubbo.demo.DemoService/providers 目录下写入本机的ip地址</li>
-<li>Subscribe the override data，这个过程貌似会向路径<br>/dubbo/org.apache.dubbo.demo.DemoService/configurators路径写入本机ip地址</li>
+<li>向注册中心注册该服务，最终向zk<br>/dubbo/org.apache.dubbo.demo.DemoService/providers 目录下写入URL地址(其中包括机器等信息)</li>
+<li>Subscribe the override data，这个过程貌似会向路径<br>/dubbo/org.apache.dubbo.demo.DemoService/configurators路径写入URL地址</li>
 </ul>
 <p>上述我们主要关注前两个过程。</p>
 <h3 id="doLocalExport-开启本地服务"><a href="#doLocalExport-开启本地服务" class="headerlink" title="doLocalExport(开启本地服务)"></a>doLocalExport(开启本地服务)</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">private &lt;T&gt; ExporterChangeableWrapper&lt;T&gt; doLocalExport(final Invoker&lt;T&gt; originInvoker) &#123;</div><div class="line">    String key = getCacheKey(originInvoker);</div><div class="line">    ExporterChangeableWrapper&lt;T&gt; exporter = (ExporterChangeableWrapper&lt;T&gt;) bounds.get(key);</div><div class="line">    if (exporter == null) &#123;</div><div class="line">        synchronized (bounds) &#123;</div><div class="line">            exporter = (ExporterChangeableWrapper&lt;T&gt;) bounds.get(key);</div><div class="line">            if (exporter == null) &#123;</div><div class="line">                final Invoker&lt;?&gt; invokerDelegete = new InvokerDelegete&lt;T&gt;(originInvoker, getProviderUrl(originInvoker));</div><div class="line">                exporter = new ExporterChangeableWrapper&lt;T&gt;((Exporter&lt;T&gt;) protocol.export(invokerDelegete), originInvoker);</div><div class="line">                bounds.put(key, exporter);</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">    return exporter;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
@@ -475,6 +475,10 @@ Registry：服务注册与发现的注册中心
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/07/29/dubbo3/" rel="prev" title="Dubbo源码学习三(服务引用)">
+                Dubbo源码学习三(服务引用) <i class="fa fa-chevron-right"></i>
+              </a>
             
           </div>
         </div>
@@ -562,7 +566,7 @@ Registry：服务注册与发现的注册中心
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">27</span>
+              <span class="site-state-item-count">28</span>
               <span class="site-state-item-name">posts</span>
             </a>
           </div>
