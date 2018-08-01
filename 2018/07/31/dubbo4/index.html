@@ -1,0 +1,961 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="en">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Dubbo,netty," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/uploads/avatar.png?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="之前我们介绍了Provider启动时候向注册中心注册服务Dubbo源码学习二(服务注册)，Consumer启动时候向注册中心订阅服务Dubbo源码学习三(服务引用)，本文我们就来看下Consumer端和Provider是怎么通信的。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Dubbo源码学习四(Consumer，Provider通信)">
+<meta property="og:url" content="http://yeming.me/2018/07/31/dubbo4/index.html">
+<meta property="og:site_name" content="Smartの小明">
+<meta property="og:description" content="之前我们介绍了Provider启动时候向注册中心注册服务Dubbo源码学习二(服务注册)，Consumer启动时候向注册中心订阅服务Dubbo源码学习三(服务引用)，本文我们就来看下Consumer端和Provider是怎么通信的。">
+<meta property="og:image" content="https://coding.net/u/lightoheaven/p/image2/git/raw/master/201807/communicate.jpeg">
+<meta property="og:image" content="https://coding.net/u/lightoheaven/p/image2/git/raw/master/201807/consumerSend.jpeg">
+<meta property="og:image" content="https://coding.net/u/lightoheaven/p/image2/git/raw/master/201807/dubbo2.jpeg">
+<meta property="og:image" content="https://coding.net/u/lightoheaven/p/image2/git/raw/master/201807/transporter.jpeg">
+<meta property="og:image" content="https://coding.net/u/lightoheaven/p/image2/git/raw/master/201807/communicate.jpeg">
+<meta property="og:updated_time" content="2018-08-01T00:54:46.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Dubbo源码学习四(Consumer，Provider通信)">
+<meta name="twitter:description" content="之前我们介绍了Provider启动时候向注册中心注册服务Dubbo源码学习二(服务注册)，Consumer启动时候向注册中心订阅服务Dubbo源码学习三(服务引用)，本文我们就来看下Consumer端和Provider是怎么通信的。">
+<meta name="twitter:image" content="https://coding.net/u/lightoheaven/p/image2/git/raw/master/201807/communicate.jpeg">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '6252881861358388000',
+      author: '小明'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yeming.me/2018/07/31/dubbo4/"/>
+
+
+
+
+
+  <title> Dubbo源码学习四(Consumer，Provider通信) | Smartの小明 </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="en">
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">Smartの小明</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle">屌丝搬砖程序猿,码农界的搬运工,哪里需要搬哪里</p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            Categories
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            About
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            Archives
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            Tags
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+  <link itemprop="mainEntityOfPage" href="http://yeming.me/2018/07/31/dubbo4/">
+
+  <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <meta itemprop="name" content="Smartの小明">
+    <meta itemprop="description" content="">
+    <meta itemprop="image" content="/uploads/avatar.png">
+  </span>
+
+  <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+    <meta itemprop="name" content="Smartの小明">
+    <span style="display:none" itemprop="logo" itemscope itemtype="http://schema.org/ImageObject">
+      <img style="display:none;" itemprop="url image" alt="Smartの小明" src="">
+    </span>
+  </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                Dubbo源码学习四(Consumer，Provider通信)
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-07-31T22:03:58+08:00">
+                2018-07-31
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+              <span class="post-meta-divider">|</span>
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/技术分享/" itemprop="url" rel="index">
+                    <span itemprop="name">技术分享</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+
+          
+          
+             <span id="/2018/07/31/dubbo4/" class="leancloud_visitors" data-flag-title="Dubbo源码学习四(Consumer，Provider通信)">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               <span class="post-meta-item-text">Visitors </span>
+               <span class="leancloud-visitors-count"></span>
+              </span>
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="page-pv"><i class="fa fa-file-o"></i>
+            <span class="busuanzi-value" id="busuanzi_value_page_pv" ></span>
+            </span>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p><img src="https://coding.net/u/lightoheaven/p/image2/git/raw/master/201807/communicate.jpeg" alt="通信交互过程"><br>之前我们介绍了Provider启动时候向注册中心注册服务<a href="http://yeming.me/2018/07/28/dubbo2/">Dubbo源码学习二(服务注册)</a>，Consumer启动时候向注册中心订阅服务<a href="http://yeming.me/2018/07/29/dubbo3/">Dubbo源码学习三(服务引用)</a>，本文我们就来看下Consumer端和Provider是怎么通信的。<br><a id="more"></a></p>
+<h2 id="Consumer"><a href="#Consumer" class="headerlink" title="Consumer"></a>Consumer</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">public static void main(String[] args) &#123;</div><div class="line">    DemoService demoService = (DemoService) context.getBean(&quot;demoService&quot;); // get remote service proxy</div><div class="line">    String hello = demoService.sayHello(&quot;world&quot;); </div><div class="line">    System.out.println(hello); // get result</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>Consumer部分主要包含以下逻辑：</p>
+<ul>
+<li>主线程里面寻找合适的invoker经由netty发送request生成future对象。</li>
+<li>netty工作线程对Consumer端request进行编码然后发送</li>
+<li>netty工作线程对Provider端 response进行解码然后提交任务到业务自定义线程池</li>
+<li>业务自定义线程池对response进行相应处理，设置1中的future状态为done状态</li>
+<li>主线程future返回<br>我们主要看下上述1，2，3，4几个过程</li>
+</ul>
+<h3 id="主线程发送request"><a href="#主线程发送request" class="headerlink" title="主线程发送request"></a>主线程发送request</h3><p><img src="https://coding.net/u/lightoheaven/p/image2/git/raw/master/201807/consumerSend.jpeg" alt="Consumer.send"></p>
+<p>上图是主线程发送request的时序图，接下来会对从1-7的几个过程逐一分析。</p>
+<p><font color="red">过程1</font>在上一篇文章中，我们知道demoService在Consumer端通过JDK动态代理，把Invoker转换成为客户端需要的接口。然后调用sayHello方法时，经由动态代理调用到InvokerInvocationHandler.invoke()方法</p>
+<p><b>InvokerInvocationHandler</b><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">@Override</div><div class="line">    public Object invoke(Object proxy, Method method, Object[] args) throws Throwable &#123;</div><div class="line">    RpcInvocation invocation = new RpcInvocation(method, args);</div><div class="line">    return invoker.invoke(invocation).recreate();</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p><font color="red">过程2</font>主要是调用AbstractClusterInvoker的invoke方法，该方法会根据directory获取缓存的invokers(提供服务的Provider有多少个就有多少个invoker)，然后通过调用子类<br>FailoverClusterInvoker的doInvoke方法，该方法会根据loadBalance选取合适的invoker进行调用，调用失败还会进行重试，默认最多重试3次<br><b>AbstractClusterInvoker</b><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line"> @Override</div><div class="line">public Result invoke(final Invocation invocation) throws RpcException &#123;</div><div class="line">    checkWhetherDestroyed();</div><div class="line">    LoadBalance loadbalance = null;</div><div class="line">    List&lt;Invoker&lt;T&gt;&gt; invokers = list(invocation);</div><div class="line">    if (invokers != null &amp;&amp; !invokers.isEmpty()) &#123;</div><div class="line">        loadbalance = ExtensionLoader.getExtensionLoader(LoadBalance.class).getExtension(invokers.get(0).getUrl()</div><div class="line">                .getMethodParameter(RpcUtils.getMethodName(invocation), Constants.LOADBALANCE_KEY, Constants.DEFAULT_LOADBALANCE));</div><div class="line">    &#125;</div><div class="line">    RpcUtils.attachInvocationIdIfAsync(getUrl(), invocation);</div><div class="line">    return doInvoke(invocation, invokers, loadbalance);</div><div class="line">&#125;</div><div class="line"></div><div class="line">protected List&lt;Invoker&lt;T&gt;&gt; list(Invocation invocation) throws RpcException &#123;</div><div class="line">    List&lt;Invoker&lt;T&gt;&gt; invokers = directory.list(invocation);</div><div class="line">    return invokers;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p><font color="red">过程3</font>FailoverClusterInvoker.doInvoke<br>==&gt;InvokerWrapper.invoke==&gt;InvokerWrapper.invoke==&gt;ProtocolFilterWrapper</p>
+<p><font color="red">过程4</font>用到了责任链设计模式，这里可以添加自定的filter对调用前后进行拦截，完成一些通用的逻辑。默认情况有ConsumerContextFilter，FutureFilter，MonitoFilter，依次调用其<br>invoke方法</p>
+<p><b>ProtocolFilterWrapper</b><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div></pre></td><td class="code"><pre><div class="line">private static &lt;T&gt; Invoker&lt;T&gt; buildInvokerChain(final Invoker&lt;T&gt; invoker, String key, String group) &#123;</div><div class="line">    Invoker&lt;T&gt; last = invoker;</div><div class="line">    List&lt;Filter&gt; filters = ExtensionLoader.getExtensionLoader(Filter.class).getActivateExtension(invoker.getUrl(), key, group);</div><div class="line">    if (!filters.isEmpty()) &#123;</div><div class="line">        for (int i = filters.size() - 1; i &gt;= 0; i--) &#123;</div><div class="line">            final Filter filter = filters.get(i);</div><div class="line">            final Invoker&lt;T&gt; next = last;</div><div class="line">            last = new Invoker&lt;T&gt;() &#123;</div><div class="line"></div><div class="line">                @Override</div><div class="line">                public Class&lt;T&gt; getInterface() &#123;</div><div class="line">                    return invoker.getInterface();</div><div class="line">                &#125;</div><div class="line"></div><div class="line">                @Override</div><div class="line">                public URL getUrl() &#123;</div><div class="line">                    return invoker.getUrl();</div><div class="line">                &#125;</div><div class="line"></div><div class="line">                @Override</div><div class="line">                public boolean isAvailable() &#123;</div><div class="line">                    return invoker.isAvailable();</div><div class="line">                &#125;</div><div class="line"></div><div class="line">                @Override</div><div class="line">                public Result invoke(Invocation invocation) throws RpcException &#123;</div><div class="line">                    return filter.invoke(next, invocation);</div><div class="line">                &#125;</div><div class="line"></div><div class="line">                @Override</div><div class="line">                public void destroy() &#123;</div><div class="line">                    invoker.destroy();</div><div class="line">                &#125;</div><div class="line"></div><div class="line">                @Override</div><div class="line">                public String toString() &#123;</div><div class="line">                    return invoker.toString();</div><div class="line">                &#125;</div><div class="line">            &#125;;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">    return last;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p><font color="red">过程5</font>生成调用的RpcInvocation(其中包含方法名，参数类型，参数值以及一些附加的属性)，并根据需要支持方法异步调用或者callback调用</p>
+<p><b>DubboInvoker</b><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div></pre></td><td class="code"><pre><div class="line">@Override</div><div class="line">protected Result doInvoke(final Invocation invocation) throws Throwable &#123;</div><div class="line">    RpcInvocation inv = (RpcInvocation) invocation;</div><div class="line">    final String methodName = RpcUtils.getMethodName(invocation);</div><div class="line">    inv.setAttachment(Constants.PATH_KEY, getUrl().getPath());</div><div class="line">    inv.setAttachment(Constants.VERSION_KEY, version);</div><div class="line"></div><div class="line">    ExchangeClient currentClient;</div><div class="line">    if (clients.length == 1) &#123;</div><div class="line">        currentClient = clients[0];</div><div class="line">    &#125; else &#123;</div><div class="line">        currentClient = clients[index.getAndIncrement() % clients.length];</div><div class="line">    &#125;</div><div class="line">    try &#123;</div><div class="line">        boolean isAsync = RpcUtils.isAsync(getUrl(), invocation);</div><div class="line">        boolean isAsyncFuture = RpcUtils.isGeneratedFuture(inv) || RpcUtils.isFutureReturnType(inv);</div><div class="line">        boolean isOneway = RpcUtils.isOneway(getUrl(), invocation);</div><div class="line">        int timeout = getUrl().getMethodParameter(methodName, Constants.TIMEOUT_KEY, Constants.DEFAULT_TIMEOUT);</div><div class="line">        if (isOneway) &#123;</div><div class="line">            boolean isSent = getUrl().getMethodParameter(methodName, Constants.SENT_KEY, false);</div><div class="line">            currentClient.send(inv, isSent);</div><div class="line">            RpcContext.getContext().setFuture(null);</div><div class="line">            return new RpcResult();</div><div class="line">        &#125; else if (isAsync) &#123;</div><div class="line">            ResponseFuture future = currentClient.request(inv, timeout);</div><div class="line">            // For compatibility</div><div class="line">            FutureAdapter&lt;Object&gt; futureAdapter = new FutureAdapter&lt;&gt;(future);</div><div class="line">            RpcContext.getContext().setFuture(futureAdapter);</div><div class="line"></div><div class="line">            Result result;</div><div class="line">            if (isAsyncFuture) &#123;</div><div class="line">                // register resultCallback, sometimes we need the asyn result being processed by the filter chain.</div><div class="line">                result = new AsyncRpcResult(futureAdapter, futureAdapter.getResultFuture(), false);</div><div class="line">            &#125; else &#123;</div><div class="line">                result = new SimpleAsyncRpcResult(futureAdapter, futureAdapter.getResultFuture(), false);</div><div class="line">            &#125;</div><div class="line">            return result;</div><div class="line">        &#125; else &#123;</div><div class="line">            RpcContext.getContext().setFuture(null);</div><div class="line">            return (Result) currentClient.request(inv, timeout).get();</div><div class="line">        &#125;</div><div class="line">    &#125; catch (TimeoutException e) &#123;</div><div class="line">        throw new RpcException(RpcException.TIMEOUT_EXCEPTION, &quot;Invoke remote method timeout. method: &quot; + invocation.getMethodName() + &quot;, provider: &quot; + getUrl() + &quot;, cause: &quot; + e.getMessage(), e);</div><div class="line">    &#125; catch (RemotingException e) &#123;</div><div class="line">        throw new RpcException(RpcException.NETWORK_EXCEPTION, &quot;Failed to invoke remote method: &quot; + invocation.getMethodName() + &quot;, provider: &quot; + getUrl() + &quot;, cause: &quot; + e.getMessage(), e);</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p><font color="red">过程6</font>channel.writeAndFlush(message)这个channel是NioSocketChannel(<a href="http://yeming.me/2016/04/02/netty2/">netty源码研究二(请求处理)</a>是客户端用来发送消息的)</p>
+<p><b>NettyChannel</b><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div></pre></td><td class="code"><pre><div class="line">@Override</div><div class="line">public void send(Object message, boolean sent) throws RemotingException &#123;</div><div class="line">    super.send(message, sent);</div><div class="line"></div><div class="line">    boolean success = true;</div><div class="line">    int timeout = 0;</div><div class="line">    try &#123;</div><div class="line">        ChannelFuture future = channel.writeAndFlush(message);</div><div class="line">        if (sent) &#123;</div><div class="line">            timeout = getUrl().getPositiveParameter(Constants.TIMEOUT_KEY, Constants.DEFAULT_TIMEOUT);</div><div class="line">            success = future.await(timeout);</div><div class="line">        &#125;</div><div class="line">        Throwable cause = future.cause();</div><div class="line">        if (cause != null) &#123;</div><div class="line">            throw cause;</div><div class="line">        &#125;</div><div class="line">    &#125; catch (Throwable e) &#123;</div><div class="line">        throw new RemotingException(this, &quot;Failed to send message &quot; + message + &quot; to &quot; + getRemoteAddress() + &quot;, cause: &quot; + e.getMessage(), e);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    if (!success) &#123;</div><div class="line">        throw new RemotingException(this, &quot;Failed to send message &quot; + message + &quot; to &quot; + getRemoteAddress()</div><div class="line">                + &quot;in timeout(&quot; + timeout + &quot;ms) limit&quot;);</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p><b>AbstractChannelHandlerContext</b><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div></pre></td><td class="code"><pre><div class="line">private void write(Object msg, boolean flush, ChannelPromise promise) &#123;</div><div class="line">    AbstractChannelHandlerContext next = findContextOutbound();</div><div class="line">    final Object m = pipeline.touch(msg, next);</div><div class="line">    EventExecutor executor = next.executor();</div><div class="line">    if (executor.inEventLoop()) &#123;</div><div class="line">        if (flush) &#123;</div><div class="line">            next.invokeWriteAndFlush(m, promise);</div><div class="line">        &#125; else &#123;</div><div class="line">            next.invokeWrite(m, promise);</div><div class="line">        &#125;</div><div class="line">    &#125; else &#123;</div><div class="line">        AbstractWriteTask task;</div><div class="line">        if (flush) &#123;</div><div class="line">            task = WriteAndFlushTask.newInstance(next, m, promise);</div><div class="line">        &#125;  else &#123;</div><div class="line">            task = WriteTask.newInstance(next, m, promise);</div><div class="line">        &#125;</div><div class="line">        safeExecute(executor, task, promise, m);</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>上述channel.writeAndFlush(message)最终会对调用到AbstractChannelHandlerContext的execute方法，该方法会判断当前线程是否在一个eventLoop里面，如果不在就新开启一个eventLoop线程或者eventLoop线程已经开启就放到队列里面。显然该线程是Consumer调用线程，显然不是eventLoop线程，此时会生成WriteAndFlushTask任务丢到队列里面。</p>
+<p><font color="red">过程7</font>调用DefaultFuture构造函数创建一个future并返回，然后主线程调用阻塞在future.get()方法。</p>
+<p><b>HeaderExchangeChannel</b><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line">@Override</div><div class="line">public ResponseFuture request(Object request, int timeout) throws RemotingException &#123;</div><div class="line">    if (closed) &#123;</div><div class="line">        throw new RemotingException(this.getLocalAddress(), null, &quot;Failed to send request &quot; + request + &quot;, cause: The channel &quot; + this + &quot; is closed!&quot;);</div><div class="line">    &#125;</div><div class="line">    // create request.</div><div class="line">    Request req = new Request();</div><div class="line">    req.setVersion(Version.getProtocolVersion());</div><div class="line">    req.setTwoWay(true);</div><div class="line">    req.setData(request);</div><div class="line">    DefaultFuture future = new DefaultFuture(channel, req, timeout);</div><div class="line">    try &#123;</div><div class="line">        channel.send(req);</div><div class="line">    &#125; catch (RemotingException e) &#123;</div><div class="line">        future.cancel();</div><div class="line">        throw e;</div><div class="line">    &#125;</div><div class="line">    return future;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>可以看到DefaultFuture类缓存了连个全局的Map，构造函数里面，将请求的id和和对应的future，channel关联起来保存到Map里面，后续接受Provider端的response会用到。</p>
+<p><b>DefaultFuture</b><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">private static final Map&lt;Long, Channel&gt; CHANNELS = new ConcurrentHashMap&lt;Long, Channel&gt;();</div><div class="line">private static final Map&lt;Long, DefaultFuture&gt; FUTURES = new ConcurrentHashMap&lt;Long, DefaultFuture&gt;();</div><div class="line"></div><div class="line">public DefaultFuture(Channel channel, Request request, int timeout) &#123;</div><div class="line">    this.channel = channel;</div><div class="line">    this.request = request;</div><div class="line">    this.id = request.getId();</div><div class="line">    this.timeout = timeout &gt; 0 ? timeout : channel.getUrl().getPositiveParameter(Constants.TIMEOUT_KEY, Constants.DEFAULT_TIMEOUT);</div><div class="line">    // put into waiting map.</div><div class="line">    FUTURES.put(id, this);</div><div class="line">    CHANNELS.put(id, channel);</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<h3 id="Netty工作线程处理request并发送"><a href="#Netty工作线程处理request并发送" class="headerlink" title="Netty工作线程处理request并发送"></a>Netty工作线程处理request并发送</h3><p>上面一个流程会将request提交给netty EventLoop线程，下面看下eventLoop线程怎么处理的。</p>
+<p><b>NettyClient</b><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">bootstrap.handler(new ChannelInitializer() &#123;</div><div class="line">    @Override</div><div class="line">    protected void initChannel(Channel ch) throws Exception &#123;</div><div class="line">        NettyCodecAdapter adapter = new NettyCodecAdapter(getCodec(), getUrl(), NettyClient.this);</div><div class="line">        ch.pipeline()//.addLast(&quot;logging&quot;,new LoggingHandler(LogLevel.INFO))//for debug</div><div class="line">                .addLast(&quot;decoder&quot;, adapter.getDecoder())</div><div class="line">                .addLast(&quot;encoder&quot;, adapter.getEncoder())</div><div class="line">                .addLast(&quot;handler&quot;, nettyClientHandler);</div><div class="line">    &#125;</div><div class="line">&#125;);</div></pre></td></tr></table></figure></p>
+<p>Consumer端Netty启动时候添加了以上3个ChannelHandler，注意以上<br>adapter.getEncoder()是ChannelOutboundHandler，adapter.getDecoder()是ChannelInboundHandler，nettyClientHandler两者都是。这里我们只需要知道接受主线程传过来的req会用到ChannelOutboundHandler，并且依次调用nettyClientHandler，adapter.getEncoder()；接受服务端发过来的response会用到ChannelInboundHandler，并且依次调用<br>adapter.getDecoder()，nettyClientHandler，两者顺序正好相反</p>
+<p>接下来我们就看下netty编码encode过程<br><b>NettyCodecAdapter.InternalEncoder</b><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">private class InternalEncoder extends MessageToByteEncoder &#123;</div><div class="line">    @Override</div><div class="line">    protected void encode(ChannelHandlerContext ctx, Object msg, ByteBuf out) throws Exception &#123;</div><div class="line">        org.apache.dubbo.remoting.buffer.ChannelBuffer buffer = new NettyBackedChannelBuffer(out);</div><div class="line">        Channel ch = ctx.channel();</div><div class="line">        NettyChannel channel = NettyChannel.getOrAddChannel(ch, url, handler);</div><div class="line">        try &#123;</div><div class="line">            codec.encode(channel, buffer, msg);</div><div class="line">        &#125; finally &#123;</div><div class="line">            NettyChannel.removeChannelIfDisconnected(ch);</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>InternalEncoder继承netty自带的MessageToByteEncoder，netty工作线程在对request进行编码过程中，会调用到上述encode方法。上述方法先通过Netty原生Channel拿到dubbo自身封装的NettyChannel，然后调用<br>DubboCountCodec.encode==&gt;ExchangeCodec.encode==&gt;ExchangeCodec.<br>encodeRequest</p>
+<p><b>ExchangeCodec</b><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div></pre></td><td class="code"><pre><div class="line">protected void encodeRequest(Channel channel, ChannelBuffer buffer, Request req) throws IOException &#123;</div><div class="line">    Serialization serialization = getSerialization(channel);</div><div class="line">    // header.</div><div class="line">    byte[] header = new byte[HEADER_LENGTH];</div><div class="line">    // set magic number.</div><div class="line">    Bytes.short2bytes(MAGIC, header);</div><div class="line"></div><div class="line">    // set request and serialization flag.</div><div class="line">    header[2] = (byte) (FLAG_REQUEST | serialization.getContentTypeId());</div><div class="line"></div><div class="line">    if (req.isTwoWay()) header[2] |= FLAG_TWOWAY;</div><div class="line">    if (req.isEvent()) header[2] |= FLAG_EVENT;</div><div class="line"></div><div class="line">    // set request id.</div><div class="line">    Bytes.long2bytes(req.getId(), header, 4);</div><div class="line"></div><div class="line">    // encode request data.</div><div class="line">    int savedWriteIndex = buffer.writerIndex();</div><div class="line">    buffer.writerIndex(savedWriteIndex + HEADER_LENGTH);</div><div class="line">    ChannelBufferOutputStream bos = new ChannelBufferOutputStream(buffer);</div><div class="line">    ObjectOutput out = serialization.serialize(channel.getUrl(), bos);</div><div class="line">    if (req.isEvent()) &#123;</div><div class="line">        encodeEventData(channel, out, req.getData());</div><div class="line">    &#125; else &#123;</div><div class="line">        encodeRequestData(channel, out, req.getData(), req.getVersion());</div><div class="line">    &#125;</div><div class="line">    out.flushBuffer();</div><div class="line">    if (out instanceof Cleanable) &#123;</div><div class="line">        ((Cleanable) out).cleanup();</div><div class="line">    &#125;</div><div class="line">    bos.flush();</div><div class="line">    bos.close();</div><div class="line">    int len = bos.writtenBytes();</div><div class="line">    checkPayload(channel, len);</div><div class="line">    Bytes.int2bytes(len, header, 12);</div><div class="line"></div><div class="line">    // write</div><div class="line">    buffer.writerIndex(savedWriteIndex);</div><div class="line">    buffer.writeBytes(header); // write header.</div><div class="line">    buffer.writerIndex(savedWriteIndex + HEADER_LENGTH + len);</div><div class="line">    </div><div class="line">//header固定16个字节，每个字节内容如下    </div><div class="line">2byte magic:类似java字节码文件里的魔数，用来判断是不是dubbo协议的数据包。魔数是常量0xdabb</div><div class="line">1byte 的消息标志位:16-20序列id,21 event,22 two way,23请求或响应标识</div><div class="line">1byte 状态，当消息类型为响应时，设置响应状态。24-31位。状态位, 设置请求响应状态，dubbo定义了一些响应的类型。具体类型见com.alibaba.dubbo.remoting.exchange.Response</div><div class="line">8byte 消息ID,long类型，32-95位。每一个请求的唯一识别id（由于采用异步通讯的方式，用来把请求request和返回的response对应上）</div><div class="line">4byte 消息长度，96-127位。消息体 body 长度, int 类型，即记录Body Content有多少个字节。</div><div class="line">&#125;</div><div class="line"></div><div class="line">//消息体的内容如下：</div><div class="line">1、dubbo版本号</div><div class="line">2、invoke的路径</div><div class="line">3、invoke的provider端暴露的服务的版本号</div><div class="line">4、调用的方法名称</div><div class="line">5、参数类型描述符</div><div class="line">6、遍历请求参数值并编码</div><div class="line">7、dubbo请求的attachments</div></pre></td></tr></table></figure></p>
+<p><img src="https://coding.net/u/lightoheaven/p/image2/git/raw/master/201807/dubbo2.jpeg" alt="header"><br>上述代码是dubbo的编码过程，dubbo通过上述代码自定义通信协议，每条dubbo消息包含header和body(包含方法参数值等信息)，header固定16个字节。buffer先将writeIndex设置为header长度，然后将body req.getData()序列化写进buffer。最后重新设置writeIndex=0，将header写入buffer。</p>
+<p>最后WriteAndFlushTask类，ctx.invokeFlush() flush刷新buffer就会提交消息到Provider端<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">public void write(AbstractChannelHandlerContext ctx, Object msg, ChannelPromise promise) &#123;</div><div class="line">    super.write(ctx, msg, promise);</div><div class="line">    ctx.invokeFlush();</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>用Netty作为传输框架时，图中的Client和Server分别对应NettyClient和NettyServer，在创建的时候会指定encoder和decoder完成对象的编码和解码。Dubbo协议默认DubboCountCodec为编解码器，该类的成员DubboCodec封装了Dubbo协议的编解码逻辑，同时完成对象的序列化或反序列化。</p>
+<p><img src="https://coding.net/u/lightoheaven/p/image2/git/raw/master/201807/transporter.jpeg" alt="transporter"></p>
+<h3 id="Netty工作线程接收response"><a href="#Netty工作线程接收response" class="headerlink" title="Netty工作线程接收response"></a>Netty工作线程接收response</h3><p>上述发送request对应的客户端ChannelOutboundHandler，接收response对应ChannelInboundHandler，Consumer端接收到Provider端的response会依次经由adapter.getDecoder()，nettyClientHandler进行处理。</p>
+<p>这里有一点比较麻烦，Consumer收到Provider response时通过InternalDecoder进行解码(对应的Provider接收Consumer的request)，InternalDecoder每次收到的数据包不一定是完整的dubbo协议包，也有可能是多个dubbo协议包。这里就是tcp传输所谓的<font color="red">黏包和拆包问题</font>。</p>
+<p>黏包/拆包问题是由于底层的TCP无法理解上层的业务数据，所以底层是无法保证数据包不被拆分和分组的，只能通过上层的应用协议栈来设计解决。一般有以下几种方案来解决</p>
+<ul>
+<li>消息定长，如果不够，用空格来补</li>
+<li>在包尾增加回车换行符来分割</li>
+<li>将消息分为消息头和消息体，消息头中包含消息体的长度。</li>
+</ul>
+<p>Dubbo采用了第三种方案，我们上面讲过dubbo协议的header是定长的16字节，最后4字节表示消息体长度。</p>
+<p><b>InternalDecoder</b><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div></pre></td><td class="code"><pre><div class="line">protected void decode(ChannelHandlerContext ctx, ByteBuf input, List&lt;Object&gt; out) throws Exception &#123;</div><div class="line">    ChannelBuffer message = new NettyBackedChannelBuffer(input);</div><div class="line"></div><div class="line">    NettyChannel channel = NettyChannel.getOrAddChannel(ctx.channel(), url, handler);</div><div class="line"></div><div class="line">    Object msg;</div><div class="line"></div><div class="line">    int saveReaderIndex;</div><div class="line"></div><div class="line">    try &#123;</div><div class="line">        // decode object.</div><div class="line">        do &#123;</div><div class="line">            saveReaderIndex = message.readerIndex();</div><div class="line">            try &#123;</div><div class="line">                msg = codec.decode(channel, message);</div><div class="line">            &#125; catch (IOException e) &#123;</div><div class="line">                throw e;</div><div class="line">            &#125;</div><div class="line">            if (msg == Codec2.DecodeResult.NEED_MORE_INPUT) &#123;</div><div class="line">                message.readerIndex(saveReaderIndex);</div><div class="line">                break;</div><div class="line">            &#125; else &#123;</div><div class="line">                //is it possible to go here ?</div><div class="line">                if (saveReaderIndex == message.readerIndex()) &#123;</div><div class="line">                    throw new IOException(&quot;Decode without read data.&quot;);</div><div class="line">                &#125;</div><div class="line">                if (msg != null) &#123;</div><div class="line">                    out.add(msg);</div><div class="line">                &#125;</div><div class="line">            &#125;</div><div class="line">        &#125; while (message.readable());</div><div class="line">    &#125; finally &#123;</div><div class="line">        NettyChannel.removeChannelIfDisconnected(ctx.channel());</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p><b>ExchangeCodec</b><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div></pre></td><td class="code"><pre><div class="line">protected Object decode(Channel channel, ChannelBuffer buffer, int readable, byte[] header) throws IOException &#123;</div><div class="line">    // check magic number.</div><div class="line">    if (readable &gt; 0 &amp;&amp; header[0] != MAGIC_HIGH</div><div class="line">            || readable &gt; 1 &amp;&amp; header[1] != MAGIC_LOW) &#123;</div><div class="line">        int length = header.length;</div><div class="line">        if (header.length &lt; readable) &#123;</div><div class="line">            header = Bytes.copyOf(header, readable);</div><div class="line">            buffer.readBytes(header, length, readable - length);</div><div class="line">        &#125;</div><div class="line">        for (int i = 1; i &lt; header.length - 1; i++) &#123;</div><div class="line">            if (header[i] == MAGIC_HIGH &amp;&amp; header[i + 1] == MAGIC_LOW) &#123;</div><div class="line">                buffer.readerIndex(buffer.readerIndex() - header.length + i);</div><div class="line">                header = Bytes.copyOf(header, i);</div><div class="line">                break;</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line">        return super.decode(channel, buffer, readable, header);</div><div class="line">    &#125;</div><div class="line">    // check length.</div><div class="line">    if (readable &lt; HEADER_LENGTH) &#123;</div><div class="line">        return DecodeResult.NEED_MORE_INPUT;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    // get data length.</div><div class="line">    int len = Bytes.bytes2int(header, 12);</div><div class="line">    checkPayload(channel, len);</div><div class="line"></div><div class="line">    int tt = len + HEADER_LENGTH;</div><div class="line">    if (readable &lt; tt) &#123;</div><div class="line">        return DecodeResult.NEED_MORE_INPUT;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    // limit input stream.</div><div class="line">    ChannelBufferInputStream is = new ChannelBufferInputStream(buffer, len);</div><div class="line"></div><div class="line">    try &#123;</div><div class="line">        return decodeBody(channel, is, header);</div><div class="line">    &#125; finally &#123;</div><div class="line">        if (is.available() &gt; 0) &#123;</div><div class="line">            try &#123;</div><div class="line">                if (logger.isWarnEnabled()) &#123;</div><div class="line">                    logger.warn(&quot;Skip input stream &quot; + is.available());</div><div class="line">                &#125;</div><div class="line">                StreamUtils.skipUnusedStream(is);</div><div class="line">            &#125; catch (IOException e) &#123;</div><div class="line">                logger.warn(e.getMessage(), e);</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>上述方法以及后续DubboCountCodec.decode和ExchangeCodec.decode方法大致逻辑如下：</p>
+<ul>
+<li>发送过来的buffer的可读字节数小于header长度或者小于header+消息体body的长度，直接返回NEED_MORE_INPUT，并设置<font color="red">message.readerIndex(saveReaderIndex);</font></li>
+<li>满足上述规则，直接经过反序列化解析出消息体，添加到List<object> out列表</object></li>
+</ul>
+<p><b>ByteToMessageDecoder</b><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div></pre></td><td class="code"><pre><div class="line">public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception &#123;</div><div class="line">    if (msg instanceof ByteBuf) &#123;</div><div class="line">        CodecOutputList out = CodecOutputList.newInstance();</div><div class="line">        try &#123;</div><div class="line">            ByteBuf data = (ByteBuf) msg;</div><div class="line">            first = cumulation == null;</div><div class="line">            if (first) &#123;</div><div class="line">                cumulation = data;</div><div class="line">            &#125; else &#123;</div><div class="line">                cumulation = cumulator.cumulate(ctx.alloc(), cumulation, data);</div><div class="line">            &#125;</div><div class="line">            callDecode(ctx, cumulation, out);</div><div class="line">        &#125; catch (DecoderException e) &#123;</div><div class="line">            throw e;</div><div class="line">        &#125; catch (Exception e) &#123;</div><div class="line">            throw new DecoderException(e);</div><div class="line">        &#125; finally &#123;</div><div class="line">            if (cumulation != null &amp;&amp; !cumulation.isReadable()) &#123;</div><div class="line">                numReads = 0;</div><div class="line">                cumulation.release();</div><div class="line">                cumulation = null;</div><div class="line">            &#125; else if (++ numReads &gt;= discardAfterReads) &#123;</div><div class="line">                // We did enough reads already try to discard some bytes so we not risk to see a OOME.</div><div class="line">                // See https://github.com/netty/netty/issues/4275</div><div class="line">                numReads = 0;</div><div class="line">                discardSomeReadBytes();</div><div class="line">            &#125;</div><div class="line"></div><div class="line">            int size = out.size();</div><div class="line">            decodeWasNull = !out.insertSinceRecycled();</div><div class="line">            fireChannelRead(ctx, out, size);</div><div class="line">            out.recycle();</div><div class="line">        &#125;</div><div class="line">    &#125; else &#123;</div><div class="line">        ctx.fireChannelRead(msg);</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>如果发生tcp半包问题，回到父类channelRead方法，因为我们之前设置把readIndex复位，cumulation还是可以读的，所以cumulation数据会缓存不会清空，等待下一个dubbo协议包。并且此时int size = out.size()=0，也不会触发后续的fireChannelRead方法。可以看到后续的dubbo包传输过来后，因为first为false，会合并之前缓存的buffer，这样就解决了tcp半包问题。</p>
+<p>对于tcp黏包问题，InternalDecoder本身会while(message.readable())来判断消息是否可读，会持续读取buffer，解析出一个msg就添加到list，如果发生半包问题，就进行上面半包处理逻辑。</p>
+<p>上述消息解码后，会交由NettyClientHandler的channelRead方法来处理<br><b>NettyClientHandler</b><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">@Override</div><div class="line">public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception &#123;</div><div class="line">    NettyChannel channel = NettyChannel.getOrAddChannel(ctx.channel(), url, handler);</div><div class="line">    try &#123;</div><div class="line">        handler.received(channel, msg);</div><div class="line">    &#125; finally &#123;</div><div class="line">        NettyChannel.removeChannelIfDisconnected(ctx.channel());</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>最终调用到AllChannelHandler.received方法，该方法会创建一个<br>ChannelEventRunnable，然后交由自定义的业务线程池来处理。</p>
+<p><b>AllChannelHandler</b><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div></pre></td><td class="code"><pre><div class="line">@Override</div><div class="line">public void received(Channel channel, Object message) throws RemotingException &#123;</div><div class="line">    ExecutorService cexecutor = getExecutorService();</div><div class="line">    try &#123;</div><div class="line">        cexecutor.execute(new ChannelEventRunnable(channel, handler, ChannelState.RECEIVED, message));</div><div class="line">    &#125; catch (Throwable t) &#123;</div><div class="line">        //TODO A temporary solution to the problem that the exception information can not be sent to the opposite end after the thread pool is full. Need a refactoring</div><div class="line">        //fix The thread pool is full, refuses to call, does not return, and causes the consumer to wait for time out</div><div class="line">    	if(message instanceof Request &amp;&amp; t instanceof RejectedExecutionException)&#123;</div><div class="line">    		Request request = (Request)message;</div><div class="line">    		if(request.isTwoWay())&#123;</div><div class="line">    			String msg = &quot;Server side(&quot; + url.getIp() + &quot;,&quot; + url.getPort() + &quot;) threadpool is exhausted ,detail msg:&quot; + t.getMessage();</div><div class="line">    			Response response = new Response(request.getId(), request.getVersion());</div><div class="line">    			response.setStatus(Response.SERVER_THREADPOOL_EXHAUSTED_ERROR);</div><div class="line">    			response.setErrorMessage(msg);</div><div class="line">    			channel.send(response);</div><div class="line">    			return;</div><div class="line">    		&#125;</div><div class="line">    	&#125;</div><div class="line">        throw new ExecutionException(message, channel, getClass() + &quot; error when process received event .&quot;, t);</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<h3 id="业务自定义线程池对response进行相应处理"><a href="#业务自定义线程池对response进行相应处理" class="headerlink" title="业务自定义线程池对response进行相应处理"></a>业务自定义线程池对response进行相应处理</h3><p>经过ChannelEventRunnable.run==&gt;DecodeHandler.received==&gt;<br>HeaderExchangeHandler.received==&gt;HeaderExchangeHandler.handleResponse==&gt;DefaultFuture.received</p>
+<p><b>DefaultFuture</b><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div></pre></td><td class="code"><pre><div class="line">public static void received(Channel channel, Response response) &#123;</div><div class="line">    try &#123;</div><div class="line">        DefaultFuture future = FUTURES.remove(response.getId());</div><div class="line">        if (future != null) &#123;</div><div class="line">            future.doReceived(response);</div><div class="line">        &#125; else &#123;</div><div class="line">            logger.warn(&quot;The timeout response finally returned at &quot;</div><div class="line">                    + (new SimpleDateFormat(&quot;yyyy-MM-dd HH:mm:ss.SSS&quot;).format(new Date()))</div><div class="line">                    + &quot;, response &quot; + response</div><div class="line">                    + (channel == null ? &quot;&quot; : &quot;, channel: &quot; + channel.getLocalAddress()</div><div class="line">                    + &quot; -&gt; &quot; + channel.getRemoteAddress()));</div><div class="line">        &#125;</div><div class="line">    &#125; finally &#123;</div><div class="line">        CHANNELS.remove(response.getId());</div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line">private void doReceived(Response res) &#123;</div><div class="line">    lock.lock();</div><div class="line">    try &#123;</div><div class="line">        response = res;</div><div class="line">        if (done != null) &#123;</div><div class="line">            done.signal();</div><div class="line">        &#125;</div><div class="line">    &#125; finally &#123;</div><div class="line">        lock.unlock();</div><div class="line">    &#125;</div><div class="line">    if (callback != null) &#123;</div><div class="line">        invokeCallback(callback);</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>我们之前在主线程里面缓存了request.getId()对应的future和channel，这里response.getId()获取的是和request对应一样的id，所以能获取到之前缓存的future，并设置response，然后通过done.signal()来通知被阻塞的主线程。(这里针对同步调用过程)最后删除id关联的之前缓存的future和channel。</p>
+<h3 id="调用service主线程返回"><a href="#调用service主线程返回" class="headerlink" title="调用service主线程返回"></a>调用service主线程返回</h3><p>之前调用demoService.sayHello(“world”)的主线程阻塞在<br>DefaultFuture.get方法，之前通过done.signal()会唤醒阻塞在<br>done.await的主线程，并返回服务端结果。</p>
+<p><b>DefaultFuture</b><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div></pre></td><td class="code"><pre><div class="line">public Object get(int timeout) throws RemotingException &#123;</div><div class="line">    if (timeout &lt;= 0) &#123;</div><div class="line">        timeout = Constants.DEFAULT_TIMEOUT;</div><div class="line">    &#125;</div><div class="line">    if (!isDone()) &#123;</div><div class="line">        long start = System.currentTimeMillis();</div><div class="line">        lock.lock();</div><div class="line">        try &#123;</div><div class="line">            while (!isDone()) &#123;</div><div class="line">                done.await(timeout, TimeUnit.MILLISECONDS);</div><div class="line">                if (isDone() || System.currentTimeMillis() - start &gt; timeout) &#123;</div><div class="line">                    break;</div><div class="line">                &#125;</div><div class="line">            &#125;</div><div class="line">        &#125; catch (InterruptedException e) &#123;</div><div class="line">            throw new RuntimeException(e);</div><div class="line">        &#125; finally &#123;</div><div class="line">            lock.unlock();</div><div class="line">        &#125;</div><div class="line">        if (!isDone()) &#123;</div><div class="line">            throw new TimeoutException(sent &gt; 0, channel, getTimeoutMessage(false));</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">    return returnFromResponse();</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<h2 id="Provider"><a href="#Provider" class="headerlink" title="Provider"></a>Provider</h2><p>Provider端Netty bossGroup线程接受Consumer端发过来的参数，然后交由netty工作线程来处理，这个过程主要是解码request，同上面Consumer端解码response的过程基本一致。解码完成后，交由工作线程进行后续处理。以下分别对上述两个过程进行分析</p>
+<h3 id="netty工作线程解码"><a href="#netty工作线程解码" class="headerlink" title="netty工作线程解码"></a>netty工作线程解码</h3><p>netty工作线程经由InternalDecoder.decode解码request，然后经由<br>NettyServerHandler.channelRead==&gt;HeartbeatHandler.received==&gt;<br>AllChannelHandler.received，创建一个ChannelEventRunnable到工作线程池，这个过程和上面Consumer解码Provider返回的response几乎一样，这里不过多赘述</p>
+<h3 id="dubbo自定义线程池后续处理"><a href="#dubbo自定义线程池后续处理" class="headerlink" title="dubbo自定义线程池后续处理"></a>dubbo自定义线程池后续处理</h3><p>经由ChannelEventRunnable.run==&gt;DecodeHandler.received==&gt;<br>HeaderExchangeHandler.handleRequest</p>
+<p><b>HeaderExchangeHandler</b><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">void handleRequest(final ExchangeChannel channel, Request req) throws RemotingException &#123;</div><div class="line">    CompletableFuture&lt;Object&gt; future = handler.reply(channel, msg);</div><div class="line">    if (future.isDone()) &#123;</div><div class="line">        res.setStatus(Response.OK);</div><div class="line">        res.setResult(future.get());</div><div class="line">        channel.send(res);</div><div class="line">        return;</div><div class="line">    &#125;</div></pre></td></tr></table></figure></p>
+<p>上述handler.reply会调用DubboProtocol.requestHandler.reply方法，该方法根据传过来的Invocation获取到对应的serviceKey，然后从一开始启动过程缓存的Map<string, exporter<?="">&gt; exporterMap exporterMap中获取对应的invoker，这个invoker又会经过ProtocolFilterWrapper中的一系列filter最终调用到DelegateProviderMetaDataInvoker.invoke方法，最终通过反射调用到真正的实现类对应的方法并返回结果。</string,></p>
+<p>如果是同步调用方法，上面future.isDone返回true，channel.send(res)，最终会对调用到AbstractChannelHandlerContext的write方法，之前说过该方法会判断当前线程是不是在nioEventLoop里面，显然当前线程是dubbo自定义的线程，不在nioEvenloop里面，就会创建一个WriteAndFlushTask任务丢到Evenloop所在的netty工作线程里面</p>
+<h3 id="netty-server工作线程"><a href="#netty-server工作线程" class="headerlink" title="netty server工作线程"></a>netty server工作线程</h3><p>上一个过程把任务提交到netty server工作线程，然后经过NettyServerHandler.write，InternalEncoder.encode编码后，最后flush就将response发送给Consumer。</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>可以看到，dubbo整个通信过程中，涉及到很多不同的线程，大致有以下几种线程，按照调用时序如下</p>
+<ul>
+<li>Consumer端调用service线程</li>
+<li>Netty client worker线程</li>
+<li>Netty server boss线程</li>
+<li>Netty server worker线程</li>
+<li>Provider自定义线程池</li>
+<li>Consumer端自定义线城池</li>
+</ul>
+<p>本身对于异步编程，都没有同步调用看起来那么舒服，dubbo中又有这么多不同的线程进行交互，所以就更容易摸不着头脑了。我们下面再来以上述线程的发生时间先后梳理下整个过程。<br><img src="https://coding.net/u/lightoheaven/p/image2/git/raw/master/201807/communicate.jpeg" alt="通信交互过程"></p>
+<ol>
+<li>Consumer端启动过程中请求与Provider端建立连接，Netty server boss线程接受OP_ACCEPT事件，并生成对应的NioSocketChannel，这个channel后续读写请求交由某个Netty server worker线程处理</li>
+<li>首先Consumer端有个线程调用service某个方法(web应用一般是tomcat线程)，然后提交一个WriteAndFlushTask到Netty client worker线程</li>
+<li>Netty client worker线程对方法传过来的参数进行编码等其他操作然后flush就发送给Provider端</li>
+<li>Netty server worker线程接受Consumer的request，然后进行解码，解码完成后，交由Provider端自定义的业务线程池处理</li>
+<li>Provider端自定义业务线程池接受解码后的参数，然后调用指定服务的真实实现方法，并将结果封装到WriteAndFlushTask到Netty server worker线程。</li>
+<li>Netty server worker线程将provider端服务处理的结果进行编码，然后writeAndFlush发送到Consumer端。</li>
+<li>Consumer端Netty client worker线程对response进行解码，然后提交一个任务到Consumer端自定义的业务线程池。</li>
+<li>Consumer端业务线程池处理相关逻辑，然后通知Consumer端调用service方法的线程(如果是同步方法则唤醒被阻塞的线程)。</li>
+<li>Consumer端调用service的线程获取最终的结果。</li>
+</ol>
+<p>注意上述Consumer端和Provider都有一个业务线程池，这个是不能少的，有些同学可能会觉得把任务直接交给worker线程来做不就行了吗，然而并不能这样。因为worker线程主要是用来做编解码的一些与业务无关的耗时很短的逻辑，对于Provider端来说，服务的真正实现的方法可能会耗时比较长；对于Consumer端来说，可能还要支持某些callBack方法，耗时也可能比较长，所以上述步骤5和8是不能少的。</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Dubbo/" rel="tag"># Dubbo</a>
+          
+            <a href="/tags/netty/" rel="tag"># netty</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/07/29/dubbo3/" rel="next" title="Dubbo源码学习三(服务引用)">
+                <i class="fa fa-chevron-left"></i> Dubbo源码学习三(服务引用)
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <!-- 来必力City版安装代码 -->
+      <div id="lv-container" data-id="city" data-uid="MTAyMC8zODIwMS8xNDcyOQ==">
+      <script type="text/javascript">
+         (function(d, s) {
+             var j, e = d.getElementsByTagName(s)[0];
+
+             if (typeof LivereTower === 'function') { return; }
+
+             j = d.createElement(s);
+             j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+             j.async = true;
+
+             e.parentNode.insertBefore(j, e);
+         })(document, 'script');
+      </script>
+      <noscript>为正常使用来必力评论功能请激活JavaScript</noscript>
+      </div>
+      <!-- City版安装代码已完成 -->
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/uploads/avatar.png"
+               alt="Smartの小明" />
+          <p class="site-author-name" itemprop="name">Smartの小明</p>
+          <p class="site-description motion-element" itemprop="description">屌丝搬砖程序猿,码农界的搬运工,哪里需要搬哪里</p>
+        </div>
+
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">29</span>
+              <span class="site-state-item-name">posts</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">4</span>
+                <span class="site-state-item-name">categories</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">23</span>
+                <span class="site-state-item-name">tags</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/q6413260" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/1855404367/profile?rightmod=1&wvr=6&mod=personinfo&is_all=1" target="_blank" title="微博">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  微博
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://www.douban.com/people/142298114/" target="_blank" title="豆瓣">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  豆瓣
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://www.zhihu.com/people/xiaoming1990" target="_blank" title="知乎">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  知乎
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Consumer"><span class="nav-number">1.</span> <span class="nav-text">Consumer</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#主线程发送request"><span class="nav-number">1.1.</span> <span class="nav-text">主线程发送request</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Netty工作线程处理request并发送"><span class="nav-number">1.2.</span> <span class="nav-text">Netty工作线程处理request并发送</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Netty工作线程接收response"><span class="nav-number">1.3.</span> <span class="nav-text">Netty工作线程接收response</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#业务自定义线程池对response进行相应处理"><span class="nav-number">1.4.</span> <span class="nav-text">业务自定义线程池对response进行相应处理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#调用service主线程返回"><span class="nav-number">1.5.</span> <span class="nav-text">调用service主线程返回</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Provider"><span class="nav-number">2.</span> <span class="nav-text">Provider</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#netty工作线程解码"><span class="nav-number">2.1.</span> <span class="nav-text">netty工作线程解码</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#dubbo自定义线程池后续处理"><span class="nav-number">2.2.</span> <span class="nav-text">dubbo自定义线程池后续处理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#netty-server工作线程"><span class="nav-number">2.3.</span> <span class="nav-text">netty server工作线程</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#总结"><span class="nav-number">3.</span> <span class="nav-text">总结</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Smartの小明</span>
+</div>
+
+
+<div class="powered-by">
+  Powered by <a class="theme-link" href="https://hexo.io">Hexo</a>
+</div>
+
+<div class="theme-info">
+  Theme -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+
+        
+
+<div class="busuanzi-count">
+
+  <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv"><i class="fa fa-user"></i><span class="busuanzi-value" id="busuanzi_value_site_uv"></span></span>
+  
+
+  
+    <span class="site-pv"><i class="fa fa-eye"></i><span class="busuanzi-value" id="busuanzi_value_site_pv"></span></span>
+  
+  
+</div>
+
+
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.0"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+	
+
+
+
+
+  
+  
+
+  
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.1.js"></script>
+  <script>AV.initialize("Y2lqjwOrlt5p333cMSW3HNxD-gzGzoHsz", "Y6lssmQDLyXlT0HE1pgVn0UK");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+  
+
+
+</body>
+</html>
