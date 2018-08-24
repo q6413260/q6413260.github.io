@@ -160,6 +160,99 @@
           <div id="js-content" class="content-ll">
             
   
+    <article id="post-curatorLeader" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/08/24/curatorLeader/">Curator leader选举</a>
+    </h1>
+  
+
+
+        
+        <a href="/2018/08/24/curatorLeader/" class="archive-article-date">
+  	<time datetime="2018-08-24T13:45:37.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2018-08-24</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h2 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h2><p>最近一周，一直在做squirrel-ha-service高可用的改进。简单介绍下squirrel-ha-service。squirrel-ha-service(后文都简写为ha)是线上持续监控redis集群，保证redis集群高可用的一个服务。会通过redis cluster nodes命令获取redis集群所有节点的状态，如果某个节点宕机了，ha一旦发现宕机节点，首先会通过修改zk通知redis客户端不再访问该节点，然后自动替换宕机节点。替换完节点后，再次通过修改zk通知redis客户端刷新本地路由，将新添加的节点加入本地路由表。<br><img src="https://coding.net/u/lightoheaven/p/image2/git/raw/master/201808/arch.jpeg" width="400" hegiht="250"/>&nbsp;&nbsp;<img src="https://coding.net/u/lightoheaven/p/image2/git/raw/master/201808/multiIdc.jpeg" width="400" hegiht="250"/><br>上述左图是我们目前线上ha大致架构，基本能保证redis集群的整体可用性。但是最近我们在做机房容灾相关，这个架构就有问题了。</p>
+<p>上述是右图我们线上一个redis集群的部署情况，基本都是3机房部署。图中是dx，yf，gh三个机房，每个机房都有一个主节点一个从节点。redis集群这样部署，能保证最高的可用性。即使线上某个机房发生故障，剩下的两个机房也能继续提供服务。<br>这里我们假设现在gh机房发生网络故障，先忽视图中红色框。gh-master节点原来有一个dx-slave节点，一旦光环机房不可用，dx-slave节点会发起提升自己为master的请求，dx和yf机房的两个主节点投票通过，这样一个新的集群dx(2个master节点)，yf(一个master，一个slave)可以继续对外提供服务。<br>从redis集群角度看，如果机房是三机房主从均匀部署，单个机房发生故障另外两个机房依然能继续提供服务。但是此时我们的squirrel-ha服务因为也处于gh机房(我们线上一个redis集群唯一对应一个ha监控服务)，由于gh机房和另外两个机房dx，yf网络不通，此时ha服务无法刷新zk，通知dx和yf的redis客户端更新路由了。之所以发生这个问题，是因为ha自身没有保证高可用，所以我们考虑引进zk选举来保证ha服务的可用性。如上图红框，当gh机房发生网络故障，之前dx-ha-watcher会替代gh-ha成为新的leader，开始监控redis集群。<br>
+        
+          <a class="article-more-a" href="/2018/08/24/curatorLeader/#more">more >></a>
+        
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">curator</a>
+        		</li>
+      		 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">zookeeper</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+	<div class="article-category tagcloud">
+		<i class="icon-book icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="/categories/技术分享//" class="article-tag-list-link color5">技术分享</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2018/08/24/curatorLeader/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
     <article id="post-dubbo4" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
@@ -541,95 +634,6 @@
 
 
   
-    <article id="post-zebra" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2017/11/29/zebra/">数据库访问层中间件Zebra</a>
-    </h1>
-  
-
-
-        
-        <a href="/2017/11/29/zebra/" class="archive-article-date">
-  	<time datetime="2017-11-29T13:00:50.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-11-29</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>zebra是一个基于JDBC API协议上开发出的高可用、高性能的数据库访问层解决方案。类似阿里的tddl，zebra是一个smart客户端，提供了诸如动态配置、监控、读写分离、分库分表等功能。下图是zebra的整体架构图</p>
-<h2 id="zebra整体架构"><a href="#zebra整体架构" class="headerlink" title="zebra整体架构"></a>zebra整体架构</h2><p><img src="https://coding.net/u/lightoheaven/p/image2/git/raw/master/201711/zebra.jpeg" alt="zebra整体架构"><br>
-        
-          <a class="article-more-a" href="/2017/11/29/zebra/#more">more >></a>
-        
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">数据库访问层DAL</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-	<div class="article-category tagcloud">
-		<i class="icon-book icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="/categories/技术分享//" class="article-tag-list-link color5">技术分享</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2017/11/29/zebra/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
   
     <nav id="page-nav">
       <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="page-number" href="/page/3/">3</a><span class="space">&hellip;</span><a class="page-number" href="/page/6/">6</a><a class="extend next" rel="next" href="/page/2/">Next &raquo;</a>
@@ -726,11 +730,11 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
           <ul class="article-tag-list" q-show="showTags">
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">成都</a>
+                <a href="javascript:void(0)" class="js-tag color3">curator</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">穷游</a>
+                <a href="javascript:void(0)" class="js-tag color5">zookeeper</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -743,6 +747,14 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">JAVA设计原则</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">成都</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">穷游</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -766,11 +778,11 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">个人博客上线</a>
+                <a href="javascript:void(0)" class="js-tag color3">贵州</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">贵州</a>
+                <a href="javascript:void(0)" class="js-tag color2">个人博客上线</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -786,10 +798,6 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">配置中心</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">spring-kafka</a>
               </li>
              
@@ -798,15 +806,19 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">配置中心</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">离职</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">Nodejs</a>
+                <a href="javascript:void(0)" class="js-tag color2">Spring</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">Spring</a>
+                <a href="javascript:void(0)" class="js-tag color2">Nodejs</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -865,7 +877,7 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
     
     	<section class="tools-section tools-section-me" q-show="aboutme">
   	  	
-  	  		<div class="aboutme-wrap" id="js-aboutme">叶明&lt;br&gt;毕业于东华，就职于美团&lt;br&gt;&lt;br&gt;程序员，擅长JAVA&lt;br&gt;也会GO，NODEJS</div>
+  	  		<div class="aboutme-wrap" id="js-aboutme">叶明，喜欢瞎折腾&lt;br&gt;毕业于东华，就职于美团&lt;br&gt;&lt;br&gt;程序员，擅长JAVA&lt;br&gt;也会GO，NODEJS，PYTHON&lt;br&gt;&lt;br&gt;会点英语，会点日语&lt;br&gt;喜欢摄影，喜欢说走就走</div>
   	  	
     	</section>
     
