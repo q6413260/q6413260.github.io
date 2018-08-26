@@ -160,6 +160,102 @@
           <div id="js-content" class="content-ll">
             
   
+    <article id="post-tidb1" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/08/26/tidb1/">从零开始学TIDB一(搭建TIDB集群)</a>
+    </h1>
+  
+
+
+        
+        <a href="/2018/08/26/tidb1/" class="archive-article-date">
+  	<time datetime="2018-08-26T04:31:31.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2018-08-26</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>本文介绍如何在单机上(Mac OS)通过 <a href="https://docs.docker.com/compose/overview/">Docker Compose</a> 快速一键部署一套 TiDB 测试集群，我们会从零开始搭建一套由3 个 PD，3 个 TiKV，1 个 TiDB构成的集群。主要包括以下两个步骤：</p>
+<ul>
+<li>Mac OS系统上安装docker，docker-compose</li>
+<li>使用 Docker Compose 快速构建集群</li>
+</ul>
+        
+          <a class="article-more-a" href="/2018/08/26/tidb1/#more">more >></a>
+        
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">TIDB</a>
+        		</li>
+      		 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color2">docker</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+	<div class="article-category tagcloud">
+		<i class="icon-book icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="/categories/技术分享//" class="article-tag-list-link color5">技术分享</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2018/08/26/tidb1/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
     <article id="post-curatorLeader" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
@@ -534,109 +630,9 @@
 
 
   
-    <article id="post-dubbo1" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/07/25/dubbo1/">Dubbo源码学习一(扩展点ExtensionLoader)</a>
-    </h1>
-  
-
-
-        
-        <a href="/2018/07/25/dubbo1/" class="archive-article-date">
-  	<time datetime="2018-07-25T14:00:00.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2018-07-25</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>之前其实已经粗略看过Dubbo的源码，最近一个月在公司连续写了nodejs和go语言的redis cluster客户端之后，稍微有点空余时间就准备找个开源的java项目学习下。正好阿里准备对Dubbo重启开发3.0，就决定重新学习下Dubbo。</p>
-<p>Dubbo是一款高性能、轻量级的开源Java RPC框架，它提供了三大核心能力：面向接口的远程方法调用，智能容错和负载均衡，以及服务自动注册和发现。</p>
-<p>个人认为Dubbo之所以能让这么多人和公司关注，它的一些设计模式确实很值得学习。我们都知道java有七大设计原则，说下开闭原则OCP，对扩展开放，对修改关闭。Dubbo被那么多人和公司使用，可能每个公司都会根据自身的需求对Dubbo做些修改。Dubbo一开始就留了一些扩展点，对于一些常用的模块像注册中心，通信协议，路由等模块都提供了多种不同的实现。如果还不能满足需求的话，用户还可以自行定制。让参与者尽量黑盒扩展，而不是白盒去修改代码。</p>
-<p>Dubbo即然要扩展，扩展点的加载方式，首先要统一，微核心+插件式，是比较能达到 OCP 原则的思路。由一个插件生命周期管理容器，构成微核心，核心不包括任何功能，这样可以确保所有功能都能被替换，并且，框架作者能做到的功能，扩展者也一定要能做到，以保证平等对待第三方，所以，框架自身的功能也要用插件的方式实现，不能有任何硬编码。</p>
-<p>Dubbo参考了JDK标准的SPI机制，参见：java.util.ServiceLoader，开发了一套ExtensionLoader加载机制，所有需要扩展的模块都由ExtensionLoader来动态加载。<br>
-        
-          <a class="article-more-a" href="/2018/07/25/dubbo1/#more">more >></a>
-        
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color1">Dubbo</a>
-        		</li>
-      		 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">OCP</a>
-        		</li>
-      		 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">JAVA设计原则</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-	<div class="article-category tagcloud">
-		<i class="icon-book icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="/categories/技术分享//" class="article-tag-list-link color5">技术分享</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2018/07/25/dubbo1/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
   
     <nav id="page-nav">
-      <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="page-number" href="/page/3/">3</a><span class="space">&hellip;</span><a class="page-number" href="/page/6/">6</a><a class="extend next" rel="next" href="/page/2/">Next &raquo;</a>
+      <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="page-number" href="/page/3/">3</a><span class="space">&hellip;</span><a class="page-number" href="/page/7/">7</a><a class="extend next" rel="next" href="/page/2/">Next &raquo;</a>
     </nav>
   
 
@@ -758,6 +754,10 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">netty</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">elastic-job</a>
               </li>
              
@@ -771,10 +771,6 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">eureka</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">netty</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -827,6 +823,14 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color5">数据库访问层DAL</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">TIDB</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">docker</a>
               </li>
             
             <div class="clearfix"></div>

@@ -160,6 +160,94 @@
           <div id="js-content" class="content-ll">
             
   
+    <article id="post-spring" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2016/04/16/spring/">Spring IOC源码分析</a>
+    </h1>
+  
+
+
+        
+        <a href="/2016/04/16/spring/" class="archive-article-date">
+  	<time datetime="2016-04-15T16:00:00.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2016-04-16</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h2 id="IOC简要解释"><a href="#IOC简要解释" class="headerlink" title="IOC简要解释"></a>IOC简要解释</h2><p>在应用开发中，开发人员往往需要引用和调用其它组件的服务，这种依赖关系如果固化在组件设计中，就会造成依赖关系的僵化和以后维护成本的增加。如果使用IoC容易，把资源的获取反转，具体相对java来说就是把bean的依赖关系交给IoC容易来处理。在反转实现中，具体通过可读的文件来配置。并且bean的耦合关系需要变动时候，可以不用重新改变或者编译源代码就可以实现，这也符合设计原则中的开闭原则，能够提供组件系统设计的灵活性。基于此，我们下面来简要分析一下Spring IoC相关的源码<br>
+        
+          <a class="article-more-a" href="/2016/04/16/spring/#more">more >></a>
+        
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color2">Spring</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+	<div class="article-category tagcloud">
+		<i class="icon-book icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="/categories/技术分享//" class="article-tag-list-link color5">技术分享</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2016/04/16/spring/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
     <article id="post-netty2" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
@@ -512,99 +600,9 @@
 
 
   
-    <article id="post-first-post" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2016/02/20/first-post/">第一篇博客</a>
-    </h1>
-  
-
-
-        
-        <a href="/2016/02/20/first-post/" class="archive-article-date">
-  	<time datetime="2016-02-19T16:00:00.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2016-02-20</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>We如你所见，我的个人博客终于搞定了。前前后后大概花了一个多月，经历了种种困难，还好坚持下来了。现在网站既然搞定了，就开始写自己的第一篇博客。主要讲述下创建个人博客的原因、经过以及今后的打算。</p>
-<h2 id="原因"><a href="#原因" class="headerlink" title="原因"></a>原因</h2><h3 id="大学毕业找工作经历"><a href="#大学毕业找工作经历" class="headerlink" title="大学毕业找工作经历"></a>大学毕业找工作经历</h3><p>其实从报考交大研究生，由于专业课只考了75分，心有不甘的离开校园。当时就意识到通信专业不太适合我，后来决定当程序员。网上看了各种大神的经验，都说程序员最好要写博客，经常总结一些技术。网上也确实看到很多个人博客，不光界面很好看，也确实分享了一些相关的技术。从那时起，就有了想搞个人博客的想法。</p>
-<h3 id="陆金所的工作经历"><a href="#陆金所的工作经历" class="headerlink" title="陆金所的工作经历"></a>陆金所的工作经历</h3><p>虽然前不久刚刚递交辞职报告，但我对陆金所还是满怀感激的。在陆金所不光技术得到了不小的提升，更重要的是认识了不少优秀的朋友。其中不得不提到翼祥，我们经常吃完饭就去绕一圈。在路上，他要经常吐槽我党以及我党的一些领导人，恕我不敢说出那些大大的名字。暂且忘掉这些吐槽吧，翼祥对计算机技术也是一个很有追求的人，每次饭后和他交流技术，感觉都有不少收获。后来他建议我买一个macbook，说是开发效率高的一笔。后来在他的再三鼓动下，我决定搞一个mac pro，其实也有我自己想装逼的想法。<br><img src="https://coding.net/u/lightoheaven/p/image/git/raw/master/posts/201602/first-post/macpro.jpg" alt="mac"><br>
-        
-          <a class="article-more-a" href="/2016/02/20/first-post/#more">more >></a>
-        
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color2">个人博客上线</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-	<div class="article-category tagcloud">
-		<i class="icon-book icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="/categories/随笔//" class="article-tag-list-link color3">随笔</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2016/02/20/first-post/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
   
     <nav id="page-nav">
-      <a class="extend prev" rel="prev" href="/page/5/">&laquo; Prev</a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/4/">4</a><a class="page-number" href="/page/5/">5</a><span class="page-number current">6</span>
+      <a class="extend prev" rel="prev" href="/page/5/">&laquo; Prev</a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/4/">4</a><a class="page-number" href="/page/5/">5</a><span class="page-number current">6</span><a class="page-number" href="/page/7/">7</a><a class="extend next" rel="next" href="/page/7/">Next &raquo;</a>
     </nav>
   
 
@@ -726,6 +724,10 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">netty</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">elastic-job</a>
               </li>
              
@@ -739,10 +741,6 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">eureka</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">netty</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -795,6 +793,14 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color5">数据库访问层DAL</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">TIDB</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">docker</a>
               </li>
             
             <div class="clearfix"></div>

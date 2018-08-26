@@ -160,6 +160,94 @@
           <div id="js-content" class="content-ll">
             
   
+    <article id="post-hystrix1" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2017/09/27/hystrix1/">Hystrix初探</a>
+    </h1>
+  
+
+
+        
+        <a href="/2017/09/27/hystrix1/" class="archive-article-date">
+  	<time datetime="2017-09-27T13:00:50.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-09-27</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>去年在看spring cloud系列的时候，当时就已经了解到了hystrix，这个组件和eureka，zuul等组件一样都是netflix公司开源的。当时由于没有太多的精力，只简单了解了下hystrix的一些简单功能。这半年因为工作关系一直接触redis相关的东西，redis相关也看过不少书了，有时候一直搞一件事可能觉得有点枯燥。就偶然又产生了想法，就决定重新看一下hystrix，决定搞一个hystrix系列。在阅读hystrix的代码过程中，刚开始看起来很吃力，里面用到了rxjava(采用函数响应式编程模式写的，感觉看起来很费劲)，发现要学习的东西越来越多。就想从最简单的hystrix介绍到使用最后到源码分析，写一个系列的博客，正好也长时间没有研究一些新的框架了。上面废话了很多，下面进入正题，本文主要从以下几方面简要介绍下hystrix，基本都是一些概念性的(基本都是翻译自github上Hystrix主页)。<br>
+        
+          <a class="article-more-a" href="/2017/09/27/hystrix1/#more">more >></a>
+        
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">Hystrix</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+	<div class="article-category tagcloud">
+		<i class="icon-book icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="/categories/技术分享//" class="article-tag-list-link color5">技术分享</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2017/09/27/hystrix1/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
     <article id="post-jedisPoolConfig" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
@@ -526,102 +614,9 @@
 
 
   
-    <article id="post-kafkaConsumer" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2016/12/30/kafkaConsumer/">spring-kafka源码分析二(Consumer)</a>
-    </h1>
-  
-
-
-        
-        <a href="/2016/12/30/kafkaConsumer/" class="archive-article-date">
-  	<time datetime="2016-12-30T13:05:07.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2016-12-30</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>上一篇文章我们分析了spring-kafka的producer，这篇文章我们就要来分析下consumer。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div></pre></td><td class="code"><pre><div class="line">ContainerProperties containerProps = new ContainerProperties(&quot;topic1&quot;, &quot;topic2&quot;);</div><div class="line">containerProps.setMessageListener(new MessageListener&lt;Integer, String&gt;() &#123;</div><div class="line"></div><div class="line">    @Override</div><div class="line">    public void onMessage(ConsumerRecord&lt;Integer, String&gt; message) &#123;</div><div class="line">        System.out.println(&quot;received: &quot; + message);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">&#125;);</div><div class="line">KafkaMessageListenerContainer&lt;Integer, String&gt; container = createContainer(containerProps);</div><div class="line">container.setBeanName(&quot;testAuto&quot;);</div><div class="line">container.start();</div><div class="line"></div><div class="line">private static KafkaMessageListenerContainer&lt;Integer, String&gt; createContainer(ContainerProperties containerProps) &#123;</div><div class="line">    Map&lt;String, Object&gt; props = consumerProps();</div><div class="line">    DefaultKafkaConsumerFactory&lt;Integer, String&gt; cf =</div><div class="line">            new DefaultKafkaConsumerFactory&lt;Integer, String&gt;(props);</div><div class="line">    KafkaMessageListenerContainer&lt;Integer, String&gt; container =</div><div class="line">            new KafkaMessageListenerContainer&lt;Integer, String&gt;(cf, containerProps);</div><div class="line">    return container;</div><div class="line">&#125;</div><div class="line"></div><div class="line">private static Map&lt;String, Object&gt; consumerProps() &#123;</div><div class="line">        Map&lt;String, Object&gt; props = new HashMap&lt;String, Object&gt;();</div><div class="line">        props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, &quot;localhost:9092&quot;);</div><div class="line">        props.put(ConsumerConfig.GROUP_ID_CONFIG, &quot;group&quot;);</div><div class="line">        props.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, true);</div><div class="line">        props.put(ConsumerConfig.AUTO_COMMIT_INTERVAL_MS_CONFIG, &quot;100&quot;);</div><div class="line">        props.put(ConsumerConfig.SESSION_TIMEOUT_MS_CONFIG, &quot;15000&quot;);</div><div class="line">        props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, IntegerDeserializer.class);</div><div class="line">        props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);</div><div class="line">        return props;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
-<p>可以看到我们需要创建一个KafkaMessageListenerContainer，而创建上述container又需要创建一个DefaultKafkaConsumerFactory和一个ContainerProperties。注意ContainerProperties必须设置一个MessageListener，这个listener有个onMessage方法，如果consumer收到消息，就会调用这个方法。创建了上述container之后，然后调用container.start方法就可以开启consumer了。<br>
-        
-          <a class="article-more-a" href="/2016/12/30/kafkaConsumer/#more">more >></a>
-        
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">spring-kafka</a>
-        		</li>
-      		 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">NIO</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-	<div class="article-category tagcloud">
-		<i class="icon-book icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="/categories/技术分享//" class="article-tag-list-link color5">技术分享</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2016/12/30/kafkaConsumer/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
   
     <nav id="page-nav">
-      <a class="extend prev" rel="prev" href="/page/2/">&laquo; Prev</a><a class="page-number" href="/">1</a><a class="page-number" href="/page/2/">2</a><span class="page-number current">3</span><a class="page-number" href="/page/4/">4</a><a class="page-number" href="/page/5/">5</a><a class="page-number" href="/page/6/">6</a><a class="extend next" rel="next" href="/page/4/">Next &raquo;</a>
+      <a class="extend prev" rel="prev" href="/page/2/">&laquo; Prev</a><a class="page-number" href="/">1</a><a class="page-number" href="/page/2/">2</a><span class="page-number current">3</span><a class="page-number" href="/page/4/">4</a><a class="page-number" href="/page/5/">5</a><span class="space">&hellip;</span><a class="page-number" href="/page/7/">7</a><a class="extend next" rel="next" href="/page/4/">Next &raquo;</a>
     </nav>
   
 
@@ -743,6 +738,10 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">netty</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">elastic-job</a>
               </li>
              
@@ -756,10 +755,6 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">eureka</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">netty</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -812,6 +807,14 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color5">数据库访问层DAL</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">TIDB</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">docker</a>
               </li>
             
             <div class="clearfix"></div>
