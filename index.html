@@ -160,6 +160,100 @@
           <div id="js-content" class="content-ll">
             
   
+    <article id="post-tidb2" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/08/27/tidb2/">从零开始学TIDB二(TIDB简介与整体架构)</a>
+    </h1>
+  
+
+
+        
+        <a href="/2018/08/27/tidb2/" class="archive-article-date">
+  	<time datetime="2018-08-27T14:58:17.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2018-08-27</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>上一篇博客，我们简单介绍了怎么在Mac OS系统上面使用docker compose搭建一个包含3个pd，3个tikv，1个tidb的<a href="http://yeming.me/2018/08/26/tidb1/">TIDB集群</a>。本文，我们会详细介绍TIDB的一些基本概念和整体架构。</p>
+<h2 id="TIDB-简介"><a href="#TIDB-简介" class="headerlink" title="TIDB 简介"></a>TIDB 简介</h2><p>TIDB是pingcap公司开源的一款分布式数据库，结合了RDBMS和NOSQL两者的特性，支持对业务无感知的水平扩容，具备数据强一致性和高可用性。TIDB具备以下特性对某些业务应该有很大的吸引力。</p>
+<ul>
+<li>兼容MYSQL协议：由于TIDB兼容了MYSQL协议，业务几乎可以零成本的从MYSQL迁移到TIDB。</li>
+<li>水平弹性扩展：mysql虽然也可以分库分表水平扩展，但是如果需要继续水平扩容，就需要dba迁移数据，客户端可能还要修改路由规则。TIDB可以按需水平扩展吞吐或存储，数据自动迁移。</li>
+<li>分布式事物：TIDB支持分布式事物。</li>
+<li><p>高可用数据强一致：TIDB基于raft的多数派选举保证了数据的强一致性，并且在不丢失大部分副本的情况下，可以自动failover。</p>
+        
+          <a class="article-more-a" href="/2018/08/27/tidb2/#more">more >></a>
+        
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">TIDB</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+	<div class="article-category tagcloud">
+		<i class="icon-book icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="/categories/技术分享//" class="article-tag-list-link color5">技术分享</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2018/08/27/tidb2/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
     <article id="post-tidb1" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
@@ -535,101 +629,6 @@
 
 
   
-    <article id="post-dubbo2" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/07/28/dubbo2/">Dubbo源码学习二(服务注册)</a>
-    </h1>
-  
-
-
-        
-        <a href="/2018/07/28/dubbo2/" class="archive-article-date">
-  	<time datetime="2018-07-28T03:58:46.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2018-07-28</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>我们知道Dubbo逻辑上由以下几个模块组成(不考虑Monitor和Container)<br><img src="https://coding.net/u/lightoheaven/p/image2/git/raw/master/201807/dubboArch.jpeg" alt="Dubbo架构图"></p>
-<ul>
-<li>Provider：服务提供方</li>
-<li>Consumer：服务消费方</li>
-<li>Registry：服务注册与发现的注册中心</li>
-</ul>
-<p>稍微解释下Provider和Consumer只是Dubbo逻辑上的概念，对于一个业务应用，很有可能作为Provider提供服务，又作为Consumer消费服务。<br>Registry是服务注册中心，业内一般都用zk作为注册中心。服务提供方在启动时候把本机的ip和提供服务的名称注册到注册中心。节点名称是服务名称，节点内容是机器ip。这样如果有多个服务提供者，节点内容就会是机器ip列表。服务消费者在启动时候向注册中心订阅自己需要的服务名称，注册中心返回提供该服务的一些机器ip列表。消费者拿到ip列表根据一定的路由策略选择一台机器进行远程调用。当然服务消费者和提供者都必须与注册中心保持一个长连接，如果服务提供方宕机，注册中心会把该机器从ip列表中摘掉，并通知消费者更新服务ip列表。</p>
-<p>本文我们主要来看下服务提供方是如何将服务注册到注册中心的。<br>
-        
-          <a class="article-more-a" href="/2018/07/28/dubbo2/#more">more >></a>
-        
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color1">Dubbo</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-	<div class="article-category tagcloud">
-		<i class="icon-book icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="/categories/技术分享//" class="article-tag-list-link color5">技术分享</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2018/07/28/dubbo2/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
   
     <nav id="page-nav">
       <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="page-number" href="/page/3/">3</a><span class="space">&hellip;</span><a class="page-number" href="/page/7/">7</a><a class="extend next" rel="next" href="/page/2/">Next &raquo;</a>
@@ -754,15 +753,15 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">netty</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">elastic-job</a>
               </li>
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">分布式调度</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">netty</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -798,15 +797,15 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">离职</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">spring-kafka</a>
               </li>
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">NIO</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">离职</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -822,15 +821,15 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">数据库访问层DAL</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color5">TIDB</a>
               </li>
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">docker</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">数据库访问层DAL</a>
               </li>
             
             <div class="clearfix"></div>
