@@ -17,7 +17,7 @@ TIDB 简介TIDB是pingcap公司开源的一款分布式数据库，结合了RDBM
 <meta property="og:description" content="上一篇博客，我们简单介绍了怎么在Mac OS系统上面使用docker compose搭建一个包含3个pd，3个tikv，1个tidb的TIDB集群。本文，我们会详细介绍TIDB的一些基本概念和整体架构。
 TIDB 简介TIDB是pingcap公司开源的一款分布式数据库，结合了RDBMS和NOSQL两者的特性，支持对业务无感知的水平扩容，具备数据强一致性和高可用性。TIDB具备以下特性对某些业务应该">
 <meta property="og:image" content="https://coding.net/u/lightoheaven/p/image2/git/raw/master/201808/tidbArch.jpeg">
-<meta property="og:updated_time" content="2018-08-27T15:11:02.000Z">
+<meta property="og:updated_time" content="2018-08-28T01:23:21.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="从零开始学TIDB二(TIDB简介与整体架构)">
 <meta name="twitter:description" content="上一篇博客，我们简单介绍了怎么在Mac OS系统上面使用docker compose搭建一个包含3个pd，3个tikv，1个tidb的TIDB集群。本文，我们会详细介绍TIDB的一些基本概念和整体架构。
@@ -204,6 +204,13 @@ TIDB 简介TIDB是pingcap公司开源的一款分布式数据库，结合了RDBM
 <li>tikv server：tikv server负责存储数据。tikv server使用rocksdb，提供了分布式key-value的存储引擎。数据存储的基本单位是region，每个tikv负责多个region，每个region包含了一个存储range，从start到end的一个范围。tikv使用raft协议做复制，保持数据的强一致和容灾。副本以region为单位进行管理，不同tikv节点上的leader和副本region构成一个raft group，互为副本。由pd来统一负责region在tikv上的负载均衡。(这里可以类比于kafka架构，region类似于partition，副本类似于replica)</li>
 </ul>
 <p>总结下：TIDB由tidb，tikv，pd三个模块组成，tidb负责与客户端通信，提供了计算能力，tikv负责存储真正的数据，提供存储能力，pd作为管理模块，存储集群的一些元信息以及负责对整个集群进行管理调度。可以看到TIDB不同于MYSQL和其他Nosql存储，它是计算和存储分开的，各个模块都可以通过无线的水平扩展保证高可用性。</p>
+<h2 id="TiDB-的最佳适用场景"><a href="#TiDB-的最佳适用场景" class="headerlink" title="TiDB 的最佳适用场景"></a>TiDB 的最佳适用场景</h2><p>简单来说，TiDB 适合具备下面这些特点的场景：</p>
+<ul>
+<li>数据量大，单机保存不下 </li>
+<li>不希望做 Sharding 或者懒得做 Sharding </li>
+<li>访问模式上没有明显的热点 </li>
+<li>需要事务、需要强一致</li>
+</ul>
 <h2 id="SQL到KV的映射"><a href="#SQL到KV的映射" class="headerlink" title="SQL到KV的映射"></a>SQL到KV的映射</h2><p>通过上面介绍，我们知道了tikv基于rocksdb存储引擎以key-value的形式保存数据，这个和其他RDBMS基于table rows来保存数据不同。但是tidb又兼容了MYSQL协议，这是什么意思呢？就是我们完全可以像使用mysql一样使用tidb，我们可以发送一条sql命令给tidb<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">select * from user</div></pre></td></tr></table></figure></p>
 <p>正因为tidb兼容了mysql协议，所以业务可以几乎零成本的迁移到tidb。下面我们来看下tidb是怎么完成从SQL到KV的转换的。<br>假设我们有以下一张表：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">CREATE TABLE User &#123;</div><div class="line">    ID int,</div><div class="line">    Name varchar(20),</div><div class="line">    Age int,</div><div class="line">    PRIMARY KEY (ID)，</div><div class="line">    Key idxAge (age)</div><div class="line">&#125;;</div></pre></td></tr></table></figure></p>
 <p>对于一个table来说，需要存储的数据包括以下三个部分：</p>
@@ -355,7 +362,7 @@ TIDB 简介TIDB是pingcap公司开源的一款分布式数据库，结合了RDBM
                 </span>
                 <span class="tooltip-content">
                     <div class="toc-article">
-                    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#TIDB-简介"><span class="toc-number">1.</span> <span class="toc-text">TIDB 简介</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#TiDB-整体架构"><span class="toc-number">2.</span> <span class="toc-text">TiDB 整体架构</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#SQL到KV的映射"><span class="toc-number">3.</span> <span class="toc-text">SQL到KV的映射</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#MVCC"><span class="toc-number">3.1.</span> <span class="toc-text">MVCC</span></a></li></ol></li></ol>
+                    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#TIDB-简介"><span class="toc-number">1.</span> <span class="toc-text">TIDB 简介</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#TiDB-整体架构"><span class="toc-number">2.</span> <span class="toc-text">TiDB 整体架构</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#TiDB-的最佳适用场景"><span class="toc-number">3.</span> <span class="toc-text">TiDB 的最佳适用场景</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#SQL到KV的映射"><span class="toc-number">4.</span> <span class="toc-text">SQL到KV的映射</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#MVCC"><span class="toc-number">4.1.</span> <span class="toc-text">MVCC</span></a></li></ol></li></ol>
                     </div>
                 </span>
             </div>
@@ -482,19 +489,19 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
           <ul class="article-tag-list" q-show="showTags">
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">成都</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">穷游</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">curator</a>
               </li>
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color5">zookeeper</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">成都</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">穷游</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -550,19 +557,19 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">配置中心</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">离职</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">spring-kafka</a>
               </li>
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">NIO</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">配置中心</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">离职</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -578,15 +585,15 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">数据库访问层DAL</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color5">TIDB</a>
               </li>
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">docker</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">数据库访问层DAL</a>
               </li>
             
             <div class="clearfix"></div>

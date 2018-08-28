@@ -19,7 +19,7 @@
 <meta property="og:image" content="https://coding.net/u/lightoheaven/p/image2/git/raw/master/201807/dubbo2.jpeg">
 <meta property="og:image" content="https://coding.net/u/lightoheaven/p/image2/git/raw/master/201807/transporter.jpeg">
 <meta property="og:image" content="https://coding.net/u/lightoheaven/p/image2/git/raw/master/201807/communicate.jpeg">
-<meta property="og:updated_time" content="2018-08-07T15:39:39.000Z">
+<meta property="og:updated_time" content="2018-08-28T01:24:01.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Dubbo源码学习四(Consumer，Provider通信)">
 <meta name="twitter:description" content="之前我们介绍了Provider启动时候向注册中心注册服务Dubbo源码学习二(服务注册)，Consumer启动时候向注册中心订阅服务Dubbo源码学习三(服务引用)，本文我们就来看下Consumer端和Provider是怎么通信的。">
@@ -188,7 +188,7 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        <p><img src="https://coding.net/u/lightoheaven/p/image2/git/raw/master/201807/communicate.jpeg" alt="通信交互过程"><br>之前我们介绍了Provider启动时候向注册中心注册服务<a href="http://yeming.me/2018/07/28/dubbo2/">Dubbo源码学习二(服务注册)</a>，Consumer启动时候向注册中心订阅服务<a href="http://yeming.me/2018/07/29/dubbo3/">Dubbo源码学习三(服务引用)</a>，本文我们就来看下Consumer端和Provider是怎么通信的。<br><a id="more"></a></p>
+        <p><center><img src="https://coding.net/u/lightoheaven/p/image2/git/raw/master/201807/communicate.jpeg" width="700" hegiht="350"></center><br>之前我们介绍了Provider启动时候向注册中心注册服务<a href="http://yeming.me/2018/07/28/dubbo2/">Dubbo源码学习二(服务注册)</a>，Consumer启动时候向注册中心订阅服务<a href="http://yeming.me/2018/07/29/dubbo3/">Dubbo源码学习三(服务引用)</a>，本文我们就来看下Consumer端和Provider是怎么通信的。<br><a id="more"></a></p>
 <h2 id="Consumer"><a href="#Consumer" class="headerlink" title="Consumer"></a>Consumer</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">public static void main(String[] args) &#123;</div><div class="line">    DemoService demoService = (DemoService) context.getBean(&quot;demoService&quot;); // get remote service proxy</div><div class="line">    String hello = demoService.sayHello(&quot;world&quot;); </div><div class="line">    System.out.println(hello); // get result</div><div class="line">&#125;</div></pre></td></tr></table></figure>
 <p>Consumer部分主要包含以下逻辑：</p>
 <ul>
@@ -545,19 +545,19 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
           <ul class="article-tag-list" q-show="showTags">
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">成都</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">穷游</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">curator</a>
               </li>
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color5">zookeeper</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">成都</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">穷游</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -613,19 +613,19 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">配置中心</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">离职</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">spring-kafka</a>
               </li>
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">NIO</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">配置中心</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">离职</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -641,15 +641,15 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">数据库访问层DAL</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color5">TIDB</a>
               </li>
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">docker</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">数据库访问层DAL</a>
               </li>
             
             <div class="clearfix"></div>
