@@ -6,20 +6,20 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <link rel="dns-prefetch" href="http://yeming.me">
-  <title>elastic-job源码分析 | Smartの小明</title>
+  <title>elastic-job源码分析 | Smartの明</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
   <meta name="description" content="先简单介绍下elastic-job，它是当当公司开源的一个分布式调度解决方案。大家都知道，当数据量比较小的时候，我们可以只用quartz只在一台服务器上处理所有的数据。随着业务发展，数据量越来越大，一台机器已经不足以支撑，就必须想办法将一个任务分成多个小任务，拆分到不同的服务器上并行的执行。例如：有一个遍历数据库某张表的作业，现有2台服务器。为了快速的执行作业，那么每台服务器应执行作业的50%。">
 <meta property="og:type" content="article">
 <meta property="og:title" content="elastic-job源码分析">
 <meta property="og:url" content="http://yeming.me/2017/01/24/elasticJob/index.html">
-<meta property="og:site_name" content="Smartの小明">
+<meta property="og:site_name" content="Smartの明">
 <meta property="og:description" content="先简单介绍下elastic-job，它是当当公司开源的一个分布式调度解决方案。大家都知道，当数据量比较小的时候，我们可以只用quartz只在一台服务器上处理所有的数据。随着业务发展，数据量越来越大，一台机器已经不足以支撑，就必须想办法将一个任务分成多个小任务，拆分到不同的服务器上并行的执行。例如：有一个遍历数据库某张表的作业，现有2台服务器。为了快速的执行作业，那么每台服务器应执行作业的50%。">
 <meta property="og:updated_time" content="2017-01-24T04:41:28.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="elastic-job源码分析">
 <meta name="twitter:description" content="先简单介绍下elastic-job，它是当当公司开源的一个分布式调度解决方案。大家都知道，当数据量比较小的时候，我们可以只用quartz只在一台服务器上处理所有的数据。随着业务发展，数据量越来越大，一台机器已经不足以支撑，就必须想办法将一个任务分成多个小任务，拆分到不同的服务器上并行的执行。例如：有一个遍历数据库某张表的作业，现有2台服务器。为了快速的执行作业，那么每台服务器应执行作业的50%。">
   
-    <link rel="alternative" href="/atom.xml" title="Smartの小明" type="application/atom+xml">
+    <link rel="alternative" href="/atom.xml" title="Smartの明" type="application/atom+xml">
   
   
     <link rel="icon" href="/uploads/avatar.png">
@@ -49,7 +49,7 @@
 			<img src="/uploads/avatar.png" class="js-avatar">
 		</a>
 		<hgroup>
-		  <h1 class="header-author"><a href="/">Smartの小明</a></h1>
+		  <h1 class="header-author"><a href="/">Smartの明</a></h1>
 		</hgroup>
 		
 		<p class="header-subtitle">屌丝搬砖程序猿,码农界的搬运工,哪里需要搬哪里</p>
@@ -107,7 +107,7 @@
 				<img src="/uploads/avatar.png" class="js-avatar">
 			</div>
 			<hgroup>
-			  <h1 class="header-author js-header-author">Smartの小明</h1>
+			  <h1 class="header-author js-header-author">Smartの明</h1>
 			</hgroup>
 			
 			<p class="header-subtitle"><i class="icon icon-quo-left"></i>屌丝搬砖程序猿,码农界的搬运工,哪里需要搬哪里<i class="icon icon-quo-right"></i></p>
@@ -417,9 +417,9 @@ gitment.render('gitment-ctn')
   <div class="outer">
     <div id="footer-info">
     	<div class="footer-left">
-    		&copy; 2018 Smartの小明
+    		&copy; 2018 Smartの明
     	</div>
-      <script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
+      <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js">
       </script>
       <span id="busuanzi_container_site_pv">本站总访问量<span id="busuanzi_value_site_pv"></span>次
       </span>
@@ -499,19 +499,19 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
           <ul class="article-tag-list" q-show="showTags">
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">curator</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">zookeeper</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">成都</a>
               </li>
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">穷游</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">curator</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">zookeeper</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -527,15 +527,15 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">netty</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">elastic-job</a>
               </li>
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">分布式调度</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">netty</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -567,15 +567,15 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">配置中心</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">spring-kafka</a>
               </li>
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">NIO</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">配置中心</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -595,15 +595,15 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">数据库访问层DAL</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color5">TIDB</a>
               </li>
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">docker</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">数据库访问层DAL</a>
               </li>
             
             <div class="clearfix"></div>

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
-  <title>Smartの小明</title>
+  <title>Smartの明</title>
   
   <subtitle>屌丝搬砖程序猿,码农界的搬运工,哪里需要搬哪里</subtitle>
   <link href="/atom.xml" rel="self"/>
@@ -10,7 +10,7 @@
   <id>http://yeming.me/</id>
   
   <author>
-    <name>Smartの小明</name>
+    <name>Smartの明</name>
     
   </author>
   

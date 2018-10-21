@@ -6,13 +6,13 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <link rel="dns-prefetch" href="http://yeming.me">
-  <title>spring-cloud-eureka源码分析一(client端) | Smartの小明</title>
+  <title>spring-cloud-eureka源码分析一(client端) | Smartの明</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
   <meta name="description" content="what is eureka先介绍下eureka是什么玩意。eureka是netflix公司开源的一款基于REST的服务自动注册和发现的产品，并且提供了java客户端给eureka client端更好的与eureka server交互。另外不得不提一下netflix这个公司，这是一家在线影片租赁商，开源了很多java的产品，其中很多产品都被收入进了spring cloud项目里面。除了上面说的eu">
 <meta property="og:type" content="article">
 <meta property="og:title" content="spring-cloud-eureka源码分析一(client端)">
 <meta property="og:url" content="http://yeming.me/2016/12/01/eureka1/index.html">
-<meta property="og:site_name" content="Smartの小明">
+<meta property="og:site_name" content="Smartの明">
 <meta property="og:description" content="what is eureka先介绍下eureka是什么玩意。eureka是netflix公司开源的一款基于REST的服务自动注册和发现的产品，并且提供了java客户端给eureka client端更好的与eureka server交互。另外不得不提一下netflix这个公司，这是一家在线影片租赁商，开源了很多java的产品，其中很多产品都被收入进了spring cloud项目里面。除了上面说的eu">
 <meta property="og:image" content="https://coding.net/u/lightoheaven/p/image2/git/raw/master/201612/1.jpeg">
 <meta property="og:image" content="https://coding.net/u/lightoheaven/p/image2/git/raw/master/201612/eureka_2.jpeg">
@@ -27,7 +27,7 @@
 <meta name="twitter:description" content="what is eureka先介绍下eureka是什么玩意。eureka是netflix公司开源的一款基于REST的服务自动注册和发现的产品，并且提供了java客户端给eureka client端更好的与eureka server交互。另外不得不提一下netflix这个公司，这是一家在线影片租赁商，开源了很多java的产品，其中很多产品都被收入进了spring cloud项目里面。除了上面说的eu">
 <meta name="twitter:image" content="https://coding.net/u/lightoheaven/p/image2/git/raw/master/201612/1.jpeg">
   
-    <link rel="alternative" href="/atom.xml" title="Smartの小明" type="application/atom+xml">
+    <link rel="alternative" href="/atom.xml" title="Smartの明" type="application/atom+xml">
   
   
     <link rel="icon" href="/uploads/avatar.png">
@@ -57,7 +57,7 @@
 			<img src="/uploads/avatar.png" class="js-avatar">
 		</a>
 		<hgroup>
-		  <h1 class="header-author"><a href="/">Smartの小明</a></h1>
+		  <h1 class="header-author"><a href="/">Smartの明</a></h1>
 		</hgroup>
 		
 		<p class="header-subtitle">屌丝搬砖程序猿,码农界的搬运工,哪里需要搬哪里</p>
@@ -115,7 +115,7 @@
 				<img src="/uploads/avatar.png" class="js-avatar">
 			</div>
 			<hgroup>
-			  <h1 class="header-author js-header-author">Smartの小明</h1>
+			  <h1 class="header-author js-header-author">Smartの明</h1>
 			</hgroup>
 			
 			<p class="header-subtitle"><i class="icon icon-quo-left"></i>屌丝搬砖程序猿,码农界的搬运工,哪里需要搬哪里<i class="icon icon-quo-right"></i></p>
@@ -401,9 +401,9 @@ gitment.render('gitment-ctn')
   <div class="outer">
     <div id="footer-info">
     	<div class="footer-left">
-    		&copy; 2018 Smartの小明
+    		&copy; 2018 Smartの明
     	</div>
-      <script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
+      <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js">
       </script>
       <span id="busuanzi_container_site_pv">本站总访问量<span id="busuanzi_value_site_pv"></span>次
       </span>
@@ -483,19 +483,19 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
           <ul class="article-tag-list" q-show="showTags">
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">curator</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">zookeeper</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">成都</a>
               </li>
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">穷游</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">curator</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">zookeeper</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -511,15 +511,15 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">netty</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">elastic-job</a>
               </li>
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">分布式调度</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">netty</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -551,15 +551,15 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">配置中心</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">spring-kafka</a>
               </li>
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">NIO</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">配置中心</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -579,15 +579,15 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">数据库访问层DAL</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color5">TIDB</a>
               </li>
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">docker</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">数据库访问层DAL</a>
               </li>
             
             <div class="clearfix"></div>
