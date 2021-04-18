@@ -1,0 +1,1487 @@
+<!DOCTYPE HTML>
+<html lang="zh-CN">
+
+
+<head>
+    <meta charset="utf-8">
+    <meta name="keywords" content="Java线程池源码分析, Smartの明">
+    <meta name="description" content="苦练基本功，长期有耐心">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="renderer" content="webkit|ie-stand|ie-comp">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+
+
+    <title>Java线程池源码分析 | Smartの明</title>
+    <link rel="icon" type="image/png" href="/avatar.png">
+
+    <link rel="stylesheet" type="text/css" href="/libs/awesome/css/all.css">
+    <link rel="stylesheet" type="text/css" href="/libs/materialize/materialize.min.css">
+    <link rel="stylesheet" type="text/css" href="/libs/aos/aos.css">
+    <link rel="stylesheet" type="text/css" href="/libs/animate/animate.min.css">
+    <link rel="stylesheet" type="text/css" href="/libs/lightGallery/css/lightgallery.min.css">
+    <link rel="stylesheet" type="text/css" href="/css/matery.css">
+    <link rel="stylesheet" type="text/css" href="/css/my.css">
+
+    <script src="/libs/jquery/jquery.min.js"></script>
+
+<meta name="generator" content="Hexo 5.4.0"><link rel="alternate" href="/atom.xml" title="Smartの明" type="application/atom+xml">
+</head>
+
+
+
+
+<body>
+    <header class="navbar-fixed">
+    <nav id="headNav" class="bg-color nav-transparent">
+        <div id="navContainer" class="nav-wrapper container">
+            <div class="brand-logo">
+                <a href="/" class="waves-effect waves-light">
+                    
+                    <img src="/avatar.png" class="logo-img" alt="LOGO">
+                    
+                    <span class="logo-span">Smartの明</span>
+                </a>
+            </div>
+            
+
+<a href="#" data-target="mobile-nav" class="sidenav-trigger button-collapse"><i class="fas fa-bars"></i></a>
+<ul class="right nav-menu">
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/" class="waves-effect waves-light">
+      
+      <i class="fas fa-home" style="zoom: 0.6;"></i>
+      
+      <span>首页</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/tags" class="waves-effect waves-light">
+      
+      <i class="fas fa-tags" style="zoom: 0.6;"></i>
+      
+      <span>标签</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/categories" class="waves-effect waves-light">
+
+      
+      <i class="fas fa-bookmark" style="zoom: 0.6;"></i>
+      
+      <span>分类</span>
+      <i class="fas fa-chevron-down" aria-hidden="true" style="zoom: 0.6;"></i>
+    </a>
+    <ul class="sub-nav menus_item_child ">
+      
+      <li>
+        <a href="/categories/%E6%8A%80%E6%9C%AF%E5%88%86%E4%BA%AB/">
+          
+          <i class="fas fa-book" style="margin-top: -20px; zoom: 0.6;"></i>
+          
+          <span>技术分享</span>
+        </a>
+      </li>
+      
+      <li>
+        <a href="/categories/%E6%97%85%E8%A1%8C%E8%B6%B3%E8%BF%B9">
+          
+          <i class="fas fa-film" style="margin-top: -20px; zoom: 0.6;"></i>
+          
+          <span>旅行足迹</span>
+        </a>
+      </li>
+      
+    </ul>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/archives" class="waves-effect waves-light">
+      
+      <i class="fas fa-archive" style="zoom: 0.6;"></i>
+      
+      <span>归档</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/about" class="waves-effect waves-light">
+      
+      <i class="fas fa-user-circle" style="zoom: 0.6;"></i>
+      
+      <span>关于</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/friends" class="waves-effect waves-light">
+      
+      <i class="fas fa-address-book" style="zoom: 0.6;"></i>
+      
+      <span>友情链接</span>
+    </a>
+    
+  </li>
+  
+  <li>
+    <a href="#searchModal" class="modal-trigger waves-effect waves-light">
+      <i id="searchIcon" class="fas fa-search" title="搜索" style="zoom: 0.85;"></i>
+    </a>
+  </li>
+</ul>
+
+
+<div id="mobile-nav" class="side-nav sidenav">
+
+    <div class="mobile-head bg-color">
+        
+        <img src="/avatar.png" class="logo-img circle responsive-img">
+        
+        <div class="logo-name">Smartの明</div>
+        <div class="logo-desc">
+            
+            苦练基本功，长期有耐心
+            
+        </div>
+    </div>
+
+    
+
+    <ul class="menu-list mobile-menu-list">
+        
+        <li class="m-nav-item">
+	  
+		<a href="/" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-home"></i>
+			
+			首页
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/tags" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-tags"></i>
+			
+			标签
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="javascript:;">
+			
+				<i class="fa-fw fas fa-bookmark"></i>
+			
+			分类
+			<span class="m-icon"><i class="fas fa-chevron-right"></i></span>
+		</a>
+            <ul  style="background:  ;" >
+              
+                <li>
+
+                  <a href="/categories/%E6%8A%80%E6%9C%AF%E5%88%86%E4%BA%AB/ " style="margin-left:75px">
+				  
+				   <i class="fa fas fa-book" style="position: absolute;left:50px" ></i>
+			      
+		          <span>技术分享</span>
+                  </a>
+                </li>
+              
+                <li>
+
+                  <a href="/categories/%E6%97%85%E8%A1%8C%E8%B6%B3%E8%BF%B9 " style="margin-left:75px">
+				  
+				   <i class="fa fas fa-film" style="position: absolute;left:50px" ></i>
+			      
+		          <span>旅行足迹</span>
+                  </a>
+                </li>
+              
+            </ul>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/archives" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-archive"></i>
+			
+			归档
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/about" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-user-circle"></i>
+			
+			关于
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/friends" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-address-book"></i>
+			
+			友情链接
+		</a>
+          
+        </li>
+        
+        
+    </ul>
+</div>
+
+
+        </div>
+
+        
+    </nav>
+
+</header>
+
+    
+
+
+
+<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/11.jpg')">
+    <div class="container" style="right: 0px;left: 0px;">
+        <div class="row">
+            <div class="col s12 m12 l12">
+                <div class="brand">
+                    <h1 class="description center-align post-title">Java线程池源码分析</h1>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+<main class="post-container content">
+
+    
+    <link rel="stylesheet" href="/libs/tocbot/tocbot.css">
+<style>
+    #articleContent h1::before,
+    #articleContent h2::before,
+    #articleContent h3::before,
+    #articleContent h4::before,
+    #articleContent h5::before,
+    #articleContent h6::before {
+        display: block;
+        content: " ";
+        height: 100px;
+        margin-top: -100px;
+        visibility: hidden;
+    }
+
+    #articleContent :focus {
+        outline: none;
+    }
+
+    .toc-fixed {
+        position: fixed;
+        top: 64px;
+    }
+
+    .toc-widget {
+        width: 345px;
+        padding-left: 20px;
+    }
+
+    .toc-widget .toc-title {
+        padding: 35px 0 15px 17px;
+        font-size: 1.5rem;
+        font-weight: bold;
+        line-height: 1.5rem;
+    }
+
+    .toc-widget ol {
+        padding: 0;
+        list-style: none;
+    }
+
+    #toc-content {
+        padding-bottom: 30px;
+        overflow: auto;
+    }
+
+    #toc-content ol {
+        padding-left: 10px;
+    }
+
+    #toc-content ol li {
+        padding-left: 10px;
+    }
+
+    #toc-content .toc-link:hover {
+        color: #42b983;
+        font-weight: 700;
+        text-decoration: underline;
+    }
+
+    #toc-content .toc-link::before {
+        background-color: transparent;
+        max-height: 25px;
+
+        position: absolute;
+        right: 23.5vw;
+        display: block;
+    }
+
+    #toc-content .is-active-link {
+        color: #42b983;
+    }
+
+    #floating-toc-btn {
+        position: fixed;
+        right: 15px;
+        bottom: 76px;
+        padding-top: 15px;
+        margin-bottom: 0;
+        z-index: 998;
+    }
+
+    #floating-toc-btn .btn-floating {
+        width: 48px;
+        height: 48px;
+    }
+
+    #floating-toc-btn .btn-floating i {
+        line-height: 48px;
+        font-size: 1.4rem;
+    }
+</style>
+<div class="row">
+    <div id="main-content" class="col s12 m12 l9">
+        <!-- 文章内容详情 -->
+<div id="artDetail">
+    <div class="card">
+        <div class="card-content article-info">
+            <div class="row tag-cate">
+                <div class="col s7">
+                    
+                    <div class="article-tag">
+                        
+                            <a href="/tags/Java%E7%BA%BF%E7%A8%8B%E6%B1%A0/">
+                                <span class="chip bg-color">Java线程池</span>
+                            </a>
+                        
+                    </div>
+                    
+                </div>
+                <div class="col s5 right-align">
+                    
+                    <div class="post-cate">
+                        <i class="fas fa-bookmark fa-fw icon-category"></i>
+                        
+                            <a href="/categories/%E6%8A%80%E6%9C%AF%E5%88%86%E4%BA%AB/" class="post-category">
+                                技术分享
+                            </a>
+                        
+                    </div>
+                    
+                </div>
+            </div>
+
+            <div class="post-info">
+                
+                <div class="post-date info-break-policy">
+                    <i class="far fa-calendar-minus fa-fw"></i>发布日期:&nbsp;&nbsp;
+                    2016-05-07
+                </div>
+                
+
+                
+
+                
+                <div class="info-break-policy">
+                    <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
+                    2.7k
+                </div>
+                
+
+                
+                <div class="info-break-policy">
+                    <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
+                    12 分
+                </div>
+                
+
+                
+                    <div id="busuanzi_container_page_pv" class="info-break-policy">
+                        <i class="far fa-eye fa-fw"></i>阅读次数:&nbsp;&nbsp;
+                        <span id="busuanzi_value_page_pv"></span>
+                    </div>
+				
+            </div>
+        </div>
+        <hr class="clearfix">
+
+        
+        <!-- 是否加载使用自带的 prismjs. -->
+        <link rel="stylesheet" href="/libs/prism/prism.css">
+        
+
+        
+
+        <div class="card-content article-card-content">
+            <div id="articleContent">
+                <h2 id="线程池类图"><a href="#线程池类图" class="headerlink" title="线程池类图"></a>线程池类图</h2><p>本篇文章我们先从左边这条线<br>Executor==&gt;ExcutorService==&gt;AbstractExecutorService==&gt;ThreadPoolExecutor来分析一下。<br><img src="https://lightoheaven.coding.net/p/image2/d/image2/git/raw/master/201605/threadPool1/uml.jpg" alt="线程池UML类图"></p>
+<span id="more"></span>
+<ul>
+<li>上面url继承类图，线程池的最顶层的接口是Executor，这个接口只有一个方法void execute(Runnable command)</li>
+<li>ExecutorService继承Executor，新增了submit(Runnable(Callable))，shutDown，shutDownNow等几个主要方法</li>
+<li>AbstractExecutorService实现了上面的ExecutorService接口的若干个方法。</li>
+<li>ThreadPoolExecutor继承AbstractExecutorService，实现了线程池的一些主要的方法execute(Runnable)。</li>
+</ul>
+<h2 id="AbstractExecutorService"><a href="#AbstractExecutorService" class="headerlink" title="AbstractExecutorService"></a>AbstractExecutorService</h2><p>AbstractExecutorService实现了submit方法，代码如下:</p>
+<ul>
+<li>submit(Callable task)方法<pre class="line-numbers language-none"><code class="language-none">public &lt;T&gt; Future&lt;T&gt; submit(Callable&lt;T&gt; task) &#123;
+    if (task &#x3D;&#x3D; null) throw new NullPointerException();
+    RunnableFuture&lt;T&gt; ftask &#x3D; newTaskFor(task);
+    execute(ftask);
+    return ftask;
+&#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></li>
+<li>newTaskFor(Callable callable)方法<pre class="line-numbers language-none"><code class="language-none">protected &lt;T&gt; RunnableFuture&lt;T&gt; newTaskFor(Callable&lt;T&gt; callable) &#123;
+    return new FutureTask&lt;T&gt;(callable);
+&#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+上面的FutureTask实现了RunnableFuture接口，RunnableFuture继承了<br>Runnable和Future接口。Runnable接口只有一个void run方法，Future接口有cancel(boolean),V get(),V get(long timeout, TimeUnit unit),boolean isCancelled(),boolean isDone()方法。</li>
+</ul>
+<h2 id="ThreadPoolExecutor"><a href="#ThreadPoolExecutor" class="headerlink" title="ThreadPoolExecutor"></a>ThreadPoolExecutor</h2><p>接着上面的AbstractExecutorService.submit方法，会调用到execute(ftask)，这个execute方法就是ThreadPoolExecutor中的。我们接下来就以execute方法作为起点来分析。</p>
+<h3 id="execute"><a href="#execute" class="headerlink" title="execute"></a>execute</h3><pre class="line-numbers language-none"><code class="language-none">public void execute(Runnable command) &#123;
+    if (command &#x3D;&#x3D; null)
+        throw new NullPointerException();
+    int c &#x3D; ctl.get();
+    if (workerCountOf(c) &lt; corePoolSize) &#123;
+        if (addWorker(command, true))
+            return;
+        c &#x3D; ctl.get();
+    &#125;
+    if (isRunning(c) &amp;&amp; workQueue.offer(command)) &#123;
+        int recheck &#x3D; ctl.get();
+        if (! isRunning(recheck) &amp;&amp; remove(command))
+            reject(command);
+        else if (workerCountOf(recheck) &#x3D;&#x3D; 0)
+            addWorker(null, false);
+    &#125;
+    else if (!addWorker(command, false))
+        reject(command);
+&#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li>首先检查当前工作线程数是否小于corePoolSize，若小于，则添加一个worker来处理这个任务(commadn),添加任务成功则返回.</li>
+<li>如果线程还处于running状态,并且任务成功添加到queue中，重新检查一次线程池的状态，若线程池非running，则从queue中删除任务，成功则调用reject，这里根据拒绝策略来执行；若当前工作的线程数为0，则添加一个worker(addWorker(null, false)，这里要注意，这次的addWorker的参数和上面第一次的不一样)</li>
+<li>如果添加worker失败，也执行reject方法。</li>
+</ul>
+<h3 id="addWorker-Runnable-firstTask-boolean-core"><a href="#addWorker-Runnable-firstTask-boolean-core" class="headerlink" title="addWorker(Runnable firstTask, boolean core)"></a>addWorker(Runnable firstTask, boolean core)</h3> <pre class="line-numbers language-none"><code class="language-none">private boolean addWorker(Runnable firstTask, boolean core) &#123;
+    retry:
+    for (;;) &#123;
+        int c &#x3D; ctl.get();
+        int rs &#x3D; runStateOf(c);
+
+        &#x2F;&#x2F; Check if queue empty only if necessary.
+        if (rs &gt;&#x3D; SHUTDOWN &amp;&amp;
+            ! (rs &#x3D;&#x3D; SHUTDOWN &amp;&amp;
+               firstTask &#x3D;&#x3D; null &amp;&amp;
+               ! workQueue.isEmpty()))
+            return false;
+
+        for (;;) &#123;
+            int wc &#x3D; workerCountOf(c);
+            if (wc &gt;&#x3D; CAPACITY ||
+                wc &gt;&#x3D; (core ? corePoolSize : maximumPoolSize))
+                return false;
+            if (compareAndIncrementWorkerCount(c))
+                break retry;
+            c &#x3D; ctl.get();  &#x2F;&#x2F; Re-read ctl
+            if (runStateOf(c) !&#x3D; rs)
+                continue retry;
+            &#x2F;&#x2F; else CAS failed due to workerCount change; retry inner loop
+        &#125;
+    &#125;
+
+    boolean workerStarted &#x3D; false;
+    boolean workerAdded &#x3D; false;
+    Worker w &#x3D; null;
+    try &#123;
+        w &#x3D; new Worker(firstTask);
+        final Thread t &#x3D; w.thread;
+        if (t !&#x3D; null) &#123;
+            final ReentrantLock mainLock &#x3D; this.mainLock;
+            mainLock.lock();
+            try &#123;
+                &#x2F;&#x2F; Recheck while holding lock.
+                &#x2F;&#x2F; Back out on ThreadFactory failure or if
+                &#x2F;&#x2F; shut down before lock acquired.
+                int rs &#x3D; runStateOf(ctl.get());
+
+                if (rs &lt; SHUTDOWN ||
+                    (rs &#x3D;&#x3D; SHUTDOWN &amp;&amp; firstTask &#x3D;&#x3D; null)) &#123;
+                    if (t.isAlive()) &#x2F;&#x2F; precheck that t is startable
+                        throw new IllegalThreadStateException();
+                    workers.add(w);
+                    int s &#x3D; workers.size();
+                    if (s &gt; largestPoolSize)
+                        largestPoolSize &#x3D; s;
+                    workerAdded &#x3D; true;
+                &#125;
+            &#125; finally &#123;
+                mainLock.unlock();
+            &#125;
+            if (workerAdded) &#123;
+                t.start();
+                workerStarted &#x3D; true;
+            &#125;
+        &#125;
+    &#125; finally &#123;
+        if (! workerStarted)
+            addWorkerFailed(w);
+    &#125;
+    return workerStarted;
+&#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>(1)这个判断逻辑比较复杂，我们先来看下<br> <pre class="line-numbers language-none"><code class="language-none">if (rs &gt;&#x3D; SHUTDOWN &amp;&amp;
+            ! (rs &#x3D;&#x3D; SHUTDOWN &amp;&amp;
+               firstTask &#x3D;&#x3D; null &amp;&amp;
+               ! workQueue.isEmpty()))
+            return false;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre><br>若当前状态大于SHUTDOWN，显然if判断条件为ture，直接returnfalse。(很好理解，线程池处于关闭状态，肯定不让新添加worker了)<br>若当前状态小于SHUTDOWN，if判断条件为false，接着往下走(线程池为RUNNING状态，很好理解)<br>若当前状态等于SHUTDOWN：若firstTask等于null并且工作队列有任务，则if判断条件为false，代码不会return，会继续往下运行；若firstTask不等于null或者工作队列为空，则判断条件为true，会return false（这个也好理解，我们知道SHUTDOWN状态，线程池不再接受新的任务，但是已经在工作队列中的任务还是要完成才行。所以若first等于null，并且工作队列有任务，还要继续往下走。若相反，则不会往下走）<br>(2)判断当前工作线程数</p>
+<pre class="line-numbers language-none"><code class="language-none">for (;;) &#123;
+    int wc &#x3D; workerCountOf(c);
+    if (wc &gt;&#x3D; CAPACITY ||
+        wc &gt;&#x3D; (core ? corePoolSize : maximumPoolSize))
+        return false;
+    if (compareAndIncrementWorkerCount(c))
+        break retry;
+    c &#x3D; ctl.get();  &#x2F;&#x2F; Re-read ctl
+    if (runStateOf(c) !&#x3D; rs)
+        continue retry;
+    &#x2F;&#x2F; else CAS failed due to workerCount change; retry inner loop
+&#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>当前工作线程数没有超过线程池设置的参数的限制，则利用CAS添加一个worker，并跳出外层的for循环，继续向下运行。否则返回false，添加worker失败。<br>(3) 完成了上述1 2步骤后，会执行new Worker(firstTask)，Thread t = w.thread并再次检查线程池的状态，若合法，则向工作线程池HashSet中添加当前worker，并执行t.start。此时才开启了子线程来执行任务。</p>
+<h3 id="子线程run方法"><a href="#子线程run方法" class="headerlink" title="子线程run方法"></a>子线程run方法</h3><p>上面步骤3调用了t.start，会开启一个子线程来运行Worker中的run方法。</p>
+<pre class="line-numbers language-none"><code class="language-none">public void run() &#123;
+        runWorker(this);
+&#125;
+
+final void runWorker(Worker w) &#123;
+    Thread wt &#x3D; Thread.currentThread();
+    Runnable task &#x3D; w.firstTask;
+    w.firstTask &#x3D; null;
+    w.unlock(); &#x2F;&#x2F; allow interrupts
+    boolean completedAbruptly &#x3D; true;
+    try &#123;
+        while (task !&#x3D; null || (task &#x3D; getTask()) !&#x3D; null) &#123;
+            w.lock();
+            &#x2F;&#x2F; If pool is stopping, ensure thread is interrupted;
+            &#x2F;&#x2F; if not, ensure thread is not interrupted.  This
+            &#x2F;&#x2F; requires a recheck in second case to deal with
+            &#x2F;&#x2F; shutdownNow race while clearing interrupt
+            if ((runStateAtLeast(ctl.get(), STOP) ||
+                 (Thread.interrupted() &amp;&amp;
+                  runStateAtLeast(ctl.get(), STOP))) &amp;&amp;
+                !wt.isInterrupted())
+                wt.interrupt();
+            try &#123;
+                beforeExecute(wt, task);
+                Throwable thrown &#x3D; null;
+                try &#123;
+                    task.run();
+                &#125;finally &#123;
+                    afterExecute(task, thrown);
+                &#125;
+            &#125; finally &#123;
+                task &#x3D; null;
+                w.completedTasks++;
+                w.unlock();
+            &#125;
+        &#125;
+        completedAbruptly &#x3D; false;
+    &#125; finally &#123;
+        processWorkerExit(w, completedAbruptly);
+    &#125;
+&#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>上述worker不断通过getTask()方法，从workQueue中获取任务；若没有获取到任务，则调用processWorkerExit方法。</p>
+<h3 id="getTask"><a href="#getTask" class="headerlink" title="getTask()"></a>getTask()</h3><pre class="line-numbers language-none"><code class="language-none">private Runnable getTask() &#123;
+    boolean timedOut &#x3D; false; &#x2F;&#x2F; Did the last poll() time out?
+    for (;;) &#123;
+        int c &#x3D; ctl.get();
+        int rs &#x3D; runStateOf(c);
+        &#x2F;&#x2F; Check if queue empty only if necessary.
+        if (rs &gt;&#x3D; SHUTDOWN &amp;&amp; (rs &gt;&#x3D; STOP || workQueue.isEmpty())) &#123;
+            decrementWorkerCount();
+            return null;
+        &#125;
+        int wc &#x3D; workerCountOf(c);
+        &#x2F;&#x2F; Are workers subject to culling?
+        boolean timed &#x3D; allowCoreThreadTimeOut || wc &gt; corePoolSize;
+        if ((wc &gt; maximumPoolSize || (timed &amp;&amp; timedOut))
+            &amp;&amp; (wc &gt; 1 || workQueue.isEmpty())) &#123;
+            if (compareAndDecrementWorkerCount(c))
+                return null;
+            continue;
+        &#125;
+        try &#123;
+            Runnable r &#x3D; timed ?
+                workQueue.poll(keepAliveTime, TimeUnit.NANOSECONDS) :
+                workQueue.take();
+            if (r !&#x3D; null)
+                return r;
+            timedOut &#x3D; true;
+        &#125; catch (InterruptedException retry) &#123;
+            timedOut &#x3D; false;
+        &#125;
+    &#125;
+&#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>getTask方法是一个无限的for循环方法，它首先判断当前线程池的状态</p>
+<pre class="line-numbers language-none"><code class="language-none">if (rs &gt;&#x3D; SHUTDOWN &amp;&amp; (rs &gt;&#x3D; STOP || workQueue.isEmpty())) &#123;
+            decrementWorkerCount();
+            return null;
+        &#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+<p>这个判断也很好理解，若rs==SHUTDOWN，workQueue为空，显然应该直接返回null，并提前是工作的worker减一。(getTask返回null，runWorker方法会调用processWorkerExit从HashSet中remove当前worker)；若rs&gt;大于SHUTDOWN(这个对应线程池的shutDownNow方法，工作队列中等待的任务不再执行)；其他情况，说明线程池处于运行状态，继续往下运行。然后根据当前线程池设置的最大线程数，以及是否允许线coreThread超时间以及workQueue的状态来判断是否通过CAS操作来是线程数减一并return null。最后我们要关注下下面这个从工作队列中取得任务的三目运算。</p>
+<pre class="line-numbers language-none"><code class="language-none">Runnable r &#x3D; timed ?
+                workQueue.poll(keepAliveTime, TimeUnit.NANOSECONDS) :
+                workQueue.take();<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+<p>若timed为ture(设置allowCoreThreadTimeOut为true)，则超过了等待的时间还没有从workQueue中取得任务则r ＝ null，此时就有可能造成即使workerCount小于corePoolSize，当前的worker也可能被回收。<br>若timed为false，则调用阻塞方法从workQueue中获取任务，newFixedThreadPool就会一直调用这个阻塞方法，从而达到不显示关闭线程池的情况下，即使workQueue为空，也能维持固定的工作线程的个数。</p>
+<h3 id="shutDown-shutDownNow-方法"><a href="#shutDown-shutDownNow-方法" class="headerlink" title="shutDown(shutDownNow)方法"></a>shutDown(shutDownNow)方法</h3><pre class="line-numbers language-none"><code class="language-none">public List&lt;Runnable&gt; shutdownNow() &#123;
+    List&lt;Runnable&gt; tasks;
+    final ReentrantLock mainLock &#x3D; this.mainLock;
+    mainLock.lock();
+    try &#123;
+        checkShutdownAccess();
+        &#x2F;&#x2F;shutDwonNow为STOP,shutDown为SHUTDOWN
+        advanceRunState(STOP);(advanceRunState(SHUTDOWN);)
+        interruptWorkers();(interruptIdleWorkers)
+        &#x2F;&#x2F;shutDownNow专用
+        tasks &#x3D; drainQueue();
+        &#x2F;&#x2F;shutDown专用 ScheduledThreadPoolExecutor回调
+        onShutdown();
+    &#125; finally &#123;
+        mainLock.unlock();
+    &#125;
+    tryTerminate();
+    return tasks;
+&#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>shutDown和shutDownnNow方法区别(代码层面)：</p>
+<ul>
+<li>shutDownNow：advanceRunState(STOP),interruptWorkers<br>shutDown：advanceRunState(shutDown),interruptIdleWorkers</li>
+<li>shutDown多了个onShutdown();ScheduledThreadPoolExecutor复写了onShutDown方法。</li>
+<li>shutDownNow方法工作队列中还未完成的任务。</li>
+<li>interruptIdleWorkers</li>
+</ul>
+<h3 id="interruptIdleWorkers与interruptWorkers"><a href="#interruptIdleWorkers与interruptWorkers" class="headerlink" title="interruptIdleWorkers与interruptWorkers"></a>interruptIdleWorkers与interruptWorkers</h3><p>(1)shutDownNow</p>
+<pre class="line-numbers language-none"><code class="language-none">private void interruptWorkers() &#123;
+    final ReentrantLock mainLock &#x3D; this.mainLock;
+    mainLock.lock();
+    try &#123;
+        for (Worker w : workers)
+            w.interruptIfStarted();
+    &#125; finally &#123;
+        mainLock.unlock();
+    &#125;
+&#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>显然这个是中断所有的线程<br>(2)shutDown</p>
+<pre class="line-numbers language-none"><code class="language-none">private void interruptIdleWorkers(boolean onlyOne) &#123;
+    final ReentrantLock mainLock &#x3D; this.mainLock;
+    mainLock.lock();
+    try &#123;
+        for (Worker w : workers) &#123;
+            Thread t &#x3D; w.thread;
+            if (!t.isInterrupted() &amp;&amp; w.tryLock()) &#123;
+                try &#123;
+                    t.interrupt();
+                &#125; catch (SecurityException ignore) &#123;
+                &#125; finally &#123;
+                    w.unlock();
+                &#125;
+            &#125;
+            if (onlyOne)
+                break;
+        &#125;
+    &#125; finally &#123;
+        mainLock.unlock();
+    &#125;
+&#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>注意onlyOne参数，这个只有在调用tryTerminate()方法里面，会调用interruptIdleWorkers(true)，其他情况都是interruptIdleWorkers(false)，所以对于shutDown方法，也是尝试中断所有还没有被中断的线程。<br>3)tryTerminate<br>上面(2)中提到了tryTerminate方法，接下来就来看下这个方法</p>
+<pre class="line-numbers language-none"><code class="language-none">final void tryTerminate() &#123;
+    for (;;) &#123;
+        int c &#x3D; ctl.get();
+        if (isRunning(c) ||
+            runStateAtLeast(c, TIDYING) ||
+            (runStateOf(c) &#x3D;&#x3D; SHUTDOWN &amp;&amp; ! workQueue.isEmpty()))
+            return;
+        if (workerCountOf(c) !&#x3D; 0) &#123; &#x2F;&#x2F; Eligible to terminate
+            interruptIdleWorkers(ONLY_ONE);
+            return;
+        &#125;
+
+        final ReentrantLock mainLock &#x3D; this.mainLock;
+        mainLock.lock();
+        try &#123;
+            if (ctl.compareAndSet(c, ctlOf(TIDYING, 0))) &#123;
+                try &#123;
+                    terminated();
+                &#125; finally &#123;
+                    ctl.set(ctlOf(TERMINATED, 0));
+                    termination.signalAll();
+                &#125;
+                return;
+            &#125;
+        &#125; finally &#123;
+            mainLock.unlock();
+        &#125;
+        &#x2F;&#x2F; else retry on failed CAS
+    &#125;
+&#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>从上述代码可以看出，若线程池状态为SHUTDOWN，workQueue为空，工作线程数为0或者线程池状态为STOP，工作线程数为0，都最终会把线程池状态设置为TERMINATED，并且唤醒所有因为调用awaitTermination()方法阻塞在termination.awaitNanos(nanos)还未醒过来的线程。</p>
+<pre class="line-numbers language-none"><code class="language-none">public boolean awaitTermination(long timeout, TimeUnit unit)
+    throws InterruptedException &#123;
+    long nanos &#x3D; unit.toNanos(timeout);
+    final ReentrantLock mainLock &#x3D; this.mainLock;
+    mainLock.lock();
+    try &#123;
+        for (;;) &#123;
+            if (runStateAtLeast(ctl.get(), TERMINATED))
+                return true;
+            if (nanos &lt;&#x3D; 0)
+                return false;
+            nanos &#x3D; termination.awaitNanos(nanos);
+        &#125;
+    &#125; finally &#123;
+        mainLock.unlock();
+    &#125;
+&#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>上述tryTerminate方法，在addWorkerFailed()，processWorkerExit()，shutDown()，shutDownNow()，remove(Runnable task)方法中都会调用到。</p>
+<h2 id="线程池5种状态解释"><a href="#线程池5种状态解释" class="headerlink" title="线程池5种状态解释"></a>线程池5种状态解释</h2><p>上面经常提到线程池的运行状态，这里稍作解释一下。</p>
+<pre class="line-numbers language-none"><code class="language-none">private static final int RUNNING    &#x3D; -1 &lt;&lt; COUNT_BITS;
+private static final int SHUTDOWN   &#x3D;  0 &lt;&lt; COUNT_BITS;
+private static final int STOP       &#x3D;  1 &lt;&lt; COUNT_BITS;
+private static final int TIDYING    &#x3D;  2 &lt;&lt; COUNT_BITS;
+private static final int TERMINATED &#x3D;  3 &lt;&lt; COUNT_BITS;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h3 id="种状态的定义"><a href="#种状态的定义" class="headerlink" title="种状态的定义"></a>种状态的定义</h3><ul>
+<li>RUNNING: 接受新的任务，处理workQueue中的任务。</li>
+<li>SHUTDOWN: 不接受新的任务，但是会继续完成workQueue中的任务</li>
+<li>STOP: 不接受新的任务，也不处理workQueue中未完成的任务，尝试中断所有运行中的任务</li>
+<li>TIDYING: 所有任务已经完成, 工作线程数为0,线程池状态变成TIDYING随之将会调用terminated()方法。</li>
+<li>TERMINATED: terminated()方法已经完成</li>
+</ul>
+<h3 id="5种状态相互转换"><a href="#5种状态相互转换" class="headerlink" title="5种状态相互转换"></a>5种状态相互转换</h3><ul>
+<li>RUNNING -&gt; SHUTDOWN: 调用shutdown()方法，也许隐式在finalize()方法</li>
+<li>(RUNNING or SHUTDOWN) -&gt; STOP: 调用shutdownNow()方法</li>
+<li>SHUTDOWN -&gt; TIDYING: workQueue和pool都为空</li>
+<li>STOP -&gt; TIDYING: pool为空</li>
+<li>TIDYING -&gt; TERMINATED: terminated()方法完成</li>
+</ul>
+
+                
+            </div>
+            <hr/>
+
+            
+
+    <div class="reprint" id="reprint-statement">
+        
+            <div class="reprint__author">
+                <span class="reprint-meta" style="font-weight: bold;">
+                    <i class="fas fa-user">
+                        文章作者:
+                    </i>
+                </span>
+                <span class="reprint-info">
+                    <a href="/about" rel="external nofollow noreferrer">Smartの明</a>
+                </span>
+            </div>
+            <div class="reprint__type">
+                <span class="reprint-meta" style="font-weight: bold;">
+                    <i class="fas fa-link">
+                        文章链接:
+                    </i>
+                </span>
+                <span class="reprint-info">
+                    <a href="http://yeming.me/2016/05/07/threadpool1/">http://yeming.me/2016/05/07/threadpool1/</a>
+                </span>
+            </div>
+            <div class="reprint__notice">
+                <span class="reprint-meta" style="font-weight: bold;">
+                    <i class="fas fa-copyright">
+                        版权声明:
+                    </i>
+                </span>
+                <span class="reprint-info">
+                    本博客所有文章除特別声明外，均采用
+                    <a href="https://creativecommons.org/licenses/by/4.0/deed.zh" rel="external nofollow noreferrer" target="_blank">CC BY 4.0</a>
+                    许可协议。转载请注明来源
+                    <a href="/about" target="_blank">Smartの明</a>
+                    !
+                </span>
+            </div>
+        
+    </div>
+
+    <script async defer>
+      document.addEventListener("copy", function (e) {
+        let toastHTML = '<span>复制成功，请遵循本文的转载规则</span><button class="btn-flat toast-action" onclick="navToReprintStatement()" style="font-size: smaller">查看</a>';
+        M.toast({html: toastHTML})
+      });
+
+      function navToReprintStatement() {
+        $("html, body").animate({scrollTop: $("#reprint-statement").offset().top - 80}, 800);
+      }
+    </script>
+
+
+
+            <div class="tag_share" style="display: block;">
+                <div class="post-meta__tag-list" style="display: inline-block;">
+                    
+                        <div class="article-tag">
+                            
+                                <a href="/tags/Java%E7%BA%BF%E7%A8%8B%E6%B1%A0/">
+                                    <span class="chip bg-color">Java线程池</span>
+                                </a>
+                            
+                        </div>
+                    
+                </div>
+                <div class="post_share" style="zoom: 80%; width: fit-content; display: inline-block; float: right; margin: -0.15rem 0;">
+                    <link rel="stylesheet" type="text/css" href="/libs/share/css/share.min.css">
+<div id="article-share">
+
+    
+    <div class="social-share" data-sites="twitter,facebook,google,qq,qzone,wechat,weibo,douban,linkedin" data-wechat-qrcode-helper="<p>微信扫一扫即可分享！</p>"></div>
+    <script src="/libs/share/js/social-share.min.js"></script>
+    
+
+    
+
+</div>
+
+                </div>
+            </div>
+            
+        </div>
+    </div>
+
+    
+
+    
+        <link rel="stylesheet" href="/libs/gitment/gitment-default.css">
+<link rel="stylesheet" href="/css/gitment.css">
+
+<div class="gitment-card card" data-aos="fade-up">
+    <div class="comment_headling" style="font-size: 20px; font-weight: 700; position: relative; padding-left: 20px; top: 15px; padding-bottom: 5px;">
+        <i class="fas fa-comments fa-fw" aria-hidden="true"></i>
+        <span>评论</span>
+    </div>
+    <div id="gitment-content" class="card-content"></div>
+</div>
+
+<script src="/libs/gitment/gitment.js"></script>
+<script>
+var gitment = new Gitment({
+    id: 'Sat May 07 2016 00:00:00 GMT+0800',
+    owner: 'q6413260',
+    repo: 'Gitment',
+    oauth: {
+        client_id: '486b0c51ae4b0c60abe0',
+        client_secret: 'd40f9bf0c09cf6c5af98c2e2bfe2258a286a23a3'
+    }
+});
+
+gitment.render('gitment-content');
+</script>
+
+    
+
+    
+
+    
+    <div class="livere-card card" data-aos="fade-up">
+    <!-- 来必力City版安装代码 -->
+    <div id="lv-container" class="card-content" data-id="city" data-uid="MTAyMC8zODIwMS8xNDcyOQ==">
+        <script type="text/javascript">
+            (function (d, s) {
+                let j, e = d.getElementsByTagName(s)[0];
+                if (typeof LivereTower === 'function') {
+                    return;
+                }
+
+                j = d.createElement(s);
+                j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+                j.async = true;
+
+                e.parentNode.insertBefore(j, e);
+            })(document, 'script');
+        </script>
+        <noscript>为正常使用来必力评论功能请激活JavaScript。</noscript>
+    </div>
+    <!-- City版安装代码已完成 -->
+</div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+<article id="prenext-posts" class="prev-next articles">
+    <div class="row article-row">
+        
+        <div class="article col s12 m6" data-aos="fade-up">
+            <div class="article-badge left-badge text-color">
+                <i class="fas fa-chevron-left"></i>&nbsp;上一篇</div>
+            <div class="card">
+                <a href="/2016/05/13/threadpool2/">
+                    <div class="card-image">
+                        
+                        
+                        <img src="/medias/featureimages/4.jpg" class="responsive-img" alt="Java线程池源码分析二(ScheduledThreadPoolExecutor)">
+                        
+                        <span class="card-title">Java线程池源码分析二(ScheduledThreadPoolExecutor)</span>
+                    </div>
+                </a>
+                <div class="card-content article-content">
+                    <div class="summary block-with-text">
+                        
+                            线程池类图本篇文章我们从右边这条线Executor==&gt;ExcutorService==&gt;ScheduledExecutorService==&gt;ScheduledThreadPoolExecutor来分析一下。
+                        
+                    </div>
+                    <div class="publish-info">
+                        <span class="publish-date">
+                            <i class="far fa-clock fa-fw icon-date"></i>2016-05-13
+                        </span>
+                        <span class="publish-author">
+                            
+                            <i class="fas fa-bookmark fa-fw icon-category"></i>
+                            
+                            <a href="/categories/%E6%8A%80%E6%9C%AF%E5%88%86%E4%BA%AB/" class="post-category">
+                                    技术分享
+                                </a>
+                            
+                            
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="card-action article-tags">
+                    
+                    <a href="/tags/Java%E7%BA%BF%E7%A8%8B%E6%B1%A0/">
+                        <span class="chip bg-color">Java线程池</span>
+                    </a>
+                    
+                </div>
+                
+            </div>
+        </div>
+        
+        
+        <div class="article col s12 m6" data-aos="fade-up">
+            <div class="article-badge right-badge text-color">
+                下一篇&nbsp;<i class="fas fa-chevron-right"></i>
+            </div>
+            <div class="card">
+                <a href="/2016/04/28/chengdu/">
+                    <div class="card-image">
+                        
+                        
+                        <img src="/medias/featureimages/5.jpg" class="responsive-img" alt="成都游记">
+                        
+                        <span class="card-title">成都游记</span>
+                    </div>
+                </a>
+                <div class="card-content article-content">
+                    <div class="summary block-with-text">
+                        
+                            Day1－宽窄巷子到了成都，酒店安排好后，就直接去了宽窄巷子，找了一个茶馆，边喝茶边看戏。值得一提的是，李天炜同学上去当了一次演员，冒着生命危险给我们赢得了一个果盘，只有他不知道😂。
+                        
+                    </div>
+                    <div class="publish-info">
+                            <span class="publish-date">
+                                <i class="far fa-clock fa-fw icon-date"></i>2016-04-28
+                            </span>
+                        <span class="publish-author">
+                            
+                            <i class="fas fa-bookmark fa-fw icon-category"></i>
+                            
+                            <a href="/categories/%E6%97%85%E8%A1%8C%E8%B6%B3%E8%BF%B9/" class="post-category">
+                                    旅行足迹
+                                </a>
+                            
+                            
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="card-action article-tags">
+                    
+                    <a href="/tags/%E6%88%90%E9%83%BD/">
+                        <span class="chip bg-color">成都</span>
+                    </a>
+                    
+                    <a href="/tags/%E7%A9%B7%E6%B8%B8/">
+                        <span class="chip bg-color">穷游</span>
+                    </a>
+                    
+                </div>
+                
+            </div>
+        </div>
+        
+    </div>
+</article>
+
+</div>
+
+
+
+<!-- 代码块功能依赖 -->
+<script type="text/javascript" src="/libs/codeBlock/codeBlockFuction.js"></script>
+
+<!-- 代码语言 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeLang.js"></script>
+
+
+<!-- 代码块复制 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeCopy.js"></script>
+
+
+<!-- 代码块收缩 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeShrink.js"></script>
+
+
+    </div>
+    <div id="toc-aside" class="expanded col l3 hide-on-med-and-down">
+        <div class="toc-widget card" style="background-color: white;">
+            <div class="toc-title"><i class="far fa-list-alt"></i>&nbsp;&nbsp;目录</div>
+            <div id="toc-content"></div>
+        </div>
+    </div>
+</div>
+
+<!-- TOC 悬浮按钮. -->
+
+<div id="floating-toc-btn" class="hide-on-med-and-down">
+    <a class="btn-floating btn-large bg-color">
+        <i class="fas fa-list-ul"></i>
+    </a>
+</div>
+
+
+<script src="/libs/tocbot/tocbot.min.js"></script>
+<script>
+    $(function () {
+        tocbot.init({
+            tocSelector: '#toc-content',
+            contentSelector: '#articleContent',
+            headingsOffset: -($(window).height() * 0.4 - 45),
+            collapseDepth: Number('0'),
+            headingSelector: 'h2, h3, h4'
+        });
+
+        // modify the toc link href to support Chinese.
+        let i = 0;
+        let tocHeading = 'toc-heading-';
+        $('#toc-content a').each(function () {
+            $(this).attr('href', '#' + tocHeading + (++i));
+        });
+
+        // modify the heading title id to support Chinese.
+        i = 0;
+        $('#articleContent').children('h2, h3, h4').each(function () {
+            $(this).attr('id', tocHeading + (++i));
+        });
+
+        // Set scroll toc fixed.
+        let tocHeight = parseInt($(window).height() * 0.4 - 64);
+        let $tocWidget = $('.toc-widget');
+        $(window).scroll(function () {
+            let scroll = $(window).scrollTop();
+            /* add post toc fixed. */
+            if (scroll > tocHeight) {
+                $tocWidget.addClass('toc-fixed');
+            } else {
+                $tocWidget.removeClass('toc-fixed');
+            }
+        });
+
+        
+        /* 修复文章卡片 div 的宽度. */
+        let fixPostCardWidth = function (srcId, targetId) {
+            let srcDiv = $('#' + srcId);
+            if (srcDiv.length === 0) {
+                return;
+            }
+
+            let w = srcDiv.width();
+            if (w >= 450) {
+                w = w + 21;
+            } else if (w >= 350 && w < 450) {
+                w = w + 18;
+            } else if (w >= 300 && w < 350) {
+                w = w + 16;
+            } else {
+                w = w + 14;
+            }
+            $('#' + targetId).width(w);
+        };
+
+        // 切换TOC目录展开收缩的相关操作.
+        const expandedClass = 'expanded';
+        let $tocAside = $('#toc-aside');
+        let $mainContent = $('#main-content');
+        $('#floating-toc-btn .btn-floating').click(function () {
+            if ($tocAside.hasClass(expandedClass)) {
+                $tocAside.removeClass(expandedClass).hide();
+                $mainContent.removeClass('l9');
+            } else {
+                $tocAside.addClass(expandedClass).show();
+                $mainContent.addClass('l9');
+            }
+            fixPostCardWidth('artDetail', 'prenext-posts');
+        });
+        
+    });
+</script>
+
+    
+
+</main>
+
+
+
+
+    <footer class="page-footer bg-color">
+    
+        <link rel="stylesheet" href="/libs/aplayer/APlayer.min.css">
+<style>
+    .aplayer .aplayer-lrc p {
+        
+        display: none;
+        
+        font-size: 12px;
+        font-weight: 700;
+        line-height: 16px !important;
+    }
+
+    .aplayer .aplayer-lrc p.aplayer-lrc-current {
+        
+        display: none;
+        
+        font-size: 15px;
+        color: #42b983;
+    }
+
+    
+    .aplayer.aplayer-fixed.aplayer-narrow .aplayer-body {
+        left: -66px !important;
+    }
+
+    .aplayer.aplayer-fixed.aplayer-narrow .aplayer-body:hover {
+        left: 0px !important;
+    }
+
+    
+</style>
+<div class="">
+    
+    <div class="row">
+        <meting-js class="col l8 offset-l2 m10 offset-m1 s12"
+                   server="netease"
+                   type="playlist"
+                   id="503838841"
+                   fixed='true'
+                   autoplay='false'
+                   theme='#42b983'
+                   loop='all'
+                   order='random'
+                   preload='auto'
+                   volume='0.7'
+                   list-folded='true'
+        >
+        </meting-js>
+    </div>
+</div>
+
+<script src="/libs/aplayer/APlayer.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/meting@2/dist/Meting.min.js"></script>
+
+    
+    <div class="container row center-align" style="margin-bottom: 0px !important;">
+        <div class="col s12 m8 l8 copy-right">
+            Copyright&nbsp;&copy;
+            
+                <span id="year">2019-2021</span>
+            
+            <span id="year">2019</span>
+            <a href="/about" target="_blank">Smartの明</a>
+            |&nbsp;Powered by&nbsp;<a href="https://hexo.io/" target="_blank">Hexo</a>
+            |&nbsp;Theme&nbsp;<a href="https://github.com/blinkfox/hexo-theme-matery" target="_blank">Matery</a>
+            <br>
+            
+            &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
+                class="white-color">63.5k</span>&nbsp;字
+            
+            
+            
+            
+            
+            
+            <span id="busuanzi_container_site_pv">
+                |&nbsp;<i class="far fa-eye"></i>&nbsp;总访问量:&nbsp;<span id="busuanzi_value_site_pv"
+                    class="white-color"></span>&nbsp;次
+            </span>
+            
+            
+            <span id="busuanzi_container_site_uv">
+                |&nbsp;<i class="fas fa-users"></i>&nbsp;总访问人数:&nbsp;<span id="busuanzi_value_site_uv"
+                    class="white-color"></span>&nbsp;人
+            </span>
+            
+            <br>
+            
+            <br>
+            
+        </div>
+        <div class="col s12 m4 l4 social-link social-statis">
+    <a href="https://github.com/q6413260" class="tooltipped" target="_blank" data-tooltip="访问我的GitHub" data-position="top" data-delay="50">
+        <i class="fab fa-github"></i>
+    </a>
+
+
+
+    <a href="mailto:228160255@qq.com" class="tooltipped" target="_blank" data-tooltip="邮件联系我" data-position="top" data-delay="50">
+        <i class="fas fa-envelope-open"></i>
+    </a>
+
+
+
+
+
+
+
+    <a href="tencent://AddContact/?fromId=50&fromSubId=1&subcmd=all&uin=228160255" class="tooltipped" target="_blank" data-tooltip="QQ联系我: 228160255" data-position="top" data-delay="50">
+        <i class="fab fa-qq"></i>
+    </a>
+
+
+
+
+
+
+
+    <a href="/atom.xml" class="tooltipped" target="_blank" data-tooltip="RSS 订阅" data-position="top" data-delay="50">
+        <i class="fas fa-rss"></i>
+    </a>
+
+</div>
+    </div>
+</footer>
+
+<div class="progress-bar"></div>
+
+
+    <!-- 搜索遮罩框 -->
+<div id="searchModal" class="modal">
+    <div class="modal-content">
+        <div class="search-header">
+            <span class="title"><i class="fas fa-search"></i>&nbsp;&nbsp;搜索</span>
+            <input type="search" id="searchInput" name="s" placeholder="请输入搜索的关键字"
+                   class="search-input">
+        </div>
+        <div id="searchResult"></div>
+    </div>
+</div>
+
+<script type="text/javascript">
+$(function () {
+    var searchFunc = function (path, search_id, content_id) {
+        'use strict';
+        $.ajax({
+            url: path,
+            dataType: "xml",
+            success: function (xmlResponse) {
+                // get the contents from search data
+                var datas = $("entry", xmlResponse).map(function () {
+                    return {
+                        title: $("title", this).text(),
+                        content: $("content", this).text(),
+                        url: $("url", this).text()
+                    };
+                }).get();
+                var $input = document.getElementById(search_id);
+                var $resultContent = document.getElementById(content_id);
+                $input.addEventListener('input', function () {
+                    var str = '<ul class=\"search-result-list\">';
+                    var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+                    $resultContent.innerHTML = "";
+                    if (this.value.trim().length <= 0) {
+                        return;
+                    }
+                    // perform local searching
+                    datas.forEach(function (data) {
+                        var isMatch = true;
+                        var data_title = data.title.trim().toLowerCase();
+                        var data_content = data.content.trim().replace(/<[^>]+>/g, "").toLowerCase();
+                        var data_url = data.url;
+                        data_url = data_url.indexOf('/') === 0 ? data.url : '/' + data_url;
+                        var index_title = -1;
+                        var index_content = -1;
+                        var first_occur = -1;
+                        // only match artiles with not empty titles and contents
+                        if (data_title !== '' && data_content !== '') {
+                            keywords.forEach(function (keyword, i) {
+                                index_title = data_title.indexOf(keyword);
+                                index_content = data_content.indexOf(keyword);
+                                if (index_title < 0 && index_content < 0) {
+                                    isMatch = false;
+                                } else {
+                                    if (index_content < 0) {
+                                        index_content = 0;
+                                    }
+                                    if (i === 0) {
+                                        first_occur = index_content;
+                                    }
+                                }
+                            });
+                        }
+                        // show search results
+                        if (isMatch) {
+                            str += "<li><a href='" + data_url + "' class='search-result-title'>" + data_title + "</a>";
+                            var content = data.content.trim().replace(/<[^>]+>/g, "");
+                            if (first_occur >= 0) {
+                                // cut out 100 characters
+                                var start = first_occur - 20;
+                                var end = first_occur + 80;
+                                if (start < 0) {
+                                    start = 0;
+                                }
+                                if (start === 0) {
+                                    end = 100;
+                                }
+                                if (end > content.length) {
+                                    end = content.length;
+                                }
+                                var match_content = content.substr(start, end);
+                                // highlight all keywords
+                                keywords.forEach(function (keyword) {
+                                    var regS = new RegExp(keyword, "gi");
+                                    match_content = match_content.replace(regS, "<em class=\"search-keyword\">" + keyword + "</em>");
+                                });
+
+                                str += "<p class=\"search-result\">" + match_content + "...</p>"
+                            }
+                            str += "</li>";
+                        }
+                    });
+                    str += "</ul>";
+                    $resultContent.innerHTML = str;
+                });
+            }
+        });
+    };
+
+    searchFunc('/search.xml', 'searchInput', 'searchResult');
+});
+</script>
+
+    <!-- 回到顶部按钮 -->
+<div id="backTop" class="top-scroll">
+    <a class="btn-floating btn-large waves-effect waves-light" href="#!">
+        <i class="fas fa-arrow-up"></i>
+    </a>
+</div>
+
+
+    <script src="/libs/materialize/materialize.min.js"></script>
+    <script src="/libs/masonry/masonry.pkgd.min.js"></script>
+    <script src="/libs/aos/aos.js"></script>
+    <script src="/libs/scrollprogress/scrollProgress.min.js"></script>
+    <script src="/libs/lightGallery/js/lightgallery-all.min.js"></script>
+    <script src="/js/matery.js"></script>
+
+    <!-- Baidu Analytics -->
+
+    <!-- Baidu Push -->
+
+<script>
+    (function () {
+        var bp = document.createElement('script');
+        var curProtocol = window.location.protocol.split(':')[0];
+        if (curProtocol === 'https') {
+            bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+        } else {
+            bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+        }
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(bp, s);
+    })();
+</script>
+
+    
+    <script src="/libs/others/clicklove.js" async="async"></script>
+    
+    
+    <script async src="/libs/others/busuanzi.pure.mini.js"></script>
+    
+
+    
+
+    
+
+    <!--腾讯兔小巢-->
+    
+    
+
+    
+    
+    <script type="text/javascript" size="150" alpha='0.6'
+        zIndex="-1" src="/libs/background/ribbon-refresh.min.js" async="async"></script>
+    
+
+    
+
+    
+    <script src="/libs/instantpage/instantpage.js" type="module"></script>
+    
+
+</body>
+
+</html>

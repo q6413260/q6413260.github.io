@@ -1,0 +1,1620 @@
+<!DOCTYPE HTML>
+<html lang="zh-CN">
+
+
+<head>
+    <meta charset="utf-8">
+    <meta name="keywords" content="Hystrix源码分析, Smartの明">
+    <meta name="description" content="苦练基本功，长期有耐心">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="renderer" content="webkit|ie-stand|ie-comp">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+
+
+    <title>Hystrix源码分析 | Smartの明</title>
+    <link rel="icon" type="image/png" href="/avatar.png">
+
+    <link rel="stylesheet" type="text/css" href="/libs/awesome/css/all.css">
+    <link rel="stylesheet" type="text/css" href="/libs/materialize/materialize.min.css">
+    <link rel="stylesheet" type="text/css" href="/libs/aos/aos.css">
+    <link rel="stylesheet" type="text/css" href="/libs/animate/animate.min.css">
+    <link rel="stylesheet" type="text/css" href="/libs/lightGallery/css/lightgallery.min.css">
+    <link rel="stylesheet" type="text/css" href="/css/matery.css">
+    <link rel="stylesheet" type="text/css" href="/css/my.css">
+
+    <script src="/libs/jquery/jquery.min.js"></script>
+
+<meta name="generator" content="Hexo 5.4.0"><link rel="alternate" href="/atom.xml" title="Smartの明" type="application/atom+xml">
+</head>
+
+
+
+
+<body>
+    <header class="navbar-fixed">
+    <nav id="headNav" class="bg-color nav-transparent">
+        <div id="navContainer" class="nav-wrapper container">
+            <div class="brand-logo">
+                <a href="/" class="waves-effect waves-light">
+                    
+                    <img src="/avatar.png" class="logo-img" alt="LOGO">
+                    
+                    <span class="logo-span">Smartの明</span>
+                </a>
+            </div>
+            
+
+<a href="#" data-target="mobile-nav" class="sidenav-trigger button-collapse"><i class="fas fa-bars"></i></a>
+<ul class="right nav-menu">
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/" class="waves-effect waves-light">
+      
+      <i class="fas fa-home" style="zoom: 0.6;"></i>
+      
+      <span>首页</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/tags" class="waves-effect waves-light">
+      
+      <i class="fas fa-tags" style="zoom: 0.6;"></i>
+      
+      <span>标签</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/categories" class="waves-effect waves-light">
+
+      
+      <i class="fas fa-bookmark" style="zoom: 0.6;"></i>
+      
+      <span>分类</span>
+      <i class="fas fa-chevron-down" aria-hidden="true" style="zoom: 0.6;"></i>
+    </a>
+    <ul class="sub-nav menus_item_child ">
+      
+      <li>
+        <a href="/categories/%E6%8A%80%E6%9C%AF%E5%88%86%E4%BA%AB/">
+          
+          <i class="fas fa-book" style="margin-top: -20px; zoom: 0.6;"></i>
+          
+          <span>技术分享</span>
+        </a>
+      </li>
+      
+      <li>
+        <a href="/categories/%E6%97%85%E8%A1%8C%E8%B6%B3%E8%BF%B9">
+          
+          <i class="fas fa-film" style="margin-top: -20px; zoom: 0.6;"></i>
+          
+          <span>旅行足迹</span>
+        </a>
+      </li>
+      
+    </ul>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/archives" class="waves-effect waves-light">
+      
+      <i class="fas fa-archive" style="zoom: 0.6;"></i>
+      
+      <span>归档</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/about" class="waves-effect waves-light">
+      
+      <i class="fas fa-user-circle" style="zoom: 0.6;"></i>
+      
+      <span>关于</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/friends" class="waves-effect waves-light">
+      
+      <i class="fas fa-address-book" style="zoom: 0.6;"></i>
+      
+      <span>友情链接</span>
+    </a>
+    
+  </li>
+  
+  <li>
+    <a href="#searchModal" class="modal-trigger waves-effect waves-light">
+      <i id="searchIcon" class="fas fa-search" title="搜索" style="zoom: 0.85;"></i>
+    </a>
+  </li>
+</ul>
+
+
+<div id="mobile-nav" class="side-nav sidenav">
+
+    <div class="mobile-head bg-color">
+        
+        <img src="/avatar.png" class="logo-img circle responsive-img">
+        
+        <div class="logo-name">Smartの明</div>
+        <div class="logo-desc">
+            
+            苦练基本功，长期有耐心
+            
+        </div>
+    </div>
+
+    
+
+    <ul class="menu-list mobile-menu-list">
+        
+        <li class="m-nav-item">
+	  
+		<a href="/" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-home"></i>
+			
+			首页
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/tags" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-tags"></i>
+			
+			标签
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="javascript:;">
+			
+				<i class="fa-fw fas fa-bookmark"></i>
+			
+			分类
+			<span class="m-icon"><i class="fas fa-chevron-right"></i></span>
+		</a>
+            <ul  style="background:  ;" >
+              
+                <li>
+
+                  <a href="/categories/%E6%8A%80%E6%9C%AF%E5%88%86%E4%BA%AB/ " style="margin-left:75px">
+				  
+				   <i class="fa fas fa-book" style="position: absolute;left:50px" ></i>
+			      
+		          <span>技术分享</span>
+                  </a>
+                </li>
+              
+                <li>
+
+                  <a href="/categories/%E6%97%85%E8%A1%8C%E8%B6%B3%E8%BF%B9 " style="margin-left:75px">
+				  
+				   <i class="fa fas fa-film" style="position: absolute;left:50px" ></i>
+			      
+		          <span>旅行足迹</span>
+                  </a>
+                </li>
+              
+            </ul>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/archives" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-archive"></i>
+			
+			归档
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/about" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-user-circle"></i>
+			
+			关于
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/friends" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-address-book"></i>
+			
+			友情链接
+		</a>
+          
+        </li>
+        
+        
+    </ul>
+</div>
+
+
+        </div>
+
+        
+    </nav>
+
+</header>
+
+    
+
+
+
+<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/22.jpg')">
+    <div class="container" style="right: 0px;left: 0px;">
+        <div class="row">
+            <div class="col s12 m12 l12">
+                <div class="brand">
+                    <h1 class="description center-align post-title">Hystrix源码分析</h1>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+<main class="post-container content">
+
+    
+    <link rel="stylesheet" href="/libs/tocbot/tocbot.css">
+<style>
+    #articleContent h1::before,
+    #articleContent h2::before,
+    #articleContent h3::before,
+    #articleContent h4::before,
+    #articleContent h5::before,
+    #articleContent h6::before {
+        display: block;
+        content: " ";
+        height: 100px;
+        margin-top: -100px;
+        visibility: hidden;
+    }
+
+    #articleContent :focus {
+        outline: none;
+    }
+
+    .toc-fixed {
+        position: fixed;
+        top: 64px;
+    }
+
+    .toc-widget {
+        width: 345px;
+        padding-left: 20px;
+    }
+
+    .toc-widget .toc-title {
+        padding: 35px 0 15px 17px;
+        font-size: 1.5rem;
+        font-weight: bold;
+        line-height: 1.5rem;
+    }
+
+    .toc-widget ol {
+        padding: 0;
+        list-style: none;
+    }
+
+    #toc-content {
+        padding-bottom: 30px;
+        overflow: auto;
+    }
+
+    #toc-content ol {
+        padding-left: 10px;
+    }
+
+    #toc-content ol li {
+        padding-left: 10px;
+    }
+
+    #toc-content .toc-link:hover {
+        color: #42b983;
+        font-weight: 700;
+        text-decoration: underline;
+    }
+
+    #toc-content .toc-link::before {
+        background-color: transparent;
+        max-height: 25px;
+
+        position: absolute;
+        right: 23.5vw;
+        display: block;
+    }
+
+    #toc-content .is-active-link {
+        color: #42b983;
+    }
+
+    #floating-toc-btn {
+        position: fixed;
+        right: 15px;
+        bottom: 76px;
+        padding-top: 15px;
+        margin-bottom: 0;
+        z-index: 998;
+    }
+
+    #floating-toc-btn .btn-floating {
+        width: 48px;
+        height: 48px;
+    }
+
+    #floating-toc-btn .btn-floating i {
+        line-height: 48px;
+        font-size: 1.4rem;
+    }
+</style>
+<div class="row">
+    <div id="main-content" class="col s12 m12 l9">
+        <!-- 文章内容详情 -->
+<div id="artDetail">
+    <div class="card">
+        <div class="card-content article-info">
+            <div class="row tag-cate">
+                <div class="col s7">
+                    
+                    <div class="article-tag">
+                        
+                            <a href="/tags/Hystrix/">
+                                <span class="chip bg-color">Hystrix</span>
+                            </a>
+                        
+                    </div>
+                    
+                </div>
+                <div class="col s5 right-align">
+                    
+                    <div class="post-cate">
+                        <i class="fas fa-bookmark fa-fw icon-category"></i>
+                        
+                            <a href="/categories/%E6%8A%80%E6%9C%AF%E5%88%86%E4%BA%AB/" class="post-category">
+                                技术分享
+                            </a>
+                        
+                    </div>
+                    
+                </div>
+            </div>
+
+            <div class="post-info">
+                
+                <div class="post-date info-break-policy">
+                    <i class="far fa-calendar-minus fa-fw"></i>发布日期:&nbsp;&nbsp;
+                    2017-10-01
+                </div>
+                
+
+                
+
+                
+                <div class="info-break-policy">
+                    <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
+                    3.8k
+                </div>
+                
+
+                
+                <div class="info-break-policy">
+                    <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
+                    18 分
+                </div>
+                
+
+                
+                    <div id="busuanzi_container_page_pv" class="info-break-policy">
+                        <i class="far fa-eye fa-fw"></i>阅读次数:&nbsp;&nbsp;
+                        <span id="busuanzi_value_page_pv"></span>
+                    </div>
+				
+            </div>
+        </div>
+        <hr class="clearfix">
+
+        
+        <!-- 是否加载使用自带的 prismjs. -->
+        <link rel="stylesheet" href="/libs/prism/prism.css">
+        
+
+        
+
+        <div class="card-content article-card-content">
+            <div id="articleContent">
+                <p>前两篇文章我们已经讲解了Hystrix的一些基本概念，并举了一些demo说明如何使用Hystrix，这篇文章我们更深一步，通过阅读一些源码来看下Hystrix是怎么工作的。我们主要根据官方文档上的一个流程图，对其中几个主要的过程从源码层面来研究下。</p>
+<span id="more"></span>
+<p><img src="https://lightoheaven.coding.net/p/image2/d/image2/git/raw/master/201709/hystrixFlowChart.jpeg" alt="Hystrix full flow chart"></p>
+<h2 id="创建HystrixCommand-HystrixObservableCommand"><a href="#创建HystrixCommand-HystrixObservableCommand" class="headerlink" title="创建HystrixCommand(HystrixObservableCommand)"></a>创建HystrixCommand(HystrixObservableCommand)</h2><pre class="line-numbers language-none"><code class="language-none">public class GetUserAccountCommand extends HystrixCommand&lt;UserAccount&gt; &#123;
+
+    private final HttpCookie httpCookie;
+    private final UserCookie userCookie;
+
+    public GetUserAccountCommand(HttpCookie cookie) &#123;
+        super(Setter.withGroupKey(HystrixCommandGroupKey.Factory.asKey(&quot;User&quot;)));
+        this.httpCookie &#x3D; cookie;
+        &#x2F;* parse or throw an IllegalArgumentException *&#x2F;
+        this.userCookie &#x3D; UserCookie.parseCookie(httpCookie);
+    &#125;
+
+    @Override
+    protected UserAccount run() &#123;
+        
+        return new UserAccount(86975, &quot;John James&quot;, 2, true, false, true);
+    &#125;
+
+    @Override
+    protected String getCacheKey() &#123;
+        return httpCookie.getValue();
+    &#125;
+
+    @Override
+    protected UserAccount getFallback() &#123;
+        return new UserAccount(userCookie.userId, userCookie.name, userCookie.accountType, true, true, true);
+    &#125;
+&#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>上面我们通过继承HystrixCommand实现run，getFallback，getCacheKey等方法实现了一个自己的Command</p>
+<h2 id="Execute-the-Command"><a href="#Execute-the-Command" class="headerlink" title="Execute the Command"></a>Execute the Command</h2><p>执行一个command可以有以下四种方式(前两种是HystrixCommand独有的)：</p>
+<ul>
+<li>execute():阻塞方法，返回一个单个的response(或者异常)</li>
+<li>queue():非阻塞方法，返回一个与单个response关联的future</li>
+<li>observe():返回一个Observable，非延时方法，不管有没有订阅者，都会立即执行命令(不用担心后订阅的订阅者接收不到事件，因为会把事件放到一个RelaySubject里面)</li>
+<li>toObservable():同样是返回一个Observable，延时方法。只有订阅了这个Observable，才会执行命令。</li>
+</ul>
+<pre class="line-numbers language-none"><code class="language-none">UserAccount user &#x3D; new GetUserAccountCommand(new HttpCookie(&quot;mockKey&quot;, &quot;mockValueFromHttpRequest&quot;)).execute();
+
+public R execute() &#123;
+        try &#123;
+            return queue().get();
+        &#125; catch (Exception e) &#123;
+            throw Exceptions.sneakyThrow(decomposeException(e));
+        &#125;
+    &#125;
+    
+public Future&lt;R&gt; queue() &#123;
+        &#x2F;*
+         * The Future returned by Observable.toBlocking().toFuture() does not implement the
+         * interruption of the execution thread when the &quot;mayInterrupt&quot; flag of Future.cancel(boolean) is set to true;
+         * thus, to comply with the contract of Future, we must wrap around it.
+         *&#x2F;
+        final Future&lt;R&gt; delegate &#x3D; toObservable().toBlocking().toFuture();
+    	
+        final Future&lt;R&gt; f &#x3D; new Future&lt;R&gt;() &#123;
+           
+            @Override
+            public R get() throws InterruptedException, ExecutionException &#123;
+                return delegate.get();
+            &#125;
+
+            @Override
+            public R get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException &#123;
+                return delegate.get(timeout, unit);
+            &#125;
+        	
+        &#125;;
+
+        return f;
+    &#125;    <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>上述代码，我们通过GetUserAccountCommand.execute来执行命令，debug源码可以看到，execute命令其实也是调用了上面的queue方法返回一个future，然后通过future.get阻塞获取response。继续深入future方法，我们可以先不用管那个代理的future(主要用来实现中断的)，final Future<R> delegate = toObservable().toBlocking().toFuture();可以看到这里其实也是调用了上面提到的toObservable()方法返回一个Observable，然后通过toBlocking().toFuture()返回一个future。</p>
+<p><font color='red'>事实上，不管是execute，queue最终都会调用toObservable。也就是说同步的HystrixCommand最终都会依赖Observable，尽管HystrixCommand是用来发射单个事件的</font></p>
+<h2 id="Is-the-Response-Cached"><a href="#Is-the-Response-Cached" class="headerlink" title="Is the Response Cached"></a>Is the Response Cached</h2><p><b>AbstractCommand</b></p>
+<pre class="line-numbers language-none"><code class="language-none">return Observable.defer(new Func0&lt;Observable&lt;R&gt;&gt;() &#123;
+            @Override
+            public Observable&lt;R&gt; call() &#123;
+                 &#x2F;* this is a stateful object so can only be used once *&#x2F;
+                if (!commandState.compareAndSet(CommandState.NOT_STARTED, CommandState.OBSERVABLE_CHAIN_CREATED)) &#123;
+                    IllegalStateException ex &#x3D; new IllegalStateException(&quot;This instance can only be executed once. Please instantiate a new instance.&quot;);
+                    &#x2F;&#x2F;TODO make a new error type for this
+                    throw new HystrixRuntimeException(FailureType.BAD_REQUEST_EXCEPTION, _cmd.getClass(), getLogMessagePrefix() + &quot; command executed multiple times - this is not permitted.&quot;, ex, null);
+                &#125;
+
+                commandStartTimestamp &#x3D; System.currentTimeMillis();
+
+                if (properties.requestLogEnabled().get()) &#123;
+                    &#x2F;&#x2F; log this command execution regardless of what happened
+                    if (currentRequestLog !&#x3D; null) &#123;
+                        currentRequestLog.addExecutedCommand(_cmd);
+                    &#125;
+                &#125;
+
+                final boolean requestCacheEnabled &#x3D; isRequestCachingEnabled();
+                final String cacheKey &#x3D; getCacheKey();
+
+                &#x2F;* try from cache first *&#x2F;
+                if (requestCacheEnabled) &#123;
+                    HystrixCommandResponseFromCache&lt;R&gt; fromCache &#x3D; (HystrixCommandResponseFromCache&lt;R&gt;) requestCache.get(cacheKey);
+                    if (fromCache !&#x3D; null) &#123;
+                        isResponseFromCache &#x3D; true;
+                        return handleRequestCacheHitAndEmitValues(fromCache, _cmd);
+                    &#125;
+                &#125;
+
+                Observable&lt;R&gt; hystrixObservable &#x3D;
+                        Observable.defer(applyHystrixSemantics)
+                                .map(wrapWithAllOnNextHooks);
+
+                Observable&lt;R&gt; afterCache;
+
+                &#x2F;&#x2F; put in cache
+                if (requestCacheEnabled &amp;&amp; cacheKey !&#x3D; null) &#123;
+                    &#x2F;&#x2F; wrap it for caching
+                    HystrixCachedObservable&lt;R&gt; toCache &#x3D; HystrixCachedObservable.from(hystrixObservable, _cmd);
+                    HystrixCommandResponseFromCache&lt;R&gt; fromCache &#x3D; (HystrixCommandResponseFromCache&lt;R&gt;) requestCache.putIfAbsent(cacheKey, toCache);
+                    if (fromCache !&#x3D; null) &#123;
+                        &#x2F;&#x2F; another thread beat us so we&#39;ll use the cached value instead
+                        toCache.unsubscribe();
+                        isResponseFromCache &#x3D; true;
+                        return handleRequestCacheHitAndEmitValues(fromCache, _cmd);
+                    &#125; else &#123;
+                        &#x2F;&#x2F; we just created an ObservableCommand so we cast and return it
+                        afterCache &#x3D; toCache.toObservable();
+                    &#125;
+                &#125; else &#123;
+                    afterCache &#x3D; hystrixObservable;
+                &#125;
+
+                return afterCache
+                        .doOnTerminate(terminateCommandCleanup)     &#x2F;&#x2F; perform cleanup once (either on normal terminal state (this line), or unsubscribe (next line))
+                        .doOnUnsubscribe(unsubscribeCommandCleanup) &#x2F;&#x2F; perform cleanup once
+                        .doOnCompleted(fireOnCompletedHook);
+            &#125;
+        &#125;);<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>上述代码中有个判断final boolean requestCacheEnabled = isRequestCachingEnabled();可以看到如果我们的Command实现了getCacheKey方法，并且requestCacheEnabled(这个属性默认是true，可以通过调用HystrixCommand的构造方法传入一个setter对象修改默认属性)这样就不会执行后续的run方法，就会直接返回一个缓存的Observable。(<font color='red'>上一篇文章我们已经提到，必须是同一个request context里面的两个command才能用到缓存</font>)</p>
+<pre class="line-numbers language-none"><code class="language-none">protected boolean isRequestCachingEnabled() &#123;
+        return properties.requestCacheEnabled().get() &amp;&amp; getCacheKey() !&#x3D; null;
+    &#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+
+<h2 id="Is-the-Circuit-Open"><a href="#Is-the-Circuit-Open" class="headerlink" title="Is the Circuit Open?"></a>Is the Circuit Open?</h2><p>可以看到在缓存逻辑过了之后，就会判断断路器(Circuit)的状态是否是open，如果是open状态，就会直接调用fallback方法；如果不是就继续后面的流程，这里断路器要重点说一下，我们在第一篇文章中就说了Hystrix可以解决在我们依赖的外部服务异常造成瀑布式报错，就是通过这个断路器来控制的，所以我们很有必要了解它的工作过程。</p>
+<h3 id="Circuit-Breaker"><a href="#Circuit-Breaker" class="headerlink" title="Circuit Breaker"></a>Circuit Breaker</h3><p>从上面的图我们可以看到在HystrixCommand(HystrixObservableCommand)在执行过程中会与HystrixCircuitBreaker交互，执行之前会根据断路器的状态来决定后续流程，命令执行成功/失败/超时又会向断路器上报数据，断路器根据这些数据来改变状态。下面是断路器的一个流程图</p>
+<p><img src="https://lightoheaven.coding.net/p/image2/d/image2/git/raw/master/201709/circuitBreaker.jpeg" alt="断路器"></p>
+<ul>
+<li>如果通过当前断路器请求达到了阈值HystrixCommandProperties.circuitBreakerRequestVolumeThreshold()</li>
+<li>如果当前的错误率达到了阈值HystrixCommandProperties.circuitBreakerErrorThresholdPercentage()</li>
+<li>那么就会把断路器的状态从CLOSED变成OPEN</li>
+<li>OPEN状态时候，就会断路次断路器上所有的请求(直接返回fallback方法)</li>
+<li>经过一段时间(HystrixCommandProperties.circuitBreakerSleepWindowInMilliseconds()默认5s)允许一个请求进来，此时断路器状态变为HALF-OPEN，如果这个请求还是失败，那么状态就还是OPEN ，继续等待一个时间；如果此次请求成功，就把状态变更为CLOSED，然后继续循环1的过程。</li>
+</ul>
+<p>下面通过源码，来看一下上述断路器的执行过程。</p>
+<p><b>AbstractCommand</b></p>
+<pre class="line-numbers language-none"><code class="language-none">private Observable&lt;R&gt; applyHystrixSemantics(final AbstractCommand&lt;R&gt; _cmd) &#123;
+       &#x2F;&#x2F; mark that we&#39;re starting execution on the ExecutionHook
+       &#x2F;&#x2F; if this hook throws an exception, then a fast-fail occurs with no fallback.  No state is left inconsistent
+       executionHook.onStart(_cmd);
+
+       &#x2F;* determine if we&#39;re allowed to execute *&#x2F;
+       if (circuitBreaker.attemptExecution()) &#123;
+           final TryableSemaphore executionSemaphore &#x3D; getExecutionSemaphore();
+           final AtomicBoolean semaphoreHasBeenReleased &#x3D; new AtomicBoolean(false);
+           final Action0 singleSemaphoreRelease &#x3D; new Action0() &#123;
+               @Override
+               public void call() &#123;
+                   if (semaphoreHasBeenReleased.compareAndSet(false, true)) &#123;
+                       executionSemaphore.release();
+                   &#125;
+               &#125;
+           &#125;;
+
+           final Action1&lt;Throwable&gt; markExceptionThrown &#x3D; new Action1&lt;Throwable&gt;() &#123;
+               @Override
+               public void call(Throwable t) &#123;
+                   eventNotifier.markEvent(HystrixEventType.EXCEPTION_THROWN, commandKey);
+               &#125;
+           &#125;;
+
+           if (executionSemaphore.tryAcquire()) &#123;
+               try &#123;
+                   &#x2F;* used to track userThreadExecutionTime *&#x2F;
+                   executionResult &#x3D; executionResult.setInvocationStartTime(System.currentTimeMillis());
+                   return executeCommandAndObserve(_cmd)
+                           .doOnError(markExceptionThrown)
+                           .doOnTerminate(singleSemaphoreRelease)
+                           .doOnUnsubscribe(singleSemaphoreRelease);
+               &#125; catch (RuntimeException e) &#123;
+                   return Observable.error(e);
+               &#125;
+           &#125; else &#123;
+               return handleSemaphoreRejectionViaFallback();
+           &#125;
+       &#125; else &#123;
+           return handleShortCircuitViaFallback();
+       &#125;
+   &#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>commad在request cache逻辑之后，run方法之前都会运行circuitBreaker.attemptExecution()，官方注释说明这个方法不是一个幂等方法，会改变内部的状态。</p>
+<pre class="line-numbers language-none"><code class="language-none">&#x2F;**
+    * Invoked at start of command execution to attempt an execution.  This is non-idempotent - it may modify internal
+    * state.
+    *&#x2F;
+   boolean attemptExecution();<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p><b>HystrixCircuitBreaker</b></p>
+<pre class="line-numbers language-none"><code class="language-none">@Override
+public boolean attemptExecution() &#123;
+    if (properties.circuitBreakerForceOpen().get()) &#123;
+        return false;
+    &#125;
+    if (properties.circuitBreakerForceClosed().get()) &#123;
+        return true;
+    &#125;
+    if (circuitOpened.get() &#x3D;&#x3D; -1) &#123;
+        return true;
+    &#125; else &#123;
+        if (isAfterSleepWindow()) &#123;
+            &#x2F;&#x2F;only the first request after sleep window should execute
+            &#x2F;&#x2F;if the executing command succeeds, the status will transition to CLOSED
+            &#x2F;&#x2F;if the executing command fails, the status will transition to OPEN
+            &#x2F;&#x2F;if the executing command gets unsubscribed, the status will transition to OPEN
+            if (status.compareAndSet(Status.OPEN, Status.HALF_OPEN)) &#123;
+                return true;
+            &#125; else &#123;
+                return false;
+            &#125;
+        &#125; else &#123;
+            return false;
+        &#125;
+    &#125;
+&#125;
+
+private boolean isAfterSleepWindow() &#123;
+    final long circuitOpenTime &#x3D; circuitOpened.get();
+    final long currentTime &#x3D; System.currentTimeMillis();
+    final long sleepWindowTime &#x3D; properties.circuitBreakerSleepWindowInMilliseconds().get();
+    return currentTime &gt; circuitOpenTime + sleepWindowTime;
+&#125;
+
+ @Override
+public void markSuccess() &#123;
+    if (status.compareAndSet(Status.HALF_OPEN, Status.CLOSED)) &#123;
+        &#x2F;&#x2F;This thread wins the race to close the circuit - it resets the stream to start it over from 0
+        metrics.resetStream();
+        Subscription previousSubscription &#x3D; activeSubscription.get();
+        if (previousSubscription !&#x3D; null) &#123;
+            previousSubscription.unsubscribe();
+        &#125;
+        Subscription newSubscription &#x3D; subscribeToStream();
+        activeSubscription.set(newSubscription);
+        circuitOpened.set(-1L);
+    &#125;
+&#125;
+
+@Override
+public void markNonSuccess() &#123;
+    if (status.compareAndSet(Status.HALF_OPEN, Status.OPEN)) &#123;
+        &#x2F;&#x2F;This thread wins the race to re-open the circuit - it resets the start time for the sleep window
+        circuitOpened.set(System.currentTimeMillis());
+    &#125;
+&#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>上述代码，就可以说明一开始我们解释的断路器状态变迁过程。如果状态为OPEN，返回false；CLOSED返回true；经过了sleepWindow时间后，允许一个请求进来，此时断路器状态从OPEN变为HALF_OPEN，这个status是一个原子性的操作。最终这个放进来的请求完成根据成功失败会调用对应的markSuccess或者markNonSuccess，通过一个CAS操作，将HALF_OPEN状态变为CLOSED或者OPEN，如果没有成功，会circuitOpened.set(System.currentTimeMillis())更新此次失败的时间；成功更新circuitOpened.set(-1L)，这样后续请求就都可以进来了。</p>
+<h2 id="Is-the-Thread-Pool-Queue-Semaphore-Full"><a href="#Is-the-Thread-Pool-Queue-Semaphore-Full" class="headerlink" title="Is the Thread Pool/Queue/Semaphore Full?"></a>Is the Thread Pool/Queue/Semaphore Full?</h2><p>之前说过Hystrix通过为每个单独的外部服务创建一个线程池来达到隔离外部服务的目的，这个很明显的一个好处是外部服务挂了，不会影响我们。但是如果依赖过多的服务，会不会造成创建的线程池过多，这是一个问题。Hystix官方有个压测的结果，可以参考下。如果依赖的服务是一些内存级别的很快的操作，那么创建线程池带来的上下文切换的消耗可能会过大，这个时候Hystrix也提供了Semaphore，可以控制同时并发的请求数，直接在当前线程运行。上述不管是线程池还是Semaphore如果满了，就会执行fallback方法。并且我们可以通过设置execution.isolation.strategy动态调整策略</p>
+<p><b>AbstractCommand</b></p>
+<pre class="line-numbers language-none"><code class="language-none">protected TryableSemaphore getExecutionSemaphore() &#123;
+    if (properties.executionIsolationStrategy().get() &#x3D;&#x3D; ExecutionIsolationStrategy.SEMAPHORE) &#123;
+        if (executionSemaphoreOverride &#x3D;&#x3D; null) &#123;
+            TryableSemaphore _s &#x3D; executionSemaphorePerCircuit.get(commandKey.name());
+            if (_s &#x3D;&#x3D; null) &#123;
+                &#x2F;&#x2F; we didn&#39;t find one cache so setup
+                executionSemaphorePerCircuit.putIfAbsent(commandKey.name(), new TryableSemaphoreActual(properties.executionIsolationSemaphoreMaxConcurrentRequests()));
+                &#x2F;&#x2F; assign whatever got set (this or another thread)
+                return executionSemaphorePerCircuit.get(commandKey.name());
+            &#125; else &#123;
+                return _s;
+            &#125;
+        &#125; else &#123;
+            return executionSemaphoreOverride;
+        &#125;
+    &#125; else &#123;
+        &#x2F;&#x2F; return NoOp implementation since we&#39;re not using SEMAPHORE isolation
+        return TryableSemaphoreNoOp.DEFAULT;
+    &#125;
+&#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>可以看到，如果配置的策略是SEMAPHORE，会创建一个许可是properties.executionIsolationSemaphoreMaxConcurrentRequests()的SEMAPHORE，可以看到tryAcquire方法会根据设置的许可直接返回true或者false，不会阻塞。</p>
+<pre class="line-numbers language-none"><code class="language-none">static class TryableSemaphoreActual implements TryableSemaphore &#123;
+    protected final HystrixProperty&lt;Integer&gt; numberOfPermits;
+    private final AtomicInteger count &#x3D; new AtomicInteger(0);
+
+    public TryableSemaphoreActual(HystrixProperty&lt;Integer&gt; numberOfPermits) &#123;
+        this.numberOfPermits &#x3D; numberOfPermits;
+    &#125;
+
+    @Override
+    public boolean tryAcquire() &#123;
+        int currentCount &#x3D; count.incrementAndGet();
+        if (currentCount &gt; numberOfPermits.get()) &#123;
+            count.decrementAndGet();
+            return false;
+        &#125; else &#123;
+            return true;
+        &#125;
+    &#125;
+
+    @Override
+    public void release() &#123;
+        count.decrementAndGet();
+    &#125;
+
+    @Override
+    public int getNumberOfPermitsUsed() &#123;
+        return count.get();
+    &#125;
+
+&#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>如果配置的不是SEMAPHORE，则返回TryableSemaphoreNoOp.DEFAULT，这个其实不是Semaphore，因为下面源码可以看到都是返回true。</p>
+<pre class="line-numbers language-none"><code class="language-none">static class TryableSemaphoreNoOp implements TryableSemaphore &#123;
+
+    public static final TryableSemaphore DEFAULT &#x3D; new TryableSemaphoreNoOp();
+
+    @Override
+    public boolean tryAcquire() &#123;
+        return true;
+    &#125;
+
+    @Override
+    public void release() &#123;
+
+    &#125;
+
+    @Override
+    public int getNumberOfPermitsUsed() &#123;
+        return 0;
+    &#125;
+
+&#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<h2 id="HystrixObservableCommand-construct-or-HystrixCommand-run"><a href="#HystrixObservableCommand-construct-or-HystrixCommand-run" class="headerlink" title="HystrixObservableCommand.construct() or HystrixCommand.run()"></a>HystrixObservableCommand.construct() or HystrixCommand.run()</h2><p><b>AbstractCommand</b></p>
+<pre class="line-numbers language-none"><code class="language-none">private Observable&lt;R&gt; executeCommandWithSpecifiedIsolation(final AbstractCommand&lt;R&gt; _cmd) &#123;
+    if (properties.executionIsolationStrategy().get() &#x3D;&#x3D; ExecutionIsolationStrategy.THREAD) &#123;
+        &#x2F;&#x2F; mark that we are executing in a thread (even if we end up being rejected we still were a THREAD execution and not SEMAPHORE)
+        return Observable.defer(new Func0&lt;Observable&lt;R&gt;&gt;() &#123;
+            @Override
+            public Observable&lt;R&gt; call() &#123;
+                executionResult &#x3D; executionResult.setExecutionOccurred();
+                if (!commandState.compareAndSet(CommandState.OBSERVABLE_CHAIN_CREATED, CommandState.USER_CODE_EXECUTED)) &#123;
+                    return Observable.error(new IllegalStateException(&quot;execution attempted while in state : &quot; + commandState.get().name()));
+                &#125;
+
+                metrics.markCommandStart(commandKey, threadPoolKey, ExecutionIsolationStrategy.THREAD);
+
+                if (isCommandTimedOut.get() &#x3D;&#x3D; TimedOutStatus.TIMED_OUT) &#123;
+                    &#x2F;&#x2F; the command timed out in the wrapping thread so we will return immediately
+                    &#x2F;&#x2F; and not increment any of the counters below or other such logic
+                    return Observable.error(new RuntimeException(&quot;timed out before executing run()&quot;));
+                &#125;
+                if (threadState.compareAndSet(ThreadState.NOT_USING_THREAD, ThreadState.STARTED)) &#123;
+                    &#x2F;&#x2F;we have not been unsubscribed, so should proceed
+                    HystrixCounters.incrementGlobalConcurrentThreads();
+                    threadPool.markThreadExecution();
+                    &#x2F;&#x2F; store the command that is being run
+                    endCurrentThreadExecutingCommand &#x3D; Hystrix.startCurrentThreadExecutingCommand(getCommandKey());
+                    executionResult &#x3D; executionResult.setExecutedInThread();
+                    &#x2F;**
+                     * If any of these hooks throw an exception, then it appears as if the actual execution threw an error
+                     *&#x2F;
+                    try &#123;
+                        executionHook.onThreadStart(_cmd);
+                        executionHook.onRunStart(_cmd);
+                        executionHook.onExecutionStart(_cmd);
+                        return getUserExecutionObservable(_cmd);
+                    &#125; catch (Throwable ex) &#123;
+                        return Observable.error(ex);
+                    &#125;
+                &#125; else &#123;
+                    &#x2F;&#x2F;command has already been unsubscribed, so return immediately
+                    return Observable.empty();
+                &#125;
+            &#125;
+        &#125;).doOnTerminate(new Action0() &#123;
+            @Override
+            public void call() &#123;
+                if (threadState.compareAndSet(ThreadState.STARTED, ThreadState.TERMINAL)) &#123;
+                    handleThreadEnd(_cmd);
+                &#125;
+                if (threadState.compareAndSet(ThreadState.NOT_USING_THREAD, ThreadState.TERMINAL)) &#123;
+                    &#x2F;&#x2F;if it was never started and received terminal, then no need to clean up (I don&#39;t think this is possible)
+                &#125;
+                &#x2F;&#x2F;if it was unsubscribed, then other cleanup handled it
+            &#125;
+        &#125;).doOnUnsubscribe(new Action0() &#123;
+            @Override
+            public void call() &#123;
+                if (threadState.compareAndSet(ThreadState.STARTED, ThreadState.UNSUBSCRIBED)) &#123;
+                    handleThreadEnd(_cmd);
+                &#125;
+                if (threadState.compareAndSet(ThreadState.NOT_USING_THREAD, ThreadState.UNSUBSCRIBED)) &#123;
+                    &#x2F;&#x2F;if it was never started and was cancelled, then no need to clean up
+                &#125;
+                &#x2F;&#x2F;if it was terminal, then other cleanup handled it
+            &#125;
+        &#125;).subscribeOn(threadPool.getScheduler(new Func0&lt;Boolean&gt;() &#123;
+            @Override
+            public Boolean call() &#123;
+                return properties.executionIsolationThreadInterruptOnTimeout().get() &amp;&amp; _cmd.isCommandTimedOut.get() &#x3D;&#x3D; TimedOutStatus.TIMED_OUT;
+            &#125;
+        &#125;));
+    &#125; else &#123;
+        return Observable.defer(new Func0&lt;Observable&lt;R&gt;&gt;() &#123;
+            @Override
+            public Observable&lt;R&gt; call() &#123;
+                executionResult &#x3D; executionResult.setExecutionOccurred();
+                if (!commandState.compareAndSet(CommandState.OBSERVABLE_CHAIN_CREATED, CommandState.USER_CODE_EXECUTED)) &#123;
+                    return Observable.error(new IllegalStateException(&quot;execution attempted while in state : &quot; + commandState.get().name()));
+                &#125;
+
+                metrics.markCommandStart(commandKey, threadPoolKey, ExecutionIsolationStrategy.SEMAPHORE);
+                &#x2F;&#x2F; semaphore isolated
+                &#x2F;&#x2F; store the command that is being run
+                endCurrentThreadExecutingCommand &#x3D; Hystrix.startCurrentThreadExecutingCommand(getCommandKey());
+                try &#123;
+                    executionHook.onRunStart(_cmd);
+                    executionHook.onExecutionStart(_cmd);
+                    return getUserExecutionObservable(_cmd);  &#x2F;&#x2F;the getUserExecutionObservable method already wraps sync exceptions, so this shouldn&#39;t throw
+                &#125; catch (Throwable ex) &#123;
+                    &#x2F;&#x2F;If the above hooks throw, then use that as the result of the run method
+                    return Observable.error(ex);
+                &#125;
+            &#125;
+        &#125;);
+    &#125;
+&#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>上述代码可以看到首先判断是不是ExecutionIsolationStrategy.THREAD模式，如果不是，说明是Semaphore模式，就走到最后面的逻辑，直接调用getUserExecutionObservable；如果是THREAD模式，可以看到最终会对返回的Observable.subscribeOn(Func0<Boolean> shouldInterruptThread)，这也就是对于外部服务的隔离，让最终产生事件的方法(run或者construct方法)发生在一个单独的线程池里面。</p>
+<p>继续来看getUserExecutionObservable方法</p>
+<pre class="line-numbers language-none"><code class="language-none">private Observable&lt;R&gt; getUserExecutionObservable(final AbstractCommand&lt;R&gt; _cmd) &#123;
+    Observable&lt;R&gt; userObservable;
+
+    try &#123;
+        userObservable &#x3D; getExecutionObservable();
+    &#125; catch (Throwable ex) &#123;
+        &#x2F;&#x2F; the run() method is a user provided implementation so can throw instead of using Observable.onError
+        &#x2F;&#x2F; so we catch it here and turn it into Observable.error
+        userObservable &#x3D; Observable.error(ex);
+    &#125;
+
+    return userObservable
+            .lift(new ExecutionHookApplication(_cmd))
+            .lift(new DeprecatedOnRunHookApplication(_cmd));
+&#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>这个方法会调用到getExecutionObservable()方法，这里会根据你是实现的HystrixCommand还是HystrixObservableCommand调用对应的方法。</p>
+<p><b>HystrixCommand</b></p>
+<pre class="line-numbers language-none"><code class="language-none"> @Override
+final protected Observable&lt;R&gt; getExecutionObservable() &#123;
+    return Observable.defer(new Func0&lt;Observable&lt;R&gt;&gt;() &#123;
+        @Override
+        public Observable&lt;R&gt; call() &#123;
+            try &#123;
+                return Observable.just(run());
+            &#125; catch (Throwable ex) &#123;
+                return Observable.error(ex);
+            &#125;
+        &#125;
+    &#125;).doOnSubscribe(new Action0() &#123;
+        @Override
+        public void call() &#123;
+            &#x2F;&#x2F; Save thread on which we get subscribed so that we can interrupt it later if needed
+            executionThread.set(Thread.currentThread());
+        &#125;
+    &#125;);
+&#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>并且这里通过doOnSubscribe方法设置了回调保存了当前执行订阅的线程以便后续需要的时候可以interrupt。</p>
+<p><b>HystrixObservableCommand</b></p>
+<pre class="line-numbers language-none"><code class="language-none">@Override
+final protected Observable&lt;R&gt; getExecutionObservable() &#123;
+    return construct();
+&#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+<p>可以看到通过调用getExecutionObservable最终都会调用到你实现的run方法或者construct方法</p>
+<h2 id="Calculate-Circuit-Health"><a href="#Calculate-Circuit-Health" class="headerlink" title="Calculate Circuit Health"></a>Calculate Circuit Health</h2><p>从整个Hystrix flow chart看到步骤5和6的执行结果不管成功与否都会上报Metrics，然后断路器通过这些上报的数据来计算当前的状态，上面Is the Circuit Open?里面已经说过。</p>
+<h2 id="Get-the-Fallback"><a href="#Get-the-Fallback" class="headerlink" title="Get the Fallback"></a>Get the Fallback</h2><p>从整个Hystrix flow chart看到步骤4断路器状态OPEN，步骤5Semphore或者Threadpool reject，步骤6执行失败或者超时都会执行fallback方法，这里就不详细看源码了。</p>
+<h2 id="Return-the-Successful-Response"><a href="#Return-the-Successful-Response" class="headerlink" title="Return the Successful Response"></a>Return the Successful Response</h2><p>如果整个流程执行成功，那么就会返回调用者一个Observable，你可以通过同步方式获取结果也可以subscribe这个Observable通过异步方式获取最终结果，整个获取Observable的流程如下:</p>
+<p><img src="https://lightoheaven.coding.net/p/image2/d/image2/git/raw/master/201709/response.jpeg" alt="获取Observable"></p>
+
+                
+            </div>
+            <hr/>
+
+            
+
+    <div class="reprint" id="reprint-statement">
+        
+            <div class="reprint__author">
+                <span class="reprint-meta" style="font-weight: bold;">
+                    <i class="fas fa-user">
+                        文章作者:
+                    </i>
+                </span>
+                <span class="reprint-info">
+                    <a href="/about" rel="external nofollow noreferrer">Smartの明</a>
+                </span>
+            </div>
+            <div class="reprint__type">
+                <span class="reprint-meta" style="font-weight: bold;">
+                    <i class="fas fa-link">
+                        文章链接:
+                    </i>
+                </span>
+                <span class="reprint-info">
+                    <a href="http://yeming.me/2017/10/01/hystrix3/">http://yeming.me/2017/10/01/hystrix3/</a>
+                </span>
+            </div>
+            <div class="reprint__notice">
+                <span class="reprint-meta" style="font-weight: bold;">
+                    <i class="fas fa-copyright">
+                        版权声明:
+                    </i>
+                </span>
+                <span class="reprint-info">
+                    本博客所有文章除特別声明外，均采用
+                    <a href="https://creativecommons.org/licenses/by/4.0/deed.zh" rel="external nofollow noreferrer" target="_blank">CC BY 4.0</a>
+                    许可协议。转载请注明来源
+                    <a href="/about" target="_blank">Smartの明</a>
+                    !
+                </span>
+            </div>
+        
+    </div>
+
+    <script async defer>
+      document.addEventListener("copy", function (e) {
+        let toastHTML = '<span>复制成功，请遵循本文的转载规则</span><button class="btn-flat toast-action" onclick="navToReprintStatement()" style="font-size: smaller">查看</a>';
+        M.toast({html: toastHTML})
+      });
+
+      function navToReprintStatement() {
+        $("html, body").animate({scrollTop: $("#reprint-statement").offset().top - 80}, 800);
+      }
+    </script>
+
+
+
+            <div class="tag_share" style="display: block;">
+                <div class="post-meta__tag-list" style="display: inline-block;">
+                    
+                        <div class="article-tag">
+                            
+                                <a href="/tags/Hystrix/">
+                                    <span class="chip bg-color">Hystrix</span>
+                                </a>
+                            
+                        </div>
+                    
+                </div>
+                <div class="post_share" style="zoom: 80%; width: fit-content; display: inline-block; float: right; margin: -0.15rem 0;">
+                    <link rel="stylesheet" type="text/css" href="/libs/share/css/share.min.css">
+<div id="article-share">
+
+    
+    <div class="social-share" data-sites="twitter,facebook,google,qq,qzone,wechat,weibo,douban,linkedin" data-wechat-qrcode-helper="<p>微信扫一扫即可分享！</p>"></div>
+    <script src="/libs/share/js/social-share.min.js"></script>
+    
+
+    
+
+</div>
+
+                </div>
+            </div>
+            
+        </div>
+    </div>
+
+    
+
+    
+        <link rel="stylesheet" href="/libs/gitment/gitment-default.css">
+<link rel="stylesheet" href="/css/gitment.css">
+
+<div class="gitment-card card" data-aos="fade-up">
+    <div class="comment_headling" style="font-size: 20px; font-weight: 700; position: relative; padding-left: 20px; top: 15px; padding-bottom: 5px;">
+        <i class="fas fa-comments fa-fw" aria-hidden="true"></i>
+        <span>评论</span>
+    </div>
+    <div id="gitment-content" class="card-content"></div>
+</div>
+
+<script src="/libs/gitment/gitment.js"></script>
+<script>
+var gitment = new Gitment({
+    id: 'Sun Oct 01 2017 21:00:50 GMT+0800',
+    owner: 'q6413260',
+    repo: 'Gitment',
+    oauth: {
+        client_id: '486b0c51ae4b0c60abe0',
+        client_secret: 'd40f9bf0c09cf6c5af98c2e2bfe2258a286a23a3'
+    }
+});
+
+gitment.render('gitment-content');
+</script>
+
+    
+
+    
+
+    
+    <div class="livere-card card" data-aos="fade-up">
+    <!-- 来必力City版安装代码 -->
+    <div id="lv-container" class="card-content" data-id="city" data-uid="MTAyMC8zODIwMS8xNDcyOQ==">
+        <script type="text/javascript">
+            (function (d, s) {
+                let j, e = d.getElementsByTagName(s)[0];
+                if (typeof LivereTower === 'function') {
+                    return;
+                }
+
+                j = d.createElement(s);
+                j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+                j.async = true;
+
+                e.parentNode.insertBefore(j, e);
+            })(document, 'script');
+        </script>
+        <noscript>为正常使用来必力评论功能请激活JavaScript。</noscript>
+    </div>
+    <!-- City版安装代码已完成 -->
+</div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+<article id="prenext-posts" class="prev-next articles">
+    <div class="row article-row">
+        
+        <div class="article col s12 m6" data-aos="fade-up">
+            <div class="article-badge left-badge text-color">
+                <i class="fas fa-chevron-left"></i>&nbsp;上一篇</div>
+            <div class="card">
+                <a href="/2017/11/27/lion/">
+                    <div class="card-image">
+                        
+                        
+                        <img src="/medias/featureimages/19.jpg" class="responsive-img" alt="配置中心Lion">
+                        
+                        <span class="card-title">配置中心Lion</span>
+                    </div>
+                </a>
+                <div class="card-content article-content">
+                    <div class="summary block-with-text">
+                        
+                            先说下我自己理解的什么是配置中心。究其本质是我们人类无法掌控和预知一切，映射到软件领域上，我们总是需要对系统的某些功能特性预留出一些控制的线头，以便我们在未来需要的时候，可以人为的拨弄这些线头从而控制系统的行为特征，我把它叫做 “系统运行时
+                        
+                    </div>
+                    <div class="publish-info">
+                        <span class="publish-date">
+                            <i class="far fa-clock fa-fw icon-date"></i>2017-11-27
+                        </span>
+                        <span class="publish-author">
+                            
+                            <i class="fas fa-bookmark fa-fw icon-category"></i>
+                            
+                            <a href="/categories/%E6%8A%80%E6%9C%AF%E5%88%86%E4%BA%AB/" class="post-category">
+                                    技术分享
+                                </a>
+                            
+                            
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="card-action article-tags">
+                    
+                    <a href="/tags/%E9%85%8D%E7%BD%AE%E4%B8%AD%E5%BF%83/">
+                        <span class="chip bg-color">配置中心</span>
+                    </a>
+                    
+                </div>
+                
+            </div>
+        </div>
+        
+        
+        <div class="article col s12 m6" data-aos="fade-up">
+            <div class="article-badge right-badge text-color">
+                下一篇&nbsp;<i class="fas fa-chevron-right"></i>
+            </div>
+            <div class="card">
+                <a href="/2017/09/30/hystrix2/">
+                    <div class="card-image">
+                        
+                        
+                        <img src="/medias/featureimages/0.jpg" class="responsive-img" alt="Hystrix使用">
+                        
+                        <span class="card-title">Hystrix使用</span>
+                    </div>
+                </a>
+                <div class="card-content article-content">
+                    <div class="summary block-with-text">
+                        
+                            上一篇文章主要讲了Hystrix是什么，用来做什么，解决了什么问题，以及设计模式等，这篇文章主要来讲下Hystrix如何使用。下面我们从最简单的Hello World入手，来讲解下Hystrix的用法。
+                        
+                    </div>
+                    <div class="publish-info">
+                            <span class="publish-date">
+                                <i class="far fa-clock fa-fw icon-date"></i>2017-09-30
+                            </span>
+                        <span class="publish-author">
+                            
+                            <i class="fas fa-bookmark fa-fw icon-category"></i>
+                            
+                            <a href="/categories/%E6%8A%80%E6%9C%AF%E5%88%86%E4%BA%AB/" class="post-category">
+                                    技术分享
+                                </a>
+                            
+                            
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="card-action article-tags">
+                    
+                    <a href="/tags/Hystrix/">
+                        <span class="chip bg-color">Hystrix</span>
+                    </a>
+                    
+                </div>
+                
+            </div>
+        </div>
+        
+    </div>
+</article>
+
+</div>
+
+
+
+<!-- 代码块功能依赖 -->
+<script type="text/javascript" src="/libs/codeBlock/codeBlockFuction.js"></script>
+
+<!-- 代码语言 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeLang.js"></script>
+
+
+<!-- 代码块复制 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeCopy.js"></script>
+
+
+<!-- 代码块收缩 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeShrink.js"></script>
+
+
+    </div>
+    <div id="toc-aside" class="expanded col l3 hide-on-med-and-down">
+        <div class="toc-widget card" style="background-color: white;">
+            <div class="toc-title"><i class="far fa-list-alt"></i>&nbsp;&nbsp;目录</div>
+            <div id="toc-content"></div>
+        </div>
+    </div>
+</div>
+
+<!-- TOC 悬浮按钮. -->
+
+<div id="floating-toc-btn" class="hide-on-med-and-down">
+    <a class="btn-floating btn-large bg-color">
+        <i class="fas fa-list-ul"></i>
+    </a>
+</div>
+
+
+<script src="/libs/tocbot/tocbot.min.js"></script>
+<script>
+    $(function () {
+        tocbot.init({
+            tocSelector: '#toc-content',
+            contentSelector: '#articleContent',
+            headingsOffset: -($(window).height() * 0.4 - 45),
+            collapseDepth: Number('0'),
+            headingSelector: 'h2, h3, h4'
+        });
+
+        // modify the toc link href to support Chinese.
+        let i = 0;
+        let tocHeading = 'toc-heading-';
+        $('#toc-content a').each(function () {
+            $(this).attr('href', '#' + tocHeading + (++i));
+        });
+
+        // modify the heading title id to support Chinese.
+        i = 0;
+        $('#articleContent').children('h2, h3, h4').each(function () {
+            $(this).attr('id', tocHeading + (++i));
+        });
+
+        // Set scroll toc fixed.
+        let tocHeight = parseInt($(window).height() * 0.4 - 64);
+        let $tocWidget = $('.toc-widget');
+        $(window).scroll(function () {
+            let scroll = $(window).scrollTop();
+            /* add post toc fixed. */
+            if (scroll > tocHeight) {
+                $tocWidget.addClass('toc-fixed');
+            } else {
+                $tocWidget.removeClass('toc-fixed');
+            }
+        });
+
+        
+        /* 修复文章卡片 div 的宽度. */
+        let fixPostCardWidth = function (srcId, targetId) {
+            let srcDiv = $('#' + srcId);
+            if (srcDiv.length === 0) {
+                return;
+            }
+
+            let w = srcDiv.width();
+            if (w >= 450) {
+                w = w + 21;
+            } else if (w >= 350 && w < 450) {
+                w = w + 18;
+            } else if (w >= 300 && w < 350) {
+                w = w + 16;
+            } else {
+                w = w + 14;
+            }
+            $('#' + targetId).width(w);
+        };
+
+        // 切换TOC目录展开收缩的相关操作.
+        const expandedClass = 'expanded';
+        let $tocAside = $('#toc-aside');
+        let $mainContent = $('#main-content');
+        $('#floating-toc-btn .btn-floating').click(function () {
+            if ($tocAside.hasClass(expandedClass)) {
+                $tocAside.removeClass(expandedClass).hide();
+                $mainContent.removeClass('l9');
+            } else {
+                $tocAside.addClass(expandedClass).show();
+                $mainContent.addClass('l9');
+            }
+            fixPostCardWidth('artDetail', 'prenext-posts');
+        });
+        
+    });
+</script>
+
+    
+
+</main>
+
+
+
+
+    <footer class="page-footer bg-color">
+    
+        <link rel="stylesheet" href="/libs/aplayer/APlayer.min.css">
+<style>
+    .aplayer .aplayer-lrc p {
+        
+        display: none;
+        
+        font-size: 12px;
+        font-weight: 700;
+        line-height: 16px !important;
+    }
+
+    .aplayer .aplayer-lrc p.aplayer-lrc-current {
+        
+        display: none;
+        
+        font-size: 15px;
+        color: #42b983;
+    }
+
+    
+    .aplayer.aplayer-fixed.aplayer-narrow .aplayer-body {
+        left: -66px !important;
+    }
+
+    .aplayer.aplayer-fixed.aplayer-narrow .aplayer-body:hover {
+        left: 0px !important;
+    }
+
+    
+</style>
+<div class="">
+    
+    <div class="row">
+        <meting-js class="col l8 offset-l2 m10 offset-m1 s12"
+                   server="netease"
+                   type="playlist"
+                   id="503838841"
+                   fixed='true'
+                   autoplay='false'
+                   theme='#42b983'
+                   loop='all'
+                   order='random'
+                   preload='auto'
+                   volume='0.7'
+                   list-folded='true'
+        >
+        </meting-js>
+    </div>
+</div>
+
+<script src="/libs/aplayer/APlayer.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/meting@2/dist/Meting.min.js"></script>
+
+    
+    <div class="container row center-align" style="margin-bottom: 0px !important;">
+        <div class="col s12 m8 l8 copy-right">
+            Copyright&nbsp;&copy;
+            
+                <span id="year">2019-2021</span>
+            
+            <span id="year">2019</span>
+            <a href="/about" target="_blank">Smartの明</a>
+            |&nbsp;Powered by&nbsp;<a href="https://hexo.io/" target="_blank">Hexo</a>
+            |&nbsp;Theme&nbsp;<a href="https://github.com/blinkfox/hexo-theme-matery" target="_blank">Matery</a>
+            <br>
+            
+            &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
+                class="white-color">63.5k</span>&nbsp;字
+            
+            
+            
+            
+            
+            
+            <span id="busuanzi_container_site_pv">
+                |&nbsp;<i class="far fa-eye"></i>&nbsp;总访问量:&nbsp;<span id="busuanzi_value_site_pv"
+                    class="white-color"></span>&nbsp;次
+            </span>
+            
+            
+            <span id="busuanzi_container_site_uv">
+                |&nbsp;<i class="fas fa-users"></i>&nbsp;总访问人数:&nbsp;<span id="busuanzi_value_site_uv"
+                    class="white-color"></span>&nbsp;人
+            </span>
+            
+            <br>
+            
+            <br>
+            
+        </div>
+        <div class="col s12 m4 l4 social-link social-statis">
+    <a href="https://github.com/q6413260" class="tooltipped" target="_blank" data-tooltip="访问我的GitHub" data-position="top" data-delay="50">
+        <i class="fab fa-github"></i>
+    </a>
+
+
+
+    <a href="mailto:228160255@qq.com" class="tooltipped" target="_blank" data-tooltip="邮件联系我" data-position="top" data-delay="50">
+        <i class="fas fa-envelope-open"></i>
+    </a>
+
+
+
+
+
+
+
+    <a href="tencent://AddContact/?fromId=50&fromSubId=1&subcmd=all&uin=228160255" class="tooltipped" target="_blank" data-tooltip="QQ联系我: 228160255" data-position="top" data-delay="50">
+        <i class="fab fa-qq"></i>
+    </a>
+
+
+
+
+
+
+
+    <a href="/atom.xml" class="tooltipped" target="_blank" data-tooltip="RSS 订阅" data-position="top" data-delay="50">
+        <i class="fas fa-rss"></i>
+    </a>
+
+</div>
+    </div>
+</footer>
+
+<div class="progress-bar"></div>
+
+
+    <!-- 搜索遮罩框 -->
+<div id="searchModal" class="modal">
+    <div class="modal-content">
+        <div class="search-header">
+            <span class="title"><i class="fas fa-search"></i>&nbsp;&nbsp;搜索</span>
+            <input type="search" id="searchInput" name="s" placeholder="请输入搜索的关键字"
+                   class="search-input">
+        </div>
+        <div id="searchResult"></div>
+    </div>
+</div>
+
+<script type="text/javascript">
+$(function () {
+    var searchFunc = function (path, search_id, content_id) {
+        'use strict';
+        $.ajax({
+            url: path,
+            dataType: "xml",
+            success: function (xmlResponse) {
+                // get the contents from search data
+                var datas = $("entry", xmlResponse).map(function () {
+                    return {
+                        title: $("title", this).text(),
+                        content: $("content", this).text(),
+                        url: $("url", this).text()
+                    };
+                }).get();
+                var $input = document.getElementById(search_id);
+                var $resultContent = document.getElementById(content_id);
+                $input.addEventListener('input', function () {
+                    var str = '<ul class=\"search-result-list\">';
+                    var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+                    $resultContent.innerHTML = "";
+                    if (this.value.trim().length <= 0) {
+                        return;
+                    }
+                    // perform local searching
+                    datas.forEach(function (data) {
+                        var isMatch = true;
+                        var data_title = data.title.trim().toLowerCase();
+                        var data_content = data.content.trim().replace(/<[^>]+>/g, "").toLowerCase();
+                        var data_url = data.url;
+                        data_url = data_url.indexOf('/') === 0 ? data.url : '/' + data_url;
+                        var index_title = -1;
+                        var index_content = -1;
+                        var first_occur = -1;
+                        // only match artiles with not empty titles and contents
+                        if (data_title !== '' && data_content !== '') {
+                            keywords.forEach(function (keyword, i) {
+                                index_title = data_title.indexOf(keyword);
+                                index_content = data_content.indexOf(keyword);
+                                if (index_title < 0 && index_content < 0) {
+                                    isMatch = false;
+                                } else {
+                                    if (index_content < 0) {
+                                        index_content = 0;
+                                    }
+                                    if (i === 0) {
+                                        first_occur = index_content;
+                                    }
+                                }
+                            });
+                        }
+                        // show search results
+                        if (isMatch) {
+                            str += "<li><a href='" + data_url + "' class='search-result-title'>" + data_title + "</a>";
+                            var content = data.content.trim().replace(/<[^>]+>/g, "");
+                            if (first_occur >= 0) {
+                                // cut out 100 characters
+                                var start = first_occur - 20;
+                                var end = first_occur + 80;
+                                if (start < 0) {
+                                    start = 0;
+                                }
+                                if (start === 0) {
+                                    end = 100;
+                                }
+                                if (end > content.length) {
+                                    end = content.length;
+                                }
+                                var match_content = content.substr(start, end);
+                                // highlight all keywords
+                                keywords.forEach(function (keyword) {
+                                    var regS = new RegExp(keyword, "gi");
+                                    match_content = match_content.replace(regS, "<em class=\"search-keyword\">" + keyword + "</em>");
+                                });
+
+                                str += "<p class=\"search-result\">" + match_content + "...</p>"
+                            }
+                            str += "</li>";
+                        }
+                    });
+                    str += "</ul>";
+                    $resultContent.innerHTML = str;
+                });
+            }
+        });
+    };
+
+    searchFunc('/search.xml', 'searchInput', 'searchResult');
+});
+</script>
+
+    <!-- 回到顶部按钮 -->
+<div id="backTop" class="top-scroll">
+    <a class="btn-floating btn-large waves-effect waves-light" href="#!">
+        <i class="fas fa-arrow-up"></i>
+    </a>
+</div>
+
+
+    <script src="/libs/materialize/materialize.min.js"></script>
+    <script src="/libs/masonry/masonry.pkgd.min.js"></script>
+    <script src="/libs/aos/aos.js"></script>
+    <script src="/libs/scrollprogress/scrollProgress.min.js"></script>
+    <script src="/libs/lightGallery/js/lightgallery-all.min.js"></script>
+    <script src="/js/matery.js"></script>
+
+    <!-- Baidu Analytics -->
+
+    <!-- Baidu Push -->
+
+<script>
+    (function () {
+        var bp = document.createElement('script');
+        var curProtocol = window.location.protocol.split(':')[0];
+        if (curProtocol === 'https') {
+            bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+        } else {
+            bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+        }
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(bp, s);
+    })();
+</script>
+
+    
+    <script src="/libs/others/clicklove.js" async="async"></script>
+    
+    
+    <script async src="/libs/others/busuanzi.pure.mini.js"></script>
+    
+
+    
+
+    
+
+    <!--腾讯兔小巢-->
+    
+    
+
+    
+    
+    <script type="text/javascript" size="150" alpha='0.6'
+        zIndex="-1" src="/libs/background/ribbon-refresh.min.js" async="async"></script>
+    
+
+    
+
+    
+    <script src="/libs/instantpage/instantpage.js" type="module"></script>
+    
+
+</body>
+
+</html>

@@ -1,0 +1,1739 @@
+<!DOCTYPE HTML>
+<html lang="zh-CN">
+
+
+<head>
+    <meta charset="utf-8">
+    <meta name="keywords" content="spring-kafka源码分析二(Consumer), Smartの明">
+    <meta name="description" content="苦练基本功，长期有耐心">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="renderer" content="webkit|ie-stand|ie-comp">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+
+
+    <title>spring-kafka源码分析二(Consumer) | Smartの明</title>
+    <link rel="icon" type="image/png" href="/avatar.png">
+
+    <link rel="stylesheet" type="text/css" href="/libs/awesome/css/all.css">
+    <link rel="stylesheet" type="text/css" href="/libs/materialize/materialize.min.css">
+    <link rel="stylesheet" type="text/css" href="/libs/aos/aos.css">
+    <link rel="stylesheet" type="text/css" href="/libs/animate/animate.min.css">
+    <link rel="stylesheet" type="text/css" href="/libs/lightGallery/css/lightgallery.min.css">
+    <link rel="stylesheet" type="text/css" href="/css/matery.css">
+    <link rel="stylesheet" type="text/css" href="/css/my.css">
+
+    <script src="/libs/jquery/jquery.min.js"></script>
+
+<meta name="generator" content="Hexo 5.4.0"><link rel="alternate" href="/atom.xml" title="Smartの明" type="application/atom+xml">
+</head>
+
+
+
+
+<body>
+    <header class="navbar-fixed">
+    <nav id="headNav" class="bg-color nav-transparent">
+        <div id="navContainer" class="nav-wrapper container">
+            <div class="brand-logo">
+                <a href="/" class="waves-effect waves-light">
+                    
+                    <img src="/avatar.png" class="logo-img" alt="LOGO">
+                    
+                    <span class="logo-span">Smartの明</span>
+                </a>
+            </div>
+            
+
+<a href="#" data-target="mobile-nav" class="sidenav-trigger button-collapse"><i class="fas fa-bars"></i></a>
+<ul class="right nav-menu">
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/" class="waves-effect waves-light">
+      
+      <i class="fas fa-home" style="zoom: 0.6;"></i>
+      
+      <span>首页</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/tags" class="waves-effect waves-light">
+      
+      <i class="fas fa-tags" style="zoom: 0.6;"></i>
+      
+      <span>标签</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/categories" class="waves-effect waves-light">
+
+      
+      <i class="fas fa-bookmark" style="zoom: 0.6;"></i>
+      
+      <span>分类</span>
+      <i class="fas fa-chevron-down" aria-hidden="true" style="zoom: 0.6;"></i>
+    </a>
+    <ul class="sub-nav menus_item_child ">
+      
+      <li>
+        <a href="/categories/%E6%8A%80%E6%9C%AF%E5%88%86%E4%BA%AB/">
+          
+          <i class="fas fa-book" style="margin-top: -20px; zoom: 0.6;"></i>
+          
+          <span>技术分享</span>
+        </a>
+      </li>
+      
+      <li>
+        <a href="/categories/%E6%97%85%E8%A1%8C%E8%B6%B3%E8%BF%B9">
+          
+          <i class="fas fa-film" style="margin-top: -20px; zoom: 0.6;"></i>
+          
+          <span>旅行足迹</span>
+        </a>
+      </li>
+      
+    </ul>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/archives" class="waves-effect waves-light">
+      
+      <i class="fas fa-archive" style="zoom: 0.6;"></i>
+      
+      <span>归档</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/about" class="waves-effect waves-light">
+      
+      <i class="fas fa-user-circle" style="zoom: 0.6;"></i>
+      
+      <span>关于</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/friends" class="waves-effect waves-light">
+      
+      <i class="fas fa-address-book" style="zoom: 0.6;"></i>
+      
+      <span>友情链接</span>
+    </a>
+    
+  </li>
+  
+  <li>
+    <a href="#searchModal" class="modal-trigger waves-effect waves-light">
+      <i id="searchIcon" class="fas fa-search" title="搜索" style="zoom: 0.85;"></i>
+    </a>
+  </li>
+</ul>
+
+
+<div id="mobile-nav" class="side-nav sidenav">
+
+    <div class="mobile-head bg-color">
+        
+        <img src="/avatar.png" class="logo-img circle responsive-img">
+        
+        <div class="logo-name">Smartの明</div>
+        <div class="logo-desc">
+            
+            苦练基本功，长期有耐心
+            
+        </div>
+    </div>
+
+    
+
+    <ul class="menu-list mobile-menu-list">
+        
+        <li class="m-nav-item">
+	  
+		<a href="/" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-home"></i>
+			
+			首页
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/tags" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-tags"></i>
+			
+			标签
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="javascript:;">
+			
+				<i class="fa-fw fas fa-bookmark"></i>
+			
+			分类
+			<span class="m-icon"><i class="fas fa-chevron-right"></i></span>
+		</a>
+            <ul  style="background:  ;" >
+              
+                <li>
+
+                  <a href="/categories/%E6%8A%80%E6%9C%AF%E5%88%86%E4%BA%AB/ " style="margin-left:75px">
+				  
+				   <i class="fa fas fa-book" style="position: absolute;left:50px" ></i>
+			      
+		          <span>技术分享</span>
+                  </a>
+                </li>
+              
+                <li>
+
+                  <a href="/categories/%E6%97%85%E8%A1%8C%E8%B6%B3%E8%BF%B9 " style="margin-left:75px">
+				  
+				   <i class="fa fas fa-film" style="position: absolute;left:50px" ></i>
+			      
+		          <span>旅行足迹</span>
+                  </a>
+                </li>
+              
+            </ul>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/archives" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-archive"></i>
+			
+			归档
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/about" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-user-circle"></i>
+			
+			关于
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/friends" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-address-book"></i>
+			
+			友情链接
+		</a>
+          
+        </li>
+        
+        
+    </ul>
+</div>
+
+
+        </div>
+
+        
+    </nav>
+
+</header>
+
+    
+
+
+
+<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/10.jpg')">
+    <div class="container" style="right: 0px;left: 0px;">
+        <div class="row">
+            <div class="col s12 m12 l12">
+                <div class="brand">
+                    <h1 class="description center-align post-title">spring-kafka源码分析二(Consumer)</h1>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+<main class="post-container content">
+
+    
+    <link rel="stylesheet" href="/libs/tocbot/tocbot.css">
+<style>
+    #articleContent h1::before,
+    #articleContent h2::before,
+    #articleContent h3::before,
+    #articleContent h4::before,
+    #articleContent h5::before,
+    #articleContent h6::before {
+        display: block;
+        content: " ";
+        height: 100px;
+        margin-top: -100px;
+        visibility: hidden;
+    }
+
+    #articleContent :focus {
+        outline: none;
+    }
+
+    .toc-fixed {
+        position: fixed;
+        top: 64px;
+    }
+
+    .toc-widget {
+        width: 345px;
+        padding-left: 20px;
+    }
+
+    .toc-widget .toc-title {
+        padding: 35px 0 15px 17px;
+        font-size: 1.5rem;
+        font-weight: bold;
+        line-height: 1.5rem;
+    }
+
+    .toc-widget ol {
+        padding: 0;
+        list-style: none;
+    }
+
+    #toc-content {
+        padding-bottom: 30px;
+        overflow: auto;
+    }
+
+    #toc-content ol {
+        padding-left: 10px;
+    }
+
+    #toc-content ol li {
+        padding-left: 10px;
+    }
+
+    #toc-content .toc-link:hover {
+        color: #42b983;
+        font-weight: 700;
+        text-decoration: underline;
+    }
+
+    #toc-content .toc-link::before {
+        background-color: transparent;
+        max-height: 25px;
+
+        position: absolute;
+        right: 23.5vw;
+        display: block;
+    }
+
+    #toc-content .is-active-link {
+        color: #42b983;
+    }
+
+    #floating-toc-btn {
+        position: fixed;
+        right: 15px;
+        bottom: 76px;
+        padding-top: 15px;
+        margin-bottom: 0;
+        z-index: 998;
+    }
+
+    #floating-toc-btn .btn-floating {
+        width: 48px;
+        height: 48px;
+    }
+
+    #floating-toc-btn .btn-floating i {
+        line-height: 48px;
+        font-size: 1.4rem;
+    }
+</style>
+<div class="row">
+    <div id="main-content" class="col s12 m12 l9">
+        <!-- 文章内容详情 -->
+<div id="artDetail">
+    <div class="card">
+        <div class="card-content article-info">
+            <div class="row tag-cate">
+                <div class="col s7">
+                    
+                    <div class="article-tag">
+                        
+                            <a href="/tags/NIO/">
+                                <span class="chip bg-color">NIO</span>
+                            </a>
+                        
+                            <a href="/tags/spring-kafka/">
+                                <span class="chip bg-color">spring-kafka</span>
+                            </a>
+                        
+                    </div>
+                    
+                </div>
+                <div class="col s5 right-align">
+                    
+                    <div class="post-cate">
+                        <i class="fas fa-bookmark fa-fw icon-category"></i>
+                        
+                            <a href="/categories/%E6%8A%80%E6%9C%AF%E5%88%86%E4%BA%AB/" class="post-category">
+                                技术分享
+                            </a>
+                        
+                    </div>
+                    
+                </div>
+            </div>
+
+            <div class="post-info">
+                
+                <div class="post-date info-break-policy">
+                    <i class="far fa-calendar-minus fa-fw"></i>发布日期:&nbsp;&nbsp;
+                    2016-12-30
+                </div>
+                
+
+                
+
+                
+                <div class="info-break-policy">
+                    <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
+                    3.6k
+                </div>
+                
+
+                
+                <div class="info-break-policy">
+                    <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
+                    19 分
+                </div>
+                
+
+                
+                    <div id="busuanzi_container_page_pv" class="info-break-policy">
+                        <i class="far fa-eye fa-fw"></i>阅读次数:&nbsp;&nbsp;
+                        <span id="busuanzi_value_page_pv"></span>
+                    </div>
+				
+            </div>
+        </div>
+        <hr class="clearfix">
+
+        
+        <!-- 是否加载使用自带的 prismjs. -->
+        <link rel="stylesheet" href="/libs/prism/prism.css">
+        
+
+        
+
+        <div class="card-content article-card-content">
+            <div id="articleContent">
+                <p>上一篇文章我们分析了spring-kafka的producer，这篇文章我们就要来分析下consumer。</p>
+<pre class="line-numbers language-none"><code class="language-none">ContainerProperties containerProps &#x3D; new ContainerProperties(&quot;topic1&quot;, &quot;topic2&quot;);
+containerProps.setMessageListener(new MessageListener&lt;Integer, String&gt;() &#123;
+
+    @Override
+    public void onMessage(ConsumerRecord&lt;Integer, String&gt; message) &#123;
+        System.out.println(&quot;received: &quot; + message);
+    &#125;
+
+&#125;);
+KafkaMessageListenerContainer&lt;Integer, String&gt; container &#x3D; createContainer(containerProps);
+container.setBeanName(&quot;testAuto&quot;);
+container.start();
+
+private static KafkaMessageListenerContainer&lt;Integer, String&gt; createContainer(ContainerProperties containerProps) &#123;
+    Map&lt;String, Object&gt; props &#x3D; consumerProps();
+    DefaultKafkaConsumerFactory&lt;Integer, String&gt; cf &#x3D;
+            new DefaultKafkaConsumerFactory&lt;Integer, String&gt;(props);
+    KafkaMessageListenerContainer&lt;Integer, String&gt; container &#x3D;
+            new KafkaMessageListenerContainer&lt;Integer, String&gt;(cf, containerProps);
+    return container;
+&#125;
+
+private static Map&lt;String, Object&gt; consumerProps() &#123;
+        Map&lt;String, Object&gt; props &#x3D; new HashMap&lt;String, Object&gt;();
+        props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, &quot;localhost:9092&quot;);
+        props.put(ConsumerConfig.GROUP_ID_CONFIG, &quot;group&quot;);
+        props.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, true);
+        props.put(ConsumerConfig.AUTO_COMMIT_INTERVAL_MS_CONFIG, &quot;100&quot;);
+        props.put(ConsumerConfig.SESSION_TIMEOUT_MS_CONFIG, &quot;15000&quot;);
+        props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, IntegerDeserializer.class);
+        props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
+        return props;
+&#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>可以看到我们需要创建一个KafkaMessageListenerContainer，而创建上述container又需要创建一个DefaultKafkaConsumerFactory和一个ContainerProperties。注意ContainerProperties必须设置一个MessageListener，这个listener有个onMessage方法，如果consumer收到消息，就会调用这个方法。创建了上述container之后，然后调用container.start方法就可以开启consumer了。</p>
+<span id="more"></span>
+
+<h2 id="KafkaMessageListenerContainer-start"><a href="#KafkaMessageListenerContainer-start" class="headerlink" title="KafkaMessageListenerContainer.start"></a>KafkaMessageListenerContainer.start</h2><p>看源码不难发现，上述方法最终会调用到KafkaMessageListenerContainer.doStart方法<br>KafkaMessageListenerContainer.start==&gt;AbstractMessageListenerContainer.start==&gt;KafkaMessageListenerContainer.doStart</p>
+<pre class="line-numbers language-none"><code class="language-none">protected void doStart() &#123;
+    if (isRunning()) &#123;
+        return;
+    &#125;
+    ContainerProperties containerProperties &#x3D; getContainerProperties();
+
+    if (!this.consumerFactory.isAutoCommit()) &#123;
+        AckMode ackMode &#x3D; containerProperties.getAckMode();
+        if (ackMode.equals(AckMode.COUNT) || ackMode.equals(AckMode.COUNT_TIME)) &#123;
+            Assert.state(containerProperties.getAckCount() &gt; 0, &quot;&#39;ackCount&#39; must be &gt; 0&quot;);
+        &#125;
+        if ((ackMode.equals(AckMode.TIME) || ackMode.equals(AckMode.COUNT_TIME))
+                &amp;&amp; containerProperties.getAckTime() &#x3D;&#x3D; 0) &#123;
+            containerProperties.setAckTime(5000);
+        &#125;
+    &#125;
+
+    Object messageListener &#x3D; containerProperties.getMessageListener();
+    Assert.state(messageListener !&#x3D; null, &quot;A MessageListener is required&quot;);
+    if (messageListener instanceof GenericAcknowledgingMessageListener) &#123;
+        this.acknowledgingMessageListener &#x3D; (GenericAcknowledgingMessageListener&lt;?&gt;) messageListener;
+    &#125;
+    else if (messageListener instanceof GenericMessageListener) &#123;
+        this.listener &#x3D; (GenericMessageListener&lt;?&gt;) messageListener;
+    &#125;
+    else &#123;
+        throw new IllegalStateException(&quot;messageListener must be &#39;MessageListener&#39; &quot;
+                + &quot;or &#39;AcknowledgingMessageListener&#39;, not &quot; + messageListener.getClass().getName());
+    &#125;
+    if (containerProperties.getConsumerTaskExecutor() &#x3D;&#x3D; null) &#123;
+        SimpleAsyncTaskExecutor consumerExecutor &#x3D; new SimpleAsyncTaskExecutor(
+                (getBeanName() &#x3D;&#x3D; null ? &quot;&quot; : getBeanName()) + &quot;-kafka-consumer-&quot;);
+        containerProperties.setConsumerTaskExecutor(consumerExecutor);
+    &#125;
+    if (containerProperties.getListenerTaskExecutor() &#x3D;&#x3D; null) &#123;
+        SimpleAsyncTaskExecutor listenerExecutor &#x3D; new SimpleAsyncTaskExecutor(
+                (getBeanName() &#x3D;&#x3D; null ? &quot;&quot; : getBeanName()) + &quot;-kafka-listener-&quot;);
+        containerProperties.setListenerTaskExecutor(listenerExecutor);
+    &#125;
+    this.listenerConsumer &#x3D; new ListenerConsumer(this.listener, this.acknowledgingMessageListener);
+    setRunning(true);
+    this.listenerConsumerFuture &#x3D; containerProperties
+            .getConsumerTaskExecutor()
+            .submitListenable(this.listenerConsumer);
+&#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>可以看到这个方法给containerProperties设置了consumerTaskExecutor和listenerTaskExecutor。然后我们重点关注下这个方法最后会调用xxx.getConsumerTaskExecutor().submitListenable(this.listenerConsumer);这个方法会开启一个”-kafka-consumer-“线程，这个线程会运行ListenerConsumer.run()方法。<br><font color="#08c">KafkaMessageListenerContainer</font></p>
+<pre class="line-numbers language-none"><code class="language-none">public void run() &#123;
+    if (this.autoCommit &amp;&amp; this.theListener instanceof ConsumerSeekAware) &#123;
+        ((ConsumerSeekAware) this.theListener).registerSeekCallback(this);
+    &#125;
+    this.count &#x3D; 0;
+    this.last &#x3D; System.currentTimeMillis();
+    if (isRunning() &amp;&amp; this.definedPartitions !&#x3D; null) &#123;
+        initPartitionsIfNeeded();
+        &#x2F;&#x2F; we start the invoker here as there will be no rebalance calls to
+        &#x2F;&#x2F; trigger it, but only if the container is not set to autocommit
+        &#x2F;&#x2F; otherwise we will process records on a separate thread
+        if (!this.autoCommit) &#123;
+            startInvoker();
+        &#125;
+    &#125;
+    long lastReceive &#x3D; System.currentTimeMillis();
+    long lastAlertAt &#x3D; lastReceive;
+    while (isRunning()) &#123;
+        try &#123;
+            if (!this.autoCommit) &#123;
+                processCommits();
+            &#125;
+            processSeeks();
+            if (this.logger.isTraceEnabled()) &#123;
+                this.logger.trace(&quot;Polling (paused&#x3D;&quot; + this.paused + &quot;)...&quot;);
+            &#125;
+            ConsumerRecords&lt;K, V&gt; records &#x3D; this.consumer.poll(this.containerProperties.getPollTimeout());
+            if (records !&#x3D; null &amp;&amp; this.logger.isDebugEnabled()) &#123;
+                this.logger.debug(&quot;Received: &quot; + records.count() + &quot; records&quot;);
+            &#125;
+            if (records !&#x3D; null &amp;&amp; records.count() &gt; 0) &#123;
+                if (this.containerProperties.getIdleEventInterval() !&#x3D; null) &#123;
+                    lastReceive &#x3D; System.currentTimeMillis();
+                &#125;
+                &#x2F;&#x2F; if the container is set to auto-commit, then execute in the
+                &#x2F;&#x2F; same thread
+                &#x2F;&#x2F; otherwise send to the buffering queue
+                if (this.autoCommit) &#123;
+                    invokeListener(records);
+                &#125;
+                else &#123;
+                    if (sendToListener(records)) &#123;
+                        if (this.assignedPartitions !&#x3D; null) &#123;
+                            &#x2F;&#x2F; avoid group management rebalance due to a slow
+                            &#x2F;&#x2F; consumer
+                            this.consumer.pause(this.assignedPartitions);
+                            this.paused &#x3D; true;
+                            this.unsent &#x3D; records;
+                        &#125;
+                    &#125;
+                &#125;
+            &#125;
+            else &#123;
+                if (this.containerProperties.getIdleEventInterval() !&#x3D; null) &#123;
+                    long now &#x3D; System.currentTimeMillis();
+                    if (now &gt; lastReceive + this.containerProperties.getIdleEventInterval()
+                            &amp;&amp; now &gt; lastAlertAt + this.containerProperties.getIdleEventInterval()) &#123;
+                        publishIdleContainerEvent(now - lastReceive);
+                        lastAlertAt &#x3D; now;
+                        if (this.theListener instanceof ConsumerSeekAware) &#123;
+                            seekPartitions(getAssignedPartitions(), true);
+                        &#125;
+                    &#125;
+                &#125;
+            &#125;
+            this.unsent &#x3D; checkPause(this.unsent);
+        &#125;
+        catch (WakeupException e) &#123;
+            this.unsent &#x3D; checkPause(this.unsent);
+        &#125;
+        catch (Exception e) &#123;
+            if (this.containerProperties.getGenericErrorHandler() !&#x3D; null) &#123;
+                this.containerProperties.getGenericErrorHandler().handle(e, null);
+            &#125;
+            else &#123;
+                this.logger.error(&quot;Container exception&quot;, e);
+            &#125;
+        &#125;
+    &#125;
+    if (this.listenerInvokerFuture !&#x3D; null) &#123;
+        stopInvokerAndCommitManualAcks();
+    &#125;
+    try &#123;
+        this.consumer.unsubscribe();
+    &#125;
+    catch (WakeupException e) &#123;
+        &#x2F;&#x2F; No-op. Continue process
+    &#125;
+    this.consumer.close();
+    if (this.logger.isInfoEnabled()) &#123;
+        this.logger.info(&quot;Consumer stopped&quot;);
+    &#125;
+&#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p><font color="#08c">我们需要注意一点，上述代码很多地方都判断了if (!this.autoCommit)是不是自动提交，这个地方我们后面会提到</font>。我们先看到while(isRunning())循环里面有个ConsumerRecords&lt;K, V&gt; records = this.consumer.poll(this.containerProperties.getPollTimeout());这个是获取从kafka broker拿到的record，下面会判断如果record不为空，并且</p>
+<pre class="line-numbers language-none"><code class="language-none">if (this.autoCommit) &#123;
+	invokeListener(records);
+&#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+<p>则最终通过这个方法会调用到我们最早注册的MessageListener的onMessage方法。下面我们就会就这两个方面来分析一下源码。</p>
+<h2 id="从broker获取record"><a href="#从broker获取record" class="headerlink" title="从broker获取record"></a>从broker获取record</h2><pre class="line-numbers language-none"><code class="language-none">public ConsumerRecords&lt;K, V&gt; poll(long timeout) &#123;
+    acquire();
+    try &#123;
+        if (timeout &lt; 0)
+            throw new IllegalArgumentException(&quot;Timeout must not be negative&quot;);
+
+        &#x2F;&#x2F; poll for new data until the timeout expires
+        long start &#x3D; time.milliseconds();
+        long remaining &#x3D; timeout;
+        do &#123;
+            Map&lt;TopicPartition, List&lt;ConsumerRecord&lt;K, V&gt;&gt;&gt; records &#x3D; pollOnce(remaining);
+            if (!records.isEmpty()) &#123;
+                fetcher.sendFetches();
+                client.pollNoWakeup();
+
+                if (this.interceptors &#x3D;&#x3D; null)
+                    return new ConsumerRecords&lt;&gt;(records);
+                else
+                    return this.interceptors.onConsume(new ConsumerRecords&lt;&gt;(records));
+            &#125;
+
+            long elapsed &#x3D; time.milliseconds() - start;
+            remaining &#x3D; timeout - elapsed;
+        &#125; while (remaining &gt; 0);
+
+        return ConsumerRecords.empty();
+    &#125; finally &#123;
+        release();
+    &#125;
+&#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>我们看到上述方法又会调用pollOnce方法来获取record</p>
+<pre class="line-numbers language-none"><code class="language-none">private Map&lt;TopicPartition, List&lt;ConsumerRecord&lt;K, V&gt;&gt;&gt; pollOnce(long timeout) &#123;
+    &#x2F;&#x2F; TODO: Sub-requests should take into account the poll timeout (KAFKA-1894)
+    coordinator.ensureCoordinatorReady();
+
+    &#x2F;&#x2F; ensure we have partitions assigned if we expect to
+    if (subscriptions.partitionsAutoAssigned())
+        coordinator.ensurePartitionAssignment();
+
+    &#x2F;&#x2F; fetch positions if we have partitions we&#39;re subscribed to that we
+    &#x2F;&#x2F; don&#39;t know the offset for
+    if (!subscriptions.hasAllFetchPositions())
+        updateFetchPositions(this.subscriptions.missingFetchPositions());
+
+    long now &#x3D; time.milliseconds();
+
+    &#x2F;&#x2F; execute delayed tasks (e.g. autocommits and heartbeats) prior to fetching records
+    client.executeDelayedTasks(now);
+
+    &#x2F;&#x2F; init any new fetches (won&#39;t resend pending fetches)
+    Map&lt;TopicPartition, List&lt;ConsumerRecord&lt;K, V&gt;&gt;&gt; records &#x3D; fetcher.fetchedRecords();
+
+    &#x2F;&#x2F; if data is available already, e.g. from a previous network client poll() call to commit,
+    &#x2F;&#x2F; then just return it immediately
+    if (!records.isEmpty())
+        return records;
+
+    fetcher.sendFetches();
+    client.poll(timeout, now);
+    return fetcher.fetchedRecords();
+&#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>这个方法通过注释就能看到，它首先在获取数据之前会确保subscribed topics or partitions，然后执行autocommits and heartbeats任务，最后会调用client.poll(timeout, now)方法。我们猜测这个方法会把获取的record放在一个类似于queue里面，然后通过fetcher.fetchedRecords()返回。</p>
+<pre class="line-numbers language-none"><code class="language-none">private void poll(long timeout, long now, boolean executeDelayedTasks) &#123;
+    &#x2F;&#x2F; send all the requests we can send now
+    trySend(now);
+
+    &#x2F;&#x2F; ensure we don&#39;t poll any longer than the deadline for
+    &#x2F;&#x2F; the next scheduled task
+    timeout &#x3D; Math.min(timeout, delayedTasks.nextTimeout(now));
+    clientPoll(timeout, now);
+    now &#x3D; time.milliseconds();
+
+    &#x2F;&#x2F; handle any disconnects by failing the active requests. note that disconnects must
+    &#x2F;&#x2F; be checked immediately following poll since any subsequent call to client.ready()
+    &#x2F;&#x2F; will reset the disconnect status
+    checkDisconnects(now);
+
+    &#x2F;&#x2F; execute scheduled tasks
+    if (executeDelayedTasks)
+        delayedTasks.poll(now);
+
+    &#x2F;&#x2F; try again to send requests since buffer space may have been
+    &#x2F;&#x2F; cleared or a connect finished in the poll
+    trySend(now);
+
+    &#x2F;&#x2F; fail requests that couldn&#39;t be sent if they have expired
+    failExpiredRequests(now);
+&#125;
+
+private void clientPoll(long timeout, long now) &#123;
+    client.poll(timeout, now);
+    maybeTriggerWakeup();
+&#125;
+
+@Override
+public List&lt;ClientResponse&gt; poll(long timeout, long now) &#123;
+    long metadataTimeout &#x3D; metadataUpdater.maybeUpdate(now);
+    try &#123;
+        this.selector.poll(Utils.min(timeout, metadataTimeout, requestTimeoutMs));
+    &#125; catch (IOException e) &#123;
+        log.error(&quot;Unexpected error during I&#x2F;O&quot;, e);
+    &#125;
+
+    &#x2F;&#x2F; process completed actions
+    long updatedNow &#x3D; this.time.milliseconds();
+    List&lt;ClientResponse&gt; responses &#x3D; new ArrayList&lt;&gt;();
+    handleCompletedSends(responses, updatedNow);
+    handleCompletedReceives(responses, updatedNow);
+    handleDisconnections(responses, updatedNow);
+    handleConnections();
+    handleTimedOutRequests(responses, updatedNow);
+
+    &#x2F;&#x2F; invoke callbacks
+    for (ClientResponse response : responses) &#123;
+        if (response.request().hasCallback()) &#123;
+            try &#123;
+                response.request().callback().onComplete(response);
+            &#125; catch (Exception e) &#123;
+                log.error(&quot;Uncaught error in request completion:&quot;, e);
+            &#125;
+        &#125;
+    &#125;
+
+    return responses;
+&#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>可以看到最终又会调用到NetworkClient.poll方法，上一篇关于spring-kafka producer的文章我们已经讲到了这个类。它是通过NIO的Selector，将各种socketChannel绑定在这个selector上面，然后监听各种事件。</p>
+<p>我们接下来看下kafka的selector是怎么处理就绪的读事件的<br><font color="#08c">org.apache.kafka.common.network.Selector</font></p>
+<pre class="line-numbers language-none"><code class="language-none">@Override
+public void poll(long timeout) throws IOException &#123;
+    if (timeout &lt; 0)
+        throw new IllegalArgumentException(&quot;timeout should be &gt;&#x3D; 0&quot;);
+
+    clear();
+
+    if (hasStagedReceives() || !immediatelyConnectedKeys.isEmpty())
+        timeout &#x3D; 0;
+
+    &#x2F;* check ready keys *&#x2F;
+    long startSelect &#x3D; time.nanoseconds();
+    int readyKeys &#x3D; select(timeout);
+    long endSelect &#x3D; time.nanoseconds();
+    currentTimeNanos &#x3D; endSelect;
+    this.sensors.selectTime.record(endSelect - startSelect, time.milliseconds());
+
+    if (readyKeys &gt; 0 || !immediatelyConnectedKeys.isEmpty()) &#123;
+        pollSelectionKeys(this.nioSelector.selectedKeys(), false);
+        pollSelectionKeys(immediatelyConnectedKeys, true);
+    &#125;
+
+    addToCompletedReceives();
+
+    long endIo &#x3D; time.nanoseconds();
+    this.sensors.ioTime.record(endIo - endSelect, time.milliseconds());
+    maybeCloseOldestConnection();
+&#125;
+
+
+private void pollSelectionKeys(Iterable&lt;SelectionKey&gt; selectionKeys, boolean isImmediatelyConnected) &#123;
+    Iterator&lt;SelectionKey&gt; iterator &#x3D; selectionKeys.iterator();
+    while (iterator.hasNext()) &#123;
+        SelectionKey key &#x3D; iterator.next();
+        iterator.remove();
+        KafkaChannel channel &#x3D; channel(key);
+            &#x2F;* if channel is ready read from any connections that have readable data *&#x2F;
+            if (channel.ready() &amp;&amp; key.isReadable() &amp;&amp; !hasStagedReceive(channel)) &#123;
+                NetworkReceive networkReceive;
+                while ((networkReceive &#x3D; channel.read()) !&#x3D; null)
+                    addToStagedReceives(channel, networkReceive);
+&#125;
+
+private void addToStagedReceives(KafkaChannel channel, NetworkReceive receive) &#123;
+    if (!stagedReceives.containsKey(channel))
+        stagedReceives.put(channel, new ArrayDeque&lt;NetworkReceive&gt;());
+
+    Deque&lt;NetworkReceive&gt; deque &#x3D; stagedReceives.get(channel);
+    deque.add(receive);
+&#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>我们看到如果当前channel已经准备好并且SelectionKey已经可以读取并且没有staged receive，那么就把收到的消息缓存到Map&lt;KafkaChannel, Deque<NetworkReceive>&gt; stagedReceives这个里面。然后我们看下后续是怎么处理这些缓存的消息的。<br>上面poll方法处理完了pollSelectionKeys之后，就会调用addToCompletedReceives，从方法名字也可以看出，它是把上面暂存的stagedReceives放进一个List<NetworkReceive> completedReceives里面。<br>下面handleCompletedReceives会用到这个list</p>
+<p><font color="#08c">NetworkClient</font></p>
+<pre class="line-numbers language-none"><code class="language-none">public List&lt;ClientResponse&gt; poll(long timeout, long now) &#123;
+    long metadataTimeout &#x3D; metadataUpdater.maybeUpdate(now);
+    try &#123;
+        this.selector.poll(Utils.min(timeout, metadataTimeout, requestTimeoutMs));
+    &#125; catch (IOException e) &#123;
+        log.error(&quot;Unexpected error during I&#x2F;O&quot;, e);
+    &#125;
+
+    &#x2F;&#x2F; process completed actions
+    long updatedNow &#x3D; this.time.milliseconds();
+    List&lt;ClientResponse&gt; responses &#x3D; new ArrayList&lt;&gt;();
+    handleCompletedSends(responses, updatedNow);
+    handleCompletedReceives(responses, updatedNow);
+    handleDisconnections(responses, updatedNow);
+    handleConnections();
+    handleTimedOutRequests(responses, updatedNow);
+
+    &#x2F;&#x2F; invoke callbacks
+    for (ClientResponse response : responses) &#123;
+        if (response.request().hasCallback()) &#123;
+            try &#123;
+                response.request().callback().onComplete(response);
+            &#125; catch (Exception e) &#123;
+                log.error(&quot;Uncaught error in request completion:&quot;, e);
+            &#125;
+        &#125;
+    &#125;
+
+    return responses;
+&#125;
+
+private void handleCompletedReceives(List&lt;ClientResponse&gt; responses, long now) &#123;
+    for (NetworkReceive receive : this.selector.completedReceives()) &#123;
+        String source &#x3D; receive.source();
+        ClientRequest req &#x3D; inFlightRequests.completeNext(source);
+        Struct body &#x3D; parseResponse(receive.payload(), req.request().header());
+        if (!metadataUpdater.maybeHandleCompletedReceive(req, now, body))
+            responses.add(new ClientResponse(req, now, false, body));
+    &#125;
+&#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>可以看到上述方法会根据之前获得的List<NetworkReceive> completedReceives组装response，然后调用response.request().callback().onComplete(response);最终会触发Fetcher类sendFetches方法中注册RequestFutureListener的回调onSuccess方法</p>
+<pre class="line-numbers language-none"><code class="language-none">public void sendFetches() &#123;
+    for (Map.Entry&lt;Node, FetchRequest&gt; fetchEntry: createFetchRequests().entrySet()) &#123;
+        final FetchRequest request &#x3D; fetchEntry.getValue();
+        client.send(fetchEntry.getKey(), ApiKeys.FETCH, request)
+                .addListener(new RequestFutureListener&lt;ClientResponse&gt;() &#123;
+                    @Override
+                    public void onSuccess(ClientResponse resp) &#123;
+                        FetchResponse response &#x3D; new FetchResponse(resp.responseBody());
+                        Set&lt;TopicPartition&gt; partitions &#x3D; new HashSet&lt;&gt;(response.responseData().keySet());
+                        FetchResponseMetricAggregator metricAggregator &#x3D; new FetchResponseMetricAggregator(sensors, partitions);
+
+                        for (Map.Entry&lt;TopicPartition, FetchResponse.PartitionData&gt; entry : response.responseData().entrySet()) &#123;
+                            TopicPartition partition &#x3D; entry.getKey();
+                            long fetchOffset &#x3D; request.fetchData().get(partition).offset;
+                            FetchResponse.PartitionData fetchData &#x3D; entry.getValue();
+                            completedFetches.add(new CompletedFetch(partition, fetchOffset, fetchData, metricAggregator));
+                        &#125;
+
+                        sensors.fetchLatency.record(resp.requestLatencyMs());
+                        sensors.fetchThrottleTimeSensor.record(response.getThrottleTime());
+                    &#125;
+
+                    @Override
+                    public void onFailure(RuntimeException e) &#123;
+                        log.debug(&quot;Fetch failed&quot;, e);
+                    &#125;
+                &#125;);
+    &#125;
+&#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>可以看到onSuccess回调方法会把record封装后，添加到List<CompletedFetch> completedFetches，之前上面讲到的pollOnce方法会调用<br>fetcher.fetchedRecords()方法，这个方法会根据获得的completedFetches，返回一个封装好的Map&lt;TopicPartition, List&lt;ConsumerRecord&lt;K, V&gt;&gt;&gt; recordMap。</p>
+<h2 id="消费获取的record"><a href="#消费获取的record" class="headerlink" title="消费获取的record"></a>消费获取的record</h2><h3 id="配置了自动commit"><a href="#配置了自动commit" class="headerlink" title="配置了自动commit"></a>配置了自动commit</h3><p>回到最开始的KafkaMessageListenerContainer.ListenerConsumer类的run方法</p>
+<pre class="line-numbers language-none"><code class="language-none">ConsumerRecords&lt;K, V&gt; records &#x3D; this.consumer.poll(this.containerProperties.getPollTimeout());
+if (records !&#x3D; null &amp;&amp; this.logger.isDebugEnabled()) &#123;
+	this.logger.debug(&quot;Received: &quot; + records.count() + &quot; records&quot;);
+&#125;
+if (records !&#x3D; null &amp;&amp; records.count() &gt; 0) &#123;
+	if (this.containerProperties.getIdleEventInterval() !&#x3D; null) &#123;
+	    lastReceive &#x3D; System.currentTimeMillis();
+	&#125;
+	if (this.autoCommit) &#123;
+		invokeListener(records);
+	&#125;
+	else &#123;
+		if (sendToListener(records)) &#123;
+			if (this.assignedPartitions !&#x3D; null) &#123;
+		    	this.consumer.pause(this.assignedPartitions）;
+				this.paused &#x3D; true;
+				this.unsent &#x3D; records;
+			&#125;
+		&#125;
+	&#125;
+&#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>可以看到若获取到的records不为空，并且配置了自动commit，则会执行invokeListener(records);</p>
+<pre class="line-numbers language-none"><code class="language-none">private void invokeListener(final ConsumerRecords&lt;K, V&gt; records) &#123;
+	if (this.isBatchListener) &#123;
+	    invokeBatchListener(records);
+    &#125;else &#123;
+	    invokeRecordListener(records);
+    &#125;
+&#125;
+
+private void invokeRecordListener(final ConsumerRecords&lt;K, V&gt; records) &#123;
+    Iterator&lt;ConsumerRecord&lt;K, V&gt;&gt; iterator &#x3D; records.iterator();
+    while (iterator.hasNext() &amp;&amp; (this.autoCommit || (this.invoker !&#x3D; null &amp;&amp; this.invoker.active))) &#123;
+        final ConsumerRecord&lt;K, V&gt; record &#x3D; iterator.next();
+        if (this.logger.isTraceEnabled()) &#123;
+            this.logger.trace(&quot;Processing &quot; + record);
+        &#125;
+        try &#123;
+            if (this.acknowledgingMessageListener !&#x3D; null) &#123;
+                this.acknowledgingMessageListener.onMessage(record,
+                        this.isAnyManualAck
+                                ? new ConsumerAcknowledgment(record, this.isManualImmediateAck)
+                                : null);
+            &#125;
+            else &#123;
+                this.listener.onMessage(record);
+            &#125;
+            if (!this.isAnyManualAck &amp;&amp; !this.autoCommit) &#123;
+                this.acks.add(record);
+            &#125;
+            if (this.isRecordAck) &#123;
+                this.consumer.wakeup();
+            &#125;
+        &#125;
+        catch (Exception e) &#123;
+            if (this.containerProperties.isAckOnError() &amp;&amp; !this.autoCommit) &#123;
+                this.acks.add(record);
+            &#125;
+            try &#123;
+                this.errorHandler.handle(e, record);
+            &#125;
+            catch (Exception ee) &#123;
+                this.logger.error(&quot;Error handler threw an exception&quot;, ee);
+            &#125;
+            catch (Error er) &#123; &#x2F;&#x2F;NOSONAR
+                this.logger.error(&quot;Error handler threw an error&quot;, er);
+                throw er;
+            &#125;
+        &#125;
+    &#125;
+    if (this.isManualAck || this.isBatchAck) &#123;
+        this.consumer.wakeup();
+    &#125;
+&#125;
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>可以看到最终会调用到this.listener.onMessage(record);<br>这个listnerer就是我们最开始给ContainerProperties设置的MessageListener，这样就调用到了这个listener的onMessage方法，也就回调到了业务逻辑了。可以看到这里就和我们上一篇文章有点比较像了，上一篇文章我们也可以添加发送消息成功后的回调函数，这里也可以看做是一个回调函数用来消费消息。两者都是在发送/接受消息的io线程里面。所以尽量都不能在这里面做一些比较耗时的操作，如果实在需要，建议开启子线程来处理。</p>
+<h3 id="没有配置自动commit"><a href="#没有配置自动commit" class="headerlink" title="没有配置自动commit"></a>没有配置自动commit</h3><p>我们可以看到KafkaMessageListenerContainer.ListenerConsumer的run方法开始，有以下逻辑</p>
+<pre class="line-numbers language-none"><code class="language-none">if (!this.autoCommit) &#123;
+    startInvoker();
+&#125;
+
+private void startInvoker() &#123;
+	ListenerConsumer.this.invoker &#x3D; new ListenerInvoker();
+	ListenerConsumer.this.listenerInvokerFuture &#x3D;      this.containerProperties.getListenerTaskExecutor().submit(ListenerConsumer.this.invoker);
+&#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>可以看到如果没有配置自动commit，就会用到了KafkaMessageListenerContainer的doStart方法中设置的listenerTaskExecutor，并开启了一个<font color="#08c">‘-kafka-listener-‘线程</font>。</p>
+<pre class="line-numbers language-none"><code class="language-none">if (this.autoCommit) &#123;
+	invokeListener(records);
+&#125;
+else &#123;
+	if (sendToListener(records)) &#123;
+		if (this.assignedPartitions !&#x3D; null) &#123;
+			this.consumer.pause(this.assignedPartitions);
+			this.paused &#x3D; true;
+			this.unsent &#x3D; records;
+		&#125;
+	&#125;
+&#125;
+
+private boolean sendToListener(final ConsumerRecords&lt;K, V&gt; records) throws InterruptedException &#123;
+	if (this.containerProperties.isPauseEnabled() &amp;&amp; CollectionUtils.isEmpty(this.definedPartitions)) &#123;
+		return !this.recordsToProcess.offer(records, this.containerProperties.getPauseAfter(),
+				TimeUnit.MILLISECONDS);
+	&#125;
+	else &#123;
+		this.recordsToProcess.put(records);
+		return false;
+	&#125;
+&#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>可以看到如果不是自动commit，则会把这个record丢进BlockingQueue&lt;ConsumerRecords&lt;K, V&gt;&gt; recordsToProcess 里面，然后上面开启的<font color="#08c">‘-kafka-listener-‘线程</font>会用到这个</p>
+<pre class="line-numbers language-none"><code class="language-none">public void run() &#123;
+	Assert.isTrue(this.active, &quot;This instance is not active anymore&quot;);
+	if (ListenerConsumer.this.theListener instanceof ConsumerSeekAware) &#123;
+		((ConsumerSeekAware) ListenerConsumer.this.theListener).registerSeekCallback(ListenerConsumer.this);
+	&#125;
+	try &#123;
+		this.executingThread &#x3D; Thread.currentThread();
+		while (this.active) &#123;
+			try &#123;
+				ConsumerRecords&lt;K, V&gt; records &#x3D; ListenerConsumer.this.recordsToProcess.poll(1,
+						TimeUnit.SECONDS);
+				if (this.active) &#123;
+					if (records !&#x3D; null) &#123;
+						invokeListener(records);
+					&#125;
+					else &#123;
+						if (ListenerConsumer.this.logger.isTraceEnabled()) &#123;
+							ListenerConsumer.this.logger.trace(&quot;No records to process&quot;);
+						&#125;
+					&#125;
+				&#125;
+			&#125;
+			catch (InterruptedException e) &#123;
+				if (!this.active) &#123;
+					Thread.currentThread().interrupt();
+				&#125;
+				else &#123;
+					ListenerConsumer.this.logger.debug(&quot;Interrupt ignored&quot;);
+				&#125;
+			&#125;
+			if (!ListenerConsumer.this.isManualImmediateAck &amp;&amp; this.active) &#123;
+				ListenerConsumer.this.consumer.wakeup();
+			&#125;
+		&#125;
+	&#125;
+	finally &#123;
+		this.active &#x3D; false;
+		this.exitLatch.countDown();
+	&#125;
+&#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>可以看到这里先从recordsToProcess取出一条record，如果record不为空，则跟之前一样调用invokeListener(records);所以我们可以理解这个<font color="#08c">‘-kafka-listener-‘线程</font>仅仅是把消息的真正消费的逻辑从consumer的io线程搬到了这个单独的线程。</p>
+
+                
+            </div>
+            <hr/>
+
+            
+
+    <div class="reprint" id="reprint-statement">
+        
+            <div class="reprint__author">
+                <span class="reprint-meta" style="font-weight: bold;">
+                    <i class="fas fa-user">
+                        文章作者:
+                    </i>
+                </span>
+                <span class="reprint-info">
+                    <a href="/about" rel="external nofollow noreferrer">Smartの明</a>
+                </span>
+            </div>
+            <div class="reprint__type">
+                <span class="reprint-meta" style="font-weight: bold;">
+                    <i class="fas fa-link">
+                        文章链接:
+                    </i>
+                </span>
+                <span class="reprint-info">
+                    <a href="http://yeming.me/2016/12/30/kafkaconsumer/">http://yeming.me/2016/12/30/kafkaconsumer/</a>
+                </span>
+            </div>
+            <div class="reprint__notice">
+                <span class="reprint-meta" style="font-weight: bold;">
+                    <i class="fas fa-copyright">
+                        版权声明:
+                    </i>
+                </span>
+                <span class="reprint-info">
+                    本博客所有文章除特別声明外，均采用
+                    <a href="https://creativecommons.org/licenses/by/4.0/deed.zh" rel="external nofollow noreferrer" target="_blank">CC BY 4.0</a>
+                    许可协议。转载请注明来源
+                    <a href="/about" target="_blank">Smartの明</a>
+                    !
+                </span>
+            </div>
+        
+    </div>
+
+    <script async defer>
+      document.addEventListener("copy", function (e) {
+        let toastHTML = '<span>复制成功，请遵循本文的转载规则</span><button class="btn-flat toast-action" onclick="navToReprintStatement()" style="font-size: smaller">查看</a>';
+        M.toast({html: toastHTML})
+      });
+
+      function navToReprintStatement() {
+        $("html, body").animate({scrollTop: $("#reprint-statement").offset().top - 80}, 800);
+      }
+    </script>
+
+
+
+            <div class="tag_share" style="display: block;">
+                <div class="post-meta__tag-list" style="display: inline-block;">
+                    
+                        <div class="article-tag">
+                            
+                                <a href="/tags/NIO/">
+                                    <span class="chip bg-color">NIO</span>
+                                </a>
+                            
+                                <a href="/tags/spring-kafka/">
+                                    <span class="chip bg-color">spring-kafka</span>
+                                </a>
+                            
+                        </div>
+                    
+                </div>
+                <div class="post_share" style="zoom: 80%; width: fit-content; display: inline-block; float: right; margin: -0.15rem 0;">
+                    <link rel="stylesheet" type="text/css" href="/libs/share/css/share.min.css">
+<div id="article-share">
+
+    
+    <div class="social-share" data-sites="twitter,facebook,google,qq,qzone,wechat,weibo,douban,linkedin" data-wechat-qrcode-helper="<p>微信扫一扫即可分享！</p>"></div>
+    <script src="/libs/share/js/social-share.min.js"></script>
+    
+
+    
+
+</div>
+
+                </div>
+            </div>
+            
+        </div>
+    </div>
+
+    
+
+    
+        <link rel="stylesheet" href="/libs/gitment/gitment-default.css">
+<link rel="stylesheet" href="/css/gitment.css">
+
+<div class="gitment-card card" data-aos="fade-up">
+    <div class="comment_headling" style="font-size: 20px; font-weight: 700; position: relative; padding-left: 20px; top: 15px; padding-bottom: 5px;">
+        <i class="fas fa-comments fa-fw" aria-hidden="true"></i>
+        <span>评论</span>
+    </div>
+    <div id="gitment-content" class="card-content"></div>
+</div>
+
+<script src="/libs/gitment/gitment.js"></script>
+<script>
+var gitment = new Gitment({
+    id: 'Fri Dec 30 2016 21:05:07 GMT+0800',
+    owner: 'q6413260',
+    repo: 'Gitment',
+    oauth: {
+        client_id: '486b0c51ae4b0c60abe0',
+        client_secret: 'd40f9bf0c09cf6c5af98c2e2bfe2258a286a23a3'
+    }
+});
+
+gitment.render('gitment-content');
+</script>
+
+    
+
+    
+
+    
+    <div class="livere-card card" data-aos="fade-up">
+    <!-- 来必力City版安装代码 -->
+    <div id="lv-container" class="card-content" data-id="city" data-uid="MTAyMC8zODIwMS8xNDcyOQ==">
+        <script type="text/javascript">
+            (function (d, s) {
+                let j, e = d.getElementsByTagName(s)[0];
+                if (typeof LivereTower === 'function') {
+                    return;
+                }
+
+                j = d.createElement(s);
+                j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+                j.async = true;
+
+                e.parentNode.insertBefore(j, e);
+            })(document, 'script');
+        </script>
+        <noscript>为正常使用来必力评论功能请激活JavaScript。</noscript>
+    </div>
+    <!-- City版安装代码已完成 -->
+</div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+<article id="prenext-posts" class="prev-next articles">
+    <div class="row article-row">
+        
+        <div class="article col s12 m6" data-aos="fade-up">
+            <div class="article-badge left-badge text-color">
+                <i class="fas fa-chevron-left"></i>&nbsp;上一篇</div>
+            <div class="card">
+                <a href="/2017/01/24/elasticjob/">
+                    <div class="card-image">
+                        
+                        
+                        <img src="/medias/featureimages/8.jpg" class="responsive-img" alt="elastic-job源码分析">
+                        
+                        <span class="card-title">elastic-job源码分析</span>
+                    </div>
+                </a>
+                <div class="card-content article-content">
+                    <div class="summary block-with-text">
+                        
+                            先简单介绍下elastic-job，它是当当公司开源的一个分布式调度解决方案。大家都知道，当数据量比较小的时候，我们可以只用quartz只在一台服务器上处理所有的数据。随着业务发展，数据量越来越大，一台机器已经不足以支撑，就必须想办法将一个
+                        
+                    </div>
+                    <div class="publish-info">
+                        <span class="publish-date">
+                            <i class="far fa-clock fa-fw icon-date"></i>2017-01-24
+                        </span>
+                        <span class="publish-author">
+                            
+                            <i class="fas fa-bookmark fa-fw icon-category"></i>
+                            
+                            <a href="/categories/%E6%8A%80%E6%9C%AF%E5%88%86%E4%BA%AB/" class="post-category">
+                                    技术分享
+                                </a>
+                            
+                            
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="card-action article-tags">
+                    
+                    <a href="/tags/elastic-job/">
+                        <span class="chip bg-color">elastic-job</span>
+                    </a>
+                    
+                    <a href="/tags/%E5%88%86%E5%B8%83%E5%BC%8F%E8%B0%83%E5%BA%A6/">
+                        <span class="chip bg-color">分布式调度</span>
+                    </a>
+                    
+                </div>
+                
+            </div>
+        </div>
+        
+        
+        <div class="article col s12 m6" data-aos="fade-up">
+            <div class="article-badge right-badge text-color">
+                下一篇&nbsp;<i class="fas fa-chevron-right"></i>
+            </div>
+            <div class="card">
+                <a href="/2016/12/17/kafkaproducer/">
+                    <div class="card-image">
+                        
+                        
+                        <img src="/medias/featureimages/22.jpg" class="responsive-img" alt="spring-kafka源码分析一(Producer)">
+                        
+                        <span class="card-title">spring-kafka源码分析一(Producer)</span>
+                    </div>
+                </a>
+                <div class="card-content article-content">
+                    <div class="summary block-with-text">
+                        
+                            spring-kafka是运用spring的概念基于apache kafka(linkedin开源已经捐献给apache基金会)消息解决方案开发的一个java client端。它提供了一些接口来更方便收发消息与kafka server端交互
+                        
+                    </div>
+                    <div class="publish-info">
+                            <span class="publish-date">
+                                <i class="far fa-clock fa-fw icon-date"></i>2016-12-17
+                            </span>
+                        <span class="publish-author">
+                            
+                            <i class="fas fa-bookmark fa-fw icon-category"></i>
+                            
+                            <a href="/categories/%E6%8A%80%E6%9C%AF%E5%88%86%E4%BA%AB/" class="post-category">
+                                    技术分享
+                                </a>
+                            
+                            
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="card-action article-tags">
+                    
+                    <a href="/tags/NIO/">
+                        <span class="chip bg-color">NIO</span>
+                    </a>
+                    
+                    <a href="/tags/spring-kafka/">
+                        <span class="chip bg-color">spring-kafka</span>
+                    </a>
+                    
+                </div>
+                
+            </div>
+        </div>
+        
+    </div>
+</article>
+
+</div>
+
+
+
+<!-- 代码块功能依赖 -->
+<script type="text/javascript" src="/libs/codeBlock/codeBlockFuction.js"></script>
+
+<!-- 代码语言 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeLang.js"></script>
+
+
+<!-- 代码块复制 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeCopy.js"></script>
+
+
+<!-- 代码块收缩 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeShrink.js"></script>
+
+
+    </div>
+    <div id="toc-aside" class="expanded col l3 hide-on-med-and-down">
+        <div class="toc-widget card" style="background-color: white;">
+            <div class="toc-title"><i class="far fa-list-alt"></i>&nbsp;&nbsp;目录</div>
+            <div id="toc-content"></div>
+        </div>
+    </div>
+</div>
+
+<!-- TOC 悬浮按钮. -->
+
+<div id="floating-toc-btn" class="hide-on-med-and-down">
+    <a class="btn-floating btn-large bg-color">
+        <i class="fas fa-list-ul"></i>
+    </a>
+</div>
+
+
+<script src="/libs/tocbot/tocbot.min.js"></script>
+<script>
+    $(function () {
+        tocbot.init({
+            tocSelector: '#toc-content',
+            contentSelector: '#articleContent',
+            headingsOffset: -($(window).height() * 0.4 - 45),
+            collapseDepth: Number('0'),
+            headingSelector: 'h2, h3, h4'
+        });
+
+        // modify the toc link href to support Chinese.
+        let i = 0;
+        let tocHeading = 'toc-heading-';
+        $('#toc-content a').each(function () {
+            $(this).attr('href', '#' + tocHeading + (++i));
+        });
+
+        // modify the heading title id to support Chinese.
+        i = 0;
+        $('#articleContent').children('h2, h3, h4').each(function () {
+            $(this).attr('id', tocHeading + (++i));
+        });
+
+        // Set scroll toc fixed.
+        let tocHeight = parseInt($(window).height() * 0.4 - 64);
+        let $tocWidget = $('.toc-widget');
+        $(window).scroll(function () {
+            let scroll = $(window).scrollTop();
+            /* add post toc fixed. */
+            if (scroll > tocHeight) {
+                $tocWidget.addClass('toc-fixed');
+            } else {
+                $tocWidget.removeClass('toc-fixed');
+            }
+        });
+
+        
+        /* 修复文章卡片 div 的宽度. */
+        let fixPostCardWidth = function (srcId, targetId) {
+            let srcDiv = $('#' + srcId);
+            if (srcDiv.length === 0) {
+                return;
+            }
+
+            let w = srcDiv.width();
+            if (w >= 450) {
+                w = w + 21;
+            } else if (w >= 350 && w < 450) {
+                w = w + 18;
+            } else if (w >= 300 && w < 350) {
+                w = w + 16;
+            } else {
+                w = w + 14;
+            }
+            $('#' + targetId).width(w);
+        };
+
+        // 切换TOC目录展开收缩的相关操作.
+        const expandedClass = 'expanded';
+        let $tocAside = $('#toc-aside');
+        let $mainContent = $('#main-content');
+        $('#floating-toc-btn .btn-floating').click(function () {
+            if ($tocAside.hasClass(expandedClass)) {
+                $tocAside.removeClass(expandedClass).hide();
+                $mainContent.removeClass('l9');
+            } else {
+                $tocAside.addClass(expandedClass).show();
+                $mainContent.addClass('l9');
+            }
+            fixPostCardWidth('artDetail', 'prenext-posts');
+        });
+        
+    });
+</script>
+
+    
+
+</main>
+
+
+
+
+    <footer class="page-footer bg-color">
+    
+        <link rel="stylesheet" href="/libs/aplayer/APlayer.min.css">
+<style>
+    .aplayer .aplayer-lrc p {
+        
+        display: none;
+        
+        font-size: 12px;
+        font-weight: 700;
+        line-height: 16px !important;
+    }
+
+    .aplayer .aplayer-lrc p.aplayer-lrc-current {
+        
+        display: none;
+        
+        font-size: 15px;
+        color: #42b983;
+    }
+
+    
+    .aplayer.aplayer-fixed.aplayer-narrow .aplayer-body {
+        left: -66px !important;
+    }
+
+    .aplayer.aplayer-fixed.aplayer-narrow .aplayer-body:hover {
+        left: 0px !important;
+    }
+
+    
+</style>
+<div class="">
+    
+    <div class="row">
+        <meting-js class="col l8 offset-l2 m10 offset-m1 s12"
+                   server="netease"
+                   type="playlist"
+                   id="503838841"
+                   fixed='true'
+                   autoplay='false'
+                   theme='#42b983'
+                   loop='all'
+                   order='random'
+                   preload='auto'
+                   volume='0.7'
+                   list-folded='true'
+        >
+        </meting-js>
+    </div>
+</div>
+
+<script src="/libs/aplayer/APlayer.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/meting@2/dist/Meting.min.js"></script>
+
+    
+    <div class="container row center-align" style="margin-bottom: 0px !important;">
+        <div class="col s12 m8 l8 copy-right">
+            Copyright&nbsp;&copy;
+            
+                <span id="year">2019-2021</span>
+            
+            <span id="year">2019</span>
+            <a href="/about" target="_blank">Smartの明</a>
+            |&nbsp;Powered by&nbsp;<a href="https://hexo.io/" target="_blank">Hexo</a>
+            |&nbsp;Theme&nbsp;<a href="https://github.com/blinkfox/hexo-theme-matery" target="_blank">Matery</a>
+            <br>
+            
+            &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
+                class="white-color">63.5k</span>&nbsp;字
+            
+            
+            
+            
+            
+            
+            <span id="busuanzi_container_site_pv">
+                |&nbsp;<i class="far fa-eye"></i>&nbsp;总访问量:&nbsp;<span id="busuanzi_value_site_pv"
+                    class="white-color"></span>&nbsp;次
+            </span>
+            
+            
+            <span id="busuanzi_container_site_uv">
+                |&nbsp;<i class="fas fa-users"></i>&nbsp;总访问人数:&nbsp;<span id="busuanzi_value_site_uv"
+                    class="white-color"></span>&nbsp;人
+            </span>
+            
+            <br>
+            
+            <br>
+            
+        </div>
+        <div class="col s12 m4 l4 social-link social-statis">
+    <a href="https://github.com/q6413260" class="tooltipped" target="_blank" data-tooltip="访问我的GitHub" data-position="top" data-delay="50">
+        <i class="fab fa-github"></i>
+    </a>
+
+
+
+    <a href="mailto:228160255@qq.com" class="tooltipped" target="_blank" data-tooltip="邮件联系我" data-position="top" data-delay="50">
+        <i class="fas fa-envelope-open"></i>
+    </a>
+
+
+
+
+
+
+
+    <a href="tencent://AddContact/?fromId=50&fromSubId=1&subcmd=all&uin=228160255" class="tooltipped" target="_blank" data-tooltip="QQ联系我: 228160255" data-position="top" data-delay="50">
+        <i class="fab fa-qq"></i>
+    </a>
+
+
+
+
+
+
+
+    <a href="/atom.xml" class="tooltipped" target="_blank" data-tooltip="RSS 订阅" data-position="top" data-delay="50">
+        <i class="fas fa-rss"></i>
+    </a>
+
+</div>
+    </div>
+</footer>
+
+<div class="progress-bar"></div>
+
+
+    <!-- 搜索遮罩框 -->
+<div id="searchModal" class="modal">
+    <div class="modal-content">
+        <div class="search-header">
+            <span class="title"><i class="fas fa-search"></i>&nbsp;&nbsp;搜索</span>
+            <input type="search" id="searchInput" name="s" placeholder="请输入搜索的关键字"
+                   class="search-input">
+        </div>
+        <div id="searchResult"></div>
+    </div>
+</div>
+
+<script type="text/javascript">
+$(function () {
+    var searchFunc = function (path, search_id, content_id) {
+        'use strict';
+        $.ajax({
+            url: path,
+            dataType: "xml",
+            success: function (xmlResponse) {
+                // get the contents from search data
+                var datas = $("entry", xmlResponse).map(function () {
+                    return {
+                        title: $("title", this).text(),
+                        content: $("content", this).text(),
+                        url: $("url", this).text()
+                    };
+                }).get();
+                var $input = document.getElementById(search_id);
+                var $resultContent = document.getElementById(content_id);
+                $input.addEventListener('input', function () {
+                    var str = '<ul class=\"search-result-list\">';
+                    var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+                    $resultContent.innerHTML = "";
+                    if (this.value.trim().length <= 0) {
+                        return;
+                    }
+                    // perform local searching
+                    datas.forEach(function (data) {
+                        var isMatch = true;
+                        var data_title = data.title.trim().toLowerCase();
+                        var data_content = data.content.trim().replace(/<[^>]+>/g, "").toLowerCase();
+                        var data_url = data.url;
+                        data_url = data_url.indexOf('/') === 0 ? data.url : '/' + data_url;
+                        var index_title = -1;
+                        var index_content = -1;
+                        var first_occur = -1;
+                        // only match artiles with not empty titles and contents
+                        if (data_title !== '' && data_content !== '') {
+                            keywords.forEach(function (keyword, i) {
+                                index_title = data_title.indexOf(keyword);
+                                index_content = data_content.indexOf(keyword);
+                                if (index_title < 0 && index_content < 0) {
+                                    isMatch = false;
+                                } else {
+                                    if (index_content < 0) {
+                                        index_content = 0;
+                                    }
+                                    if (i === 0) {
+                                        first_occur = index_content;
+                                    }
+                                }
+                            });
+                        }
+                        // show search results
+                        if (isMatch) {
+                            str += "<li><a href='" + data_url + "' class='search-result-title'>" + data_title + "</a>";
+                            var content = data.content.trim().replace(/<[^>]+>/g, "");
+                            if (first_occur >= 0) {
+                                // cut out 100 characters
+                                var start = first_occur - 20;
+                                var end = first_occur + 80;
+                                if (start < 0) {
+                                    start = 0;
+                                }
+                                if (start === 0) {
+                                    end = 100;
+                                }
+                                if (end > content.length) {
+                                    end = content.length;
+                                }
+                                var match_content = content.substr(start, end);
+                                // highlight all keywords
+                                keywords.forEach(function (keyword) {
+                                    var regS = new RegExp(keyword, "gi");
+                                    match_content = match_content.replace(regS, "<em class=\"search-keyword\">" + keyword + "</em>");
+                                });
+
+                                str += "<p class=\"search-result\">" + match_content + "...</p>"
+                            }
+                            str += "</li>";
+                        }
+                    });
+                    str += "</ul>";
+                    $resultContent.innerHTML = str;
+                });
+            }
+        });
+    };
+
+    searchFunc('/search.xml', 'searchInput', 'searchResult');
+});
+</script>
+
+    <!-- 回到顶部按钮 -->
+<div id="backTop" class="top-scroll">
+    <a class="btn-floating btn-large waves-effect waves-light" href="#!">
+        <i class="fas fa-arrow-up"></i>
+    </a>
+</div>
+
+
+    <script src="/libs/materialize/materialize.min.js"></script>
+    <script src="/libs/masonry/masonry.pkgd.min.js"></script>
+    <script src="/libs/aos/aos.js"></script>
+    <script src="/libs/scrollprogress/scrollProgress.min.js"></script>
+    <script src="/libs/lightGallery/js/lightgallery-all.min.js"></script>
+    <script src="/js/matery.js"></script>
+
+    <!-- Baidu Analytics -->
+
+    <!-- Baidu Push -->
+
+<script>
+    (function () {
+        var bp = document.createElement('script');
+        var curProtocol = window.location.protocol.split(':')[0];
+        if (curProtocol === 'https') {
+            bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+        } else {
+            bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+        }
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(bp, s);
+    })();
+</script>
+
+    
+    <script src="/libs/others/clicklove.js" async="async"></script>
+    
+    
+    <script async src="/libs/others/busuanzi.pure.mini.js"></script>
+    
+
+    
+
+    
+
+    <!--腾讯兔小巢-->
+    
+    
+
+    
+    
+    <script type="text/javascript" size="150" alpha='0.6'
+        zIndex="-1" src="/libs/background/ribbon-refresh.min.js" async="async"></script>
+    
+
+    
+
+    
+    <script src="/libs/instantpage/instantpage.js" type="module"></script>
+    
+
+</body>
+
+</html>

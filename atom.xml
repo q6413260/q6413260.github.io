@@ -1,0 +1,525 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title>Smartの明</title>
+  
+  <subtitle>苦练基本功，长期有耐心</subtitle>
+  <link href="http://yeming.me/atom.xml" rel="self"/>
+  
+  <link href="http://yeming.me/"/>
+  <updated>2021-04-18T07:38:23.148Z</updated>
+  <id>http://yeming.me/</id>
+  
+  <author>
+    <name>Smartの明</name>
+    
+  </author>
+  
+  <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>Postman和Java Client访问K8s</title>
+    <link href="http://yeming.me/2018/11/11/k8s/"/>
+    <id>http://yeming.me/2018/11/11/k8s/</id>
+    <published>2018-11-10T17:43:10.000Z</published>
+    <updated>2021-04-18T07:38:23.148Z</updated>
+    
+    
+    <summary type="html">&lt;p&gt;K8s的所有操作基本都是通过调用kube-apiserver这个组件进行的，它提供了restful api供外部系统访问，当然为了保证整个k8s集群的安全性，k8s提供了多种认证方式来保证集群的安全性：比如客户端证书、静态token、静态密码文件、ServiceAccountTokens等等。你可以同时使用一种或多种认证方式。只要通过任何一个都被认作是认证通过，我们一般都是使用证书方式：客户端证书认证叫作TLS双向认证(关于SSL/TLS认证的可以参考这篇文章&lt;a href=&quot;http://www.ruanyifeng.com/blog/2014/02/ssl_tls.html&quot;&gt;《SSL/TLS协议运行机制的概述》&lt;/a&gt;)，也就是服务器客户端互相验证证书的正确性，在都正确的情况下协调通信加密方案。下面来看下如何配置客户端证书验证，我们通过配置一个kubeconfig文件来讲解下&lt;/p&gt;</summary>
+    
+    
+    
+    <category term="技术分享" scheme="http://yeming.me/categories/%E6%8A%80%E6%9C%AF%E5%88%86%E4%BA%AB/"/>
+    
+    
+    <category term="k8s" scheme="http://yeming.me/tags/k8s/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>从零开始学TIDB二(TIDB简介与整体架构)</title>
+    <link href="http://yeming.me/2018/08/27/tidb2/"/>
+    <id>http://yeming.me/2018/08/27/tidb2/</id>
+    <published>2018-08-27T14:58:17.000Z</published>
+    <updated>2021-04-18T07:38:23.145Z</updated>
+    
+    
+    <summary type="html">&lt;p&gt;上一篇博客，我们简单介绍了怎么在Mac OS系统上面使用docker compose搭建一个包含3个pd，3个tikv，1个tidb的&lt;a href=&quot;http://yeming.me/2018/08/26/tidb1/&quot;&gt;TIDB集群&lt;/a&gt;。本文，我们会详细介绍TIDB的一些基本概念和整体架构。&lt;/p&gt;
+&lt;h2 id=&quot;TIDB-简介&quot;&gt;&lt;a href=&quot;#TIDB-简介&quot; class=&quot;headerlink&quot; title=&quot;TIDB 简介&quot;&gt;&lt;/a&gt;TIDB 简介&lt;/h2&gt;&lt;p&gt;TIDB是pingcap公司开源的一款分布式数据库，结合了RDBMS和NOSQL两者的特性，支持对业务无感知的水平扩容，具备数据强一致性和高可用性。TIDB具备以下特性对某些业务应该有很大的吸引力。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;p&gt;兼容MYSQL协议：由于TIDB兼容了MYSQL协议，业务几乎可以零成本的从MYSQL迁移到TIDB。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;水平弹性扩展：mysql虽然也可以分库分表水平扩展，但是如果需要继续水平扩容，就需要dba迁移数据，客户端可能还要修改路由规则。TIDB可以按需水平扩展吞吐或存储，数据自动迁移。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;分布式事物：TIDB支持分布式事物。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;高可用数据强一致：TIDB基于raft的多数派选举保证了数据的强一致性，并且在不丢失大部分副本的情况下，可以自动failover。&lt;/p&gt;</summary>
+    
+    
+    
+    <category term="技术分享" scheme="http://yeming.me/categories/%E6%8A%80%E6%9C%AF%E5%88%86%E4%BA%AB/"/>
+    
+    
+    <category term="TIDB" scheme="http://yeming.me/tags/TIDB/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>从零开始学TIDB一(搭建TIDB集群)</title>
+    <link href="http://yeming.me/2018/08/26/tidb1/"/>
+    <id>http://yeming.me/2018/08/26/tidb1/</id>
+    <published>2018-08-26T04:31:31.000Z</published>
+    <updated>2021-04-18T07:38:23.142Z</updated>
+    
+    
+    <summary type="html">&lt;p&gt;本文介绍如何在单机上(Mac OS)通过 &lt;a href=&quot;https://docs.docker.com/compose/overview/&quot;&gt;Docker Compose&lt;/a&gt; 快速一键部署一套 TiDB 测试集群，我们会从零开始搭建一套由3 个 PD，3 个 TiKV，1 个 TiDB构成的集群。主要包括以下两个步骤：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Mac OS系统上安装docker，docker-compose&lt;/li&gt;
+&lt;li&gt;使用 Docker Compose 快速构建集群&lt;/li&gt;
+&lt;/ul&gt;</summary>
+    
+    
+    
+    <category term="技术分享" scheme="http://yeming.me/categories/%E6%8A%80%E6%9C%AF%E5%88%86%E4%BA%AB/"/>
+    
+    
+    <category term="TIDB" scheme="http://yeming.me/tags/TIDB/"/>
+    
+    <category term="docker" scheme="http://yeming.me/tags/docker/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Curator leader选举</title>
+    <link href="http://yeming.me/2018/08/24/curatorleader/"/>
+    <id>http://yeming.me/2018/08/24/curatorleader/</id>
+    <published>2018-08-24T13:45:37.000Z</published>
+    <updated>2021-04-18T07:38:23.094Z</updated>
+    
+    
+    <summary type="html">&lt;h2 id=&quot;背景&quot;&gt;&lt;a href=&quot;#背景&quot; class=&quot;headerlink&quot; title=&quot;背景&quot;&gt;&lt;/a&gt;背景&lt;/h2&gt;&lt;p&gt;最近一周，一直在做squirrel-ha-service高可用的改进。简单介绍下squirrel-ha-service。squirrel-ha-service(后文都简写为ha)是线上持续监控redis集群，保证redis集群高可用的一个服务。会通过redis cluster nodes命令获取redis集群所有节点的状态，如果某个节点宕机了，ha一旦发现宕机节点，首先会通过修改zk通知redis客户端不再访问该节点，然后自动替换宕机节点。替换完节点后，再次通过修改zk通知redis客户端刷新本地路由，将新添加的节点加入本地路由表。&lt;br&gt;&lt;img src=&quot;https://lightoheaven.coding.net/p/image2/d/image2/git/raw/master/201808/arch.jpeg&quot; width=&quot;400&quot; hegiht=&quot;250&quot;/&gt;&amp;nbsp;&amp;nbsp;&lt;img src=&quot;https://lightoheaven.coding.net/p/image2/d/image2/git/raw/master/201808/multiIdc.jpeg&quot; width=&quot;400&quot; hegiht=&quot;250&quot;/&gt;&lt;br&gt;上述左图是我们目前线上ha大致架构，基本能保证redis集群的整体可用性。但是最近我们在做机房容灾相关，这个架构就有问题了。&lt;/p&gt;
+&lt;p&gt;上述是右图我们线上一个redis集群的部署情况，基本都是3机房部署。图中是dx，yf，gh三个机房，每个机房都有一个主节点一个从节点。redis集群这样部署，能保证最高的可用性。即使线上某个机房发生故障，剩下的两个机房也能继续提供服务。&lt;br&gt;这里我们假设现在gh机房发生网络故障，先忽视图中红色框。gh-master节点原来有一个dx-slave节点，一旦光环机房不可用，dx-slave节点会发起提升自己为master的请求，dx和yf机房的两个主节点投票通过，这样一个新的集群dx(2个master节点)，yf(一个master，一个slave)可以继续对外提供服务。&lt;br&gt;从redis集群角度看，如果机房是三机房主从均匀部署，单个机房发生故障另外两个机房依然能继续提供服务。但是此时我们的squirrel-ha服务因为也处于gh机房(我们线上一个redis集群唯一对应一个ha监控服务)，由于gh机房和另外两个机房dx，yf网络不通，此时ha服务无法刷新zk，通知dx和yf的redis客户端更新路由了。之所以发生这个问题，是因为ha自身没有保证高可用，所以我们考虑引进zk选举来保证ha服务的可用性。如上图红框，当gh机房发生网络故障，之前dx-ha-watcher会替代gh-ha成为新的leader，开始监控redis集群。&lt;/p&gt;</summary>
+    
+    
+    
+    <category term="技术分享" scheme="http://yeming.me/categories/%E6%8A%80%E6%9C%AF%E5%88%86%E4%BA%AB/"/>
+    
+    
+    <category term="curator" scheme="http://yeming.me/tags/curator/"/>
+    
+    <category term="zookeeper" scheme="http://yeming.me/tags/zookeeper/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Dubbo源码学习四(Consumer，Provider通信)</title>
+    <link href="http://yeming.me/2018/07/31/dubbo4/"/>
+    <id>http://yeming.me/2018/07/31/dubbo4/</id>
+    <published>2018-07-31T14:03:58.000Z</published>
+    <updated>2021-04-18T07:38:23.089Z</updated>
+    
+    
+    <summary type="html">&lt;p&gt;之前我们介绍了Provider启动时候向注册中心注册服务&lt;br&gt;&lt;a href=&quot;http://yeming.me/2018/07/28/dubbo2/&quot;&gt;Dubbo源码学习二(服务注册)&lt;/a&gt;，Consumer启动时候向注册中心订阅服务&lt;a href=&quot;http://yeming.me/2018/07/29/dubbo3/&quot;&gt;Dubbo源码学习三(服务引用)&lt;/a&gt;，本文我们就来看下Consumer端和Provider是怎么通信的。&lt;/p&gt;
+&lt;center&gt;&lt;img src=&quot;https://lightoheaven.coding.net/p/image2/d/image2/git/raw/master/201807/communicate.jpeg&quot; width=&quot;700&quot; hegiht=&quot;350&quot;/&gt;&lt;/center&gt;</summary>
+    
+    
+    
+    <category term="技术分享" scheme="http://yeming.me/categories/%E6%8A%80%E6%9C%AF%E5%88%86%E4%BA%AB/"/>
+    
+    
+    <category term="netty" scheme="http://yeming.me/tags/netty/"/>
+    
+    <category term="Dubbo" scheme="http://yeming.me/tags/Dubbo/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Dubbo源码学习三(服务引用)</title>
+    <link href="http://yeming.me/2018/07/29/dubbo3/"/>
+    <id>http://yeming.me/2018/07/29/dubbo3/</id>
+    <published>2018-07-29T02:03:58.000Z</published>
+    <updated>2021-04-18T07:38:23.155Z</updated>
+    
+    
+    <summary type="html">&lt;p&gt;我们知道Dubbo逻辑上由以下几个模块组成(不考虑Monitor和Container)&lt;/p&gt;
+&lt;center&gt;&lt;img src=&quot;https://lightoheaven.coding.net/p/image2/d/image2/git/raw/master/201807/dubboArch.jpeg&quot; width=&quot;400&quot; hegiht=&quot;200&quot;/&gt;&lt;/center&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Provider：服务提供方&lt;/li&gt;
+&lt;li&gt;Consumer：服务消费方&lt;/li&gt;
+&lt;li&gt;Registry：服务注册与发现的注册中心&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;上一篇文章&lt;a href=&quot;http://yeming.me/2018/07/28/dubbo2/&quot;&gt;Dubbo源码学习二(服务注册)&lt;/a&gt;我们分析了服务提供方启动时候怎么向注册中心注册服务，本文我们就来看下Consumer启动时候怎么引用服务的&lt;/p&gt;</summary>
+    
+    
+    
+    <category term="技术分享" scheme="http://yeming.me/categories/%E6%8A%80%E6%9C%AF%E5%88%86%E4%BA%AB/"/>
+    
+    
+    <category term="Dubbo" scheme="http://yeming.me/tags/Dubbo/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Dubbo源码学习二(服务注册)</title>
+    <link href="http://yeming.me/2018/07/28/dubbo2/"/>
+    <id>http://yeming.me/2018/07/28/dubbo2/</id>
+    <published>2018-07-28T03:58:46.000Z</published>
+    <updated>2021-04-18T07:38:23.133Z</updated>
+    
+    
+    <summary type="html">&lt;p&gt;我们知道Dubbo逻辑上由以下几个模块组成(不考虑Monitor和Container)&lt;/p&gt;
+&lt;center&gt;&lt;img src=&quot;https://lightoheaven.coding.net/p/image2/d/image2/git/raw/master/201807/dubboArch.jpeg&quot; width=&quot;400&quot; hegiht=&quot;200&quot;/&gt;&lt;/center&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Provider：服务提供方&lt;/li&gt;
+&lt;li&gt;Consumer：服务消费方&lt;/li&gt;
+&lt;li&gt;Registry：服务注册与发现的注册中心&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;稍微解释下Provider和Consumer只是Dubbo逻辑上的概念，对于一个业务应用，很有可能作为Provider提供服务，又作为Consumer消费服务。&lt;br&gt;Registry是服务注册中心，业内一般都用zk作为注册中心。服务提供方在启动时候把本机的ip和提供服务的名称注册到注册中心。节点名称是服务名称，节点内容是机器ip。这样如果有多个服务提供者，节点内容就会是机器ip列表。服务消费者在启动时候向注册中心订阅自己需要的服务名称，注册中心返回提供该服务的一些机器ip列表。消费者拿到ip列表根据一定的路由策略选择一台机器进行远程调用。当然服务消费者和提供者都必须与注册中心保持一个长连接，如果服务提供方宕机，注册中心会把该机器从ip列表中摘掉，并通知消费者更新服务ip列表。&lt;/p&gt;
+&lt;p&gt;本文我们主要来看下服务提供方是如何将服务注册到注册中心的。&lt;/p&gt;</summary>
+    
+    
+    
+    <category term="技术分享" scheme="http://yeming.me/categories/%E6%8A%80%E6%9C%AF%E5%88%86%E4%BA%AB/"/>
+    
+    
+    <category term="Dubbo" scheme="http://yeming.me/tags/Dubbo/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Dubbo源码学习一(扩展点ExtensionLoader)</title>
+    <link href="http://yeming.me/2018/07/25/dubbo1/"/>
+    <id>http://yeming.me/2018/07/25/dubbo1/</id>
+    <published>2018-07-25T14:00:00.000Z</published>
+    <updated>2021-04-18T07:38:23.086Z</updated>
+    
+    
+    <summary type="html">&lt;p&gt;之前其实已经粗略看过Dubbo的源码，最近一个月在公司连续写了nodejs和go语言的redis cluster客户端之后，稍微有点空余时间就准备找个开源的java项目学习下。正好阿里准备对Dubbo重启开发3.0，就决定重新学习下Dubbo。&lt;/p&gt;
+&lt;p&gt;Dubbo是一款高性能、轻量级的开源Java RPC框架，它提供了三大核心能力：面向接口的远程方法调用，智能容错和负载均衡，以及服务自动注册和发现。&lt;/p&gt;
+&lt;p&gt;个人认为Dubbo之所以能让这么多人和公司关注，它的一些设计模式确实很值得学习。我们都知道java有七大设计原则，说下开闭原则OCP，对扩展开放，对修改关闭。Dubbo被那么多人和公司使用，可能每个公司都会根据自身的需求对Dubbo做些修改。Dubbo一开始就留了一些扩展点，对于一些常用的模块像注册中心，通信协议，路由等模块都提供了多种不同的实现。如果还不能满足需求的话，用户还可以自行定制。让参与者尽量黑盒扩展，而不是白盒去修改代码。&lt;/p&gt;
+&lt;p&gt;Dubbo即然要扩展，扩展点的加载方式，首先要统一，微核心+插件式，是比较能达到 OCP 原则的思路。由一个插件生命周期管理容器，构成微核心，核心不包括任何功能，这样可以确保所有功能都能被替换，并且，框架作者能做到的功能，扩展者也一定要能做到，以保证平等对待第三方，所以，框架自身的功能也要用插件的方式实现，不能有任何硬编码。&lt;/p&gt;
+&lt;p&gt;Dubbo参考了JDK标准的SPI机制，参见：java.util.ServiceLoader，开发了一套ExtensionLoader加载机制，所有需要扩展的模块都由ExtensionLoader来动态加载。&lt;/p&gt;</summary>
+    
+    
+    
+    <category term="技术分享" scheme="http://yeming.me/categories/%E6%8A%80%E6%9C%AF%E5%88%86%E4%BA%AB/"/>
+    
+    
+    <category term="Dubbo" scheme="http://yeming.me/tags/Dubbo/"/>
+    
+    <category term="OCP" scheme="http://yeming.me/tags/OCP/"/>
+    
+    <category term="JAVA设计原则" scheme="http://yeming.me/tags/JAVA%E8%AE%BE%E8%AE%A1%E5%8E%9F%E5%88%99/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>数据库访问层中间件Zebra</title>
+    <link href="http://yeming.me/2017/11/29/zebra/"/>
+    <id>http://yeming.me/2017/11/29/zebra/</id>
+    <published>2017-11-29T13:00:50.000Z</published>
+    <updated>2021-04-18T07:38:23.136Z</updated>
+    
+    
+    <summary type="html">&lt;p&gt;zebra是一个基于JDBC API协议上开发出的高可用、高性能的数据库访问层解决方案。类似阿里的tddl，zebra是一个smart客户端，提供了诸如动态配置、监控、读写分离、分库分表等功能。下图是zebra的整体架构图&lt;/p&gt;
+&lt;h2 id=&quot;zebra整体架构&quot;&gt;&lt;a href=&quot;#zebra整体架构&quot; class=&quot;headerlink&quot; title=&quot;zebra整体架构&quot;&gt;&lt;/a&gt;zebra整体架构&lt;/h2&gt;&lt;p&gt;&lt;img src=&quot;https://lightoheaven.coding.net/p/image2/d/image2/git/raw/master/201711/zebra.jpeg&quot; alt=&quot;zebra整体架构&quot;&gt;&lt;/p&gt;</summary>
+    
+    
+    
+    <category term="技术分享" scheme="http://yeming.me/categories/%E6%8A%80%E6%9C%AF%E5%88%86%E4%BA%AB/"/>
+    
+    
+    <category term="数据库访问层DAL" scheme="http://yeming.me/tags/%E6%95%B0%E6%8D%AE%E5%BA%93%E8%AE%BF%E9%97%AE%E5%B1%82DAL/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>配置中心Lion</title>
+    <link href="http://yeming.me/2017/11/27/lion/"/>
+    <id>http://yeming.me/2017/11/27/lion/</id>
+    <published>2017-11-27T13:00:50.000Z</published>
+    <updated>2021-04-18T07:38:23.139Z</updated>
+    
+    
+    <summary type="html">&lt;p&gt;先说下我自己理解的什么是配置中心。究其本质是我们人类无法掌控和预知一切，映射到软件领域上，我们总是需要对系统的某些功能特性预留出一些控制的线头，以便我们在未来需要的时候，可以人为的拨弄这些线头从而控制系统的行为特征，我把它叫做 “系统运行时(runtime)飞行姿态的动态调整“。具体可以参考阿里中间件团队的这篇文章&lt;a href=&quot;http://jm.taobao.org/2016/09/28/an-article-about-config-center/&quot;&gt;一篇好TM长的关于配置中心的文章&lt;/a&gt;。简明扼要，一个配置中心必须要做到能动态的获取配置参数，并且当配置发生变更了，能及时准确无误的获取最新的配置。阿里用的配置中心叫diamon，我们点评用的是自研的Lion，本篇文章我们来阅读下Lion的源码。&lt;/p&gt;
+&lt;h2 id=&quot;Lion架构&quot;&gt;&lt;a href=&quot;#Lion架构&quot; class=&quot;headerlink&quot; title=&quot;Lion架构&quot;&gt;&lt;/a&gt;Lion架构&lt;/h2&gt;&lt;p&gt;&lt;img src=&quot;https://lightoheaven.coding.net/p/image2/d/image2/git/raw/master/201711/lion.jpeg&quot; alt=&quot;Lion架构图&quot;&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;https://lightoheaven.coding.net/p/image2/d/image2/git/raw/master/201711/flow.jpeg&quot; alt=&quot;流程图&quot;&gt;&lt;/p&gt;</summary>
+    
+    
+    
+    <category term="技术分享" scheme="http://yeming.me/categories/%E6%8A%80%E6%9C%AF%E5%88%86%E4%BA%AB/"/>
+    
+    
+    <category term="配置中心" scheme="http://yeming.me/tags/%E9%85%8D%E7%BD%AE%E4%B8%AD%E5%BF%83/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Hystrix源码分析</title>
+    <link href="http://yeming.me/2017/10/01/hystrix3/"/>
+    <id>http://yeming.me/2017/10/01/hystrix3/</id>
+    <published>2017-10-01T13:00:50.000Z</published>
+    <updated>2021-04-18T07:38:23.083Z</updated>
+    
+    
+    <summary type="html">&lt;p&gt;前两篇文章我们已经讲解了Hystrix的一些基本概念，并举了一些demo说明如何使用Hystrix，这篇文章我们更深一步，通过阅读一些源码来看下Hystrix是怎么工作的。我们主要根据官方文档上的一个流程图，对其中几个主要的过程从源码层面来研究下。&lt;/p&gt;</summary>
+    
+    
+    
+    <category term="技术分享" scheme="http://yeming.me/categories/%E6%8A%80%E6%9C%AF%E5%88%86%E4%BA%AB/"/>
+    
+    
+    <category term="Hystrix" scheme="http://yeming.me/tags/Hystrix/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Hystrix使用</title>
+    <link href="http://yeming.me/2017/09/30/hystrix2/"/>
+    <id>http://yeming.me/2017/09/30/hystrix2/</id>
+    <published>2017-09-30T13:00:50.000Z</published>
+    <updated>2021-04-17T14:57:30.115Z</updated>
+    
+    
+    <summary type="html">&lt;p&gt;上一篇文章主要讲了Hystrix是什么，用来做什么，解决了什么问题，以及设计模式等，这篇文章主要来讲下Hystrix如何使用。下面我们从最简单的Hello World入手，来讲解下Hystrix的用法。&lt;/p&gt;</summary>
+    
+    
+    
+    <category term="技术分享" scheme="http://yeming.me/categories/%E6%8A%80%E6%9C%AF%E5%88%86%E4%BA%AB/"/>
+    
+    
+    <category term="Hystrix" scheme="http://yeming.me/tags/Hystrix/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Hystrix初探</title>
+    <link href="http://yeming.me/2017/09/27/hystrix1/"/>
+    <id>http://yeming.me/2017/09/27/hystrix1/</id>
+    <published>2017-09-27T13:00:50.000Z</published>
+    <updated>2021-04-18T07:38:23.070Z</updated>
+    
+    
+    <summary type="html">&lt;p&gt;去年在看spring cloud系列的时候，当时就已经了解到了hystrix，这个组件和eureka，zuul等组件一样都是netflix公司开源的。当时由于没有太多的精力，只简单了解了下hystrix的一些简单功能。这半年因为工作关系一直接触redis相关的东西，redis相关也看过不少书了，有时候一直搞一件事可能觉得有点枯燥。就偶然又产生了想法，就决定重新看一下hystrix，决定搞一个hystrix系列。在阅读hystrix的代码过程中，刚开始看起来很吃力，里面用到了rxjava(采用函数响应式编程模式写的，感觉看起来很费劲)，发现要学习的东西越来越多。就想从最简单的hystrix介绍到使用最后到源码分析，写一个系列的博客，正好也长时间没有研究一些新的框架了。上面废话了很多，下面进入正题，本文主要从以下几方面简要介绍下hystrix，基本都是一些概念性的(基本都是翻译自github上Hystrix主页)。&lt;/p&gt;</summary>
+    
+    
+    
+    <category term="技术分享" scheme="http://yeming.me/categories/%E6%8A%80%E6%9C%AF%E5%88%86%E4%BA%AB/"/>
+    
+    
+    <category term="Hystrix" scheme="http://yeming.me/tags/Hystrix/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>JedisPool连接池相关配置</title>
+    <link href="http://yeming.me/2017/07/08/jedispoolconfig/"/>
+    <id>http://yeming.me/2017/07/08/jedispoolconfig/</id>
+    <published>2017-07-08T06:37:50.000Z</published>
+    <updated>2021-04-17T14:57:30.111Z</updated>
+    
+    
+    <summary type="html">&lt;p&gt;最近有些其他业务部门的同学在线上环境redis有出现以下错误Unexpected end of stream，这个错误大致是因为，redis服务器端已经关闭了客户端的连接，而客户端不知道依然拿着原来的连接去访问redis服务器，结果就会报出这个exception。既然我们知道原因是服务器端主动关闭与客户端连接，那么我们下面看下有哪些情况会导致服务器端主动关闭连接。主要在redis.conf中有以下两个参数client-output-buffer-limit、timeout，下面我们分别来介绍下这两个参数的作用。&lt;/p&gt;</summary>
+    
+    
+    
+    <category term="技术分享" scheme="http://yeming.me/categories/%E6%8A%80%E6%9C%AF%E5%88%86%E4%BA%AB/"/>
+    
+    
+    <category term="redis-cluster" scheme="http://yeming.me/tags/redis-cluster/"/>
+    
+    <category term="jedis" scheme="http://yeming.me/tags/jedis/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>jedis源码分析</title>
+    <link href="http://yeming.me/2017/06/18/jedis-cluster/"/>
+    <id>http://yeming.me/2017/06/18/jedis-cluster/</id>
+    <published>2017-06-18T15:56:49.000Z</published>
+    <updated>2021-04-18T07:38:23.080Z</updated>
+    
+    
+    <summary type="html">&lt;p&gt;&lt;img src=&quot;https://lightoheaven.coding.net/p/image2/d/image2/git/raw/master/201706/jedis-cluster.jpeg&quot; alt=&quot;类图&quot;&gt;&lt;/p&gt;
+&lt;h2 id=&quot;创建redisClient-BinaryJedisCluster&quot;&gt;&lt;a href=&quot;#创建redisClient-BinaryJedisCluster&quot; class=&quot;headerlink&quot; title=&quot;创建redisClient BinaryJedisCluster&quot;&gt;&lt;/a&gt;创建redisClient BinaryJedisCluster&lt;/h2&gt;&lt;p&gt;我们可以从jedis给出官方的redis-clusterdemo上可以看到通过构造一个BinaryJedisCluster，这个类就是jedis给我们提供的一个与redis-cluster集群交互的一个基本接口类，有了这个类我们就能执行各种查询写入操作了。&lt;/p&gt;
+&lt;pre class=&quot;line-numbers language-none&quot;&gt;&lt;code class=&quot;language-none&quot;&gt;Set&amp;lt;HostAndPort&amp;gt; set &amp;#x3D; new HashSet&amp;lt;&amp;gt;();
+HostAndPort hostAndPort &amp;#x3D; new HostAndPort(&amp;quot;127.0.0.1&amp;quot;, 7000);
+set.add(hostAndPort);
+BinaryJedisCluster client &amp;#x3D; new BinaryJedisCluster(set);&lt;span aria-hidden=&quot;true&quot; class=&quot;line-numbers-rows&quot;&gt;&lt;span&gt;&lt;/span&gt;&lt;span&gt;&lt;/span&gt;&lt;span&gt;&lt;/span&gt;&lt;span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;</summary>
+    
+    
+    
+    <category term="技术分享" scheme="http://yeming.me/categories/%E6%8A%80%E6%9C%AF%E5%88%86%E4%BA%AB/"/>
+    
+    
+    <category term="redis-cluster" scheme="http://yeming.me/tags/redis-cluster/"/>
+    
+    <category term="jedis" scheme="http://yeming.me/tags/jedis/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>spring容器启动@Value属性无法注入</title>
+    <link href="http://yeming.me/2017/04/16/springvalueannotation/"/>
+    <id>http://yeming.me/2017/04/16/springvalueannotation/</id>
+    <published>2017-04-16T02:57:40.000Z</published>
+    <updated>2021-04-18T07:38:23.075Z</updated>
+    
+    
+    <summary type="html">&lt;h2 id=&quot;问题&quot;&gt;&lt;a href=&quot;#问题&quot; class=&quot;headerlink&quot; title=&quot;问题&quot;&gt;&lt;/a&gt;问题&lt;/h2&gt;&lt;p&gt;一个同事基于Annotation配置了一段代码，结果有一个Configuration类的两个@Value标注的属性值没有注入进来，代码如下:&lt;/p&gt;
+&lt;pre class=&quot;line-numbers language-none&quot;&gt;&lt;code class=&quot;language-none&quot;&gt;@Configuration
+@PropertySource(&amp;quot;mysql.properties&amp;quot;)
+public class GroupDataSourceAnatationSample &amp;#123;
+    @Value(&amp;quot;$&amp;#123;zebra.jdbcref&amp;#125;&amp;quot;)
+    private String jdbcRef;
+
+    @Value(&amp;quot;$&amp;#123;zebra.pooltype&amp;#125;&amp;quot;)
+    private String poolType;
+
+    @Bean(destroyMethod &amp;#x3D; &amp;quot;close&amp;quot;)
+    public DataSource dataSource() &amp;#123;
+        。。。。。。
+    &amp;#125;
+
+    @Bean
+    public ZebraMapperScannerConfigurer mapperScannerConfigurer() &amp;#123;
+        ZebraMapperScannerConfigurer mapperScannerConfigurer &amp;#x3D; new ZebraMapperScannerConfigurer();
+        mapperScannerConfigurer.setBasePackage(&amp;quot;com.sankuai.flight.flagship.mapper&amp;quot;);
+        return mapperScannerConfigurer;
+    &amp;#125;
+
+    @Bean
+    public SqlSessionFactory sqlSessionFactoryBean() throws Exception &amp;#123;
+        。。。。。。
+    &amp;#125;
+&amp;#125;&lt;span aria-hidden=&quot;true&quot; class=&quot;line-numbers-rows&quot;&gt;&lt;span&gt;&lt;/span&gt;&lt;span&gt;&lt;/span&gt;&lt;span&gt;&lt;/span&gt;&lt;span&gt;&lt;/span&gt;&lt;span&gt;&lt;/span&gt;&lt;span&gt;&lt;/span&gt;&lt;span&gt;&lt;/span&gt;&lt;span&gt;&lt;/span&gt;&lt;span&gt;&lt;/span&gt;&lt;span&gt;&lt;/span&gt;&lt;span&gt;&lt;/span&gt;&lt;span&gt;&lt;/span&gt;&lt;span&gt;&lt;/span&gt;&lt;span&gt;&lt;/span&gt;&lt;span&gt;&lt;/span&gt;&lt;span&gt;&lt;/span&gt;&lt;span&gt;&lt;/span&gt;&lt;span&gt;&lt;/span&gt;&lt;span&gt;&lt;/span&gt;&lt;span&gt;&lt;/span&gt;&lt;span&gt;&lt;/span&gt;&lt;span&gt;&lt;/span&gt;&lt;span&gt;&lt;/span&gt;&lt;span&gt;&lt;/span&gt;&lt;span&gt;&lt;/span&gt;&lt;span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;</summary>
+    
+    
+    
+    <category term="技术分享" scheme="http://yeming.me/categories/%E6%8A%80%E6%9C%AF%E5%88%86%E4%BA%AB/"/>
+    
+    
+    <category term="Spring" scheme="http://yeming.me/tags/Spring/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>elastic-job源码分析</title>
+    <link href="http://yeming.me/2017/01/24/elasticjob/"/>
+    <id>http://yeming.me/2017/01/24/elasticjob/</id>
+    <published>2017-01-24T13:08:40.000Z</published>
+    <updated>2021-04-17T14:57:30.121Z</updated>
+    
+    
+    <summary type="html">&lt;p&gt;先简单介绍下&lt;a href=&quot;https://github.com/dangdangdotcom/elastic-job&quot;&gt;elastic-job&lt;/a&gt;，它是当当公司开源的一个分布式调度解决方案。大家都知道，当数据量比较小的时候，我们可以只用quartz只在一台服务器上处理所有的数据。随着业务发展，数据量越来越大，一台机器已经不足以支撑，就必须想办法将一个任务分成多个小任务，拆分到不同的服务器上并行的执行。例如：有一个遍历数据库某张表的作业，现有2台服务器。为了快速的执行作业，那么每台服务器应执行作业的50%。 为满足此需求，可将作业分成2片，每台服务器执行1片。需要注意的是elastic-job并不直接提供数据处理的功能，框架只会将分片项分配至各个运行中的作业服务器，开发者需要自行处理分片项与真实数据的对应关系。&lt;/p&gt;</summary>
+    
+    
+    
+    <category term="技术分享" scheme="http://yeming.me/categories/%E6%8A%80%E6%9C%AF%E5%88%86%E4%BA%AB/"/>
+    
+    
+    <category term="elastic-job" scheme="http://yeming.me/tags/elastic-job/"/>
+    
+    <category term="分布式调度" scheme="http://yeming.me/tags/%E5%88%86%E5%B8%83%E5%BC%8F%E8%B0%83%E5%BA%A6/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>spring-kafka源码分析二(Consumer)</title>
+    <link href="http://yeming.me/2016/12/30/kafkaconsumer/"/>
+    <id>http://yeming.me/2016/12/30/kafkaconsumer/</id>
+    <published>2016-12-30T13:05:07.000Z</published>
+    <updated>2021-04-17T14:57:30.126Z</updated>
+    
+    
+    <summary type="html">&lt;p&gt;上一篇文章我们分析了spring-kafka的producer，这篇文章我们就要来分析下consumer。&lt;/p&gt;
+&lt;pre class=&quot;line-numbers language-none&quot;&gt;&lt;code class=&quot;language-none&quot;&gt;ContainerProperties containerProps &amp;#x3D; new ContainerProperties(&amp;quot;topic1&amp;quot;, &amp;quot;topic2&amp;quot;);
+containerProps.setMessageListener(new MessageListener&amp;lt;Integer, String&amp;gt;() &amp;#123;
+
+    @Override
+    public void onMessage(ConsumerRecord&amp;lt;Integer, String&amp;gt; message) &amp;#123;
+        System.out.println(&amp;quot;received: &amp;quot; + message);
+    &amp;#125;
+
+&amp;#125;);
+KafkaMessageListenerContainer&amp;lt;Integer, String&amp;gt; container &amp;#x3D; createContainer(containerProps);
+container.setBeanName(&amp;quot;testAuto&amp;quot;);
+container.start();
+
+private static KafkaMessageListenerContainer&amp;lt;Integer, String&amp;gt; createContainer(ContainerProperties containerProps) &amp;#123;
+    Map&amp;lt;String, Object&amp;gt; props &amp;#x3D; consumerProps();
+    DefaultKafkaConsumerFactory&amp;lt;Integer, String&amp;gt; cf &amp;#x3D;
+            new DefaultKafkaConsumerFactory&amp;lt;Integer, String&amp;gt;(props);
+    KafkaMessageListenerContainer&amp;lt;Integer, String&amp;gt; container &amp;#x3D;
+            new KafkaMessageListenerContainer&amp;lt;Integer, String&amp;gt;(cf, containerProps);
+    return container;
+&amp;#125;
+
+private static Map&amp;lt;String, Object&amp;gt; consumerProps() &amp;#123;
+        Map&amp;lt;String, Object&amp;gt; props &amp;#x3D; new HashMap&amp;lt;String, Object&amp;gt;();
+        props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, &amp;quot;localhost:9092&amp;quot;);
+        props.put(ConsumerConfig.GROUP_ID_CONFIG, &amp;quot;group&amp;quot;);
+        props.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, true);
+        props.put(ConsumerConfig.AUTO_COMMIT_INTERVAL_MS_CONFIG, &amp;quot;100&amp;quot;);
+        props.put(ConsumerConfig.SESSION_TIMEOUT_MS_CONFIG, &amp;quot;15000&amp;quot;);
+        props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, IntegerDeserializer.class);
+        props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
+        return props;
+&amp;#125;&lt;span aria-hidden=&quot;true&quot; class=&quot;line-numbers-rows&quot;&gt;&lt;span&gt;&lt;/span&gt;&lt;span&gt;&lt;/span&gt;&lt;span&gt;&lt;/span&gt;&lt;span&gt;&lt;/span&gt;&lt;span&gt;&lt;/span&gt;&lt;span&gt;&lt;/span&gt;&lt;span&gt;&lt;/span&gt;&lt;span&gt;&lt;/span&gt;&lt;span&gt;&lt;/span&gt;&lt;span&gt;&lt;/span&gt;&lt;span&gt;&lt;/span&gt;&lt;span&gt;&lt;/span&gt;&lt;span&gt;&lt;/span&gt;&lt;span&gt;&lt;/span&gt;&lt;span&gt;&lt;/span&gt;&lt;span&gt;&lt;/span&gt;&lt;span&gt;&lt;/span&gt;&lt;span&gt;&lt;/span&gt;&lt;span&gt;&lt;/span&gt;&lt;span&gt;&lt;/span&gt;&lt;span&gt;&lt;/span&gt;&lt;span&gt;&lt;/span&gt;&lt;span&gt;&lt;/span&gt;&lt;span&gt;&lt;/span&gt;&lt;span&gt;&lt;/span&gt;&lt;span&gt;&lt;/span&gt;&lt;span&gt;&lt;/span&gt;&lt;span&gt;&lt;/span&gt;&lt;span&gt;&lt;/span&gt;&lt;span&gt;&lt;/span&gt;&lt;span&gt;&lt;/span&gt;&lt;span&gt;&lt;/span&gt;&lt;span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;可以看到我们需要创建一个KafkaMessageListenerContainer，而创建上述container又需要创建一个DefaultKafkaConsumerFactory和一个ContainerProperties。注意ContainerProperties必须设置一个MessageListener，这个listener有个onMessage方法，如果consumer收到消息，就会调用这个方法。创建了上述container之后，然后调用container.start方法就可以开启consumer了。&lt;/p&gt;</summary>
+    
+    
+    
+    <category term="技术分享" scheme="http://yeming.me/categories/%E6%8A%80%E6%9C%AF%E5%88%86%E4%BA%AB/"/>
+    
+    
+    <category term="NIO" scheme="http://yeming.me/tags/NIO/"/>
+    
+    <category term="spring-kafka" scheme="http://yeming.me/tags/spring-kafka/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>spring-kafka源码分析一(Producer)</title>
+    <link href="http://yeming.me/2016/12/17/kafkaproducer/"/>
+    <id>http://yeming.me/2016/12/17/kafkaproducer/</id>
+    <published>2016-12-17T07:26:10.000Z</published>
+    <updated>2021-04-18T07:38:23.151Z</updated>
+    
+    
+    <summary type="html">&lt;p&gt;&lt;img src=&quot;https://lightoheaven.coding.net/p/image2/d/image2/git/raw/master/201612/kafkaUml.jpeg&quot; alt=&quot;spring kafka uml类图&quot;&gt;&lt;br&gt;spring-kafka是运用spring的概念基于apache kafka(linkedin开源已经捐献给apache基金会)消息解决方案开发的一个java client端。它提供了一些接口来更方便收发消息与kafka server端交互，并且支持spring 注解形式。并且我们知道消息是一个异步调用逻辑，我们下文也会分析源码体现出spring kafka怎么实现这个异步的过程。下面我们通过一个demo来分析下spring kafka的源码。&lt;/p&gt;</summary>
+    
+    
+    
+    <category term="技术分享" scheme="http://yeming.me/categories/%E6%8A%80%E6%9C%AF%E5%88%86%E4%BA%AB/"/>
+    
+    
+    <category term="NIO" scheme="http://yeming.me/tags/NIO/"/>
+    
+    <category term="spring-kafka" scheme="http://yeming.me/tags/spring-kafka/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>spring-cloud-eureka源码分析二(server端)</title>
+    <link href="http://yeming.me/2016/12/02/eureka2/"/>
+    <id>http://yeming.me/2016/12/02/eureka2/</id>
+    <published>2016-12-02T10:41:32.000Z</published>
+    <updated>2021-04-18T07:38:23.169Z</updated>
+    
+    
+    <summary type="html">&lt;p&gt;上一篇文章我们介绍了eureka client的工作模式，我们知道eureka client是通过http rest来与eureka server交互，来注册服务，续约服务，取消服务，服务查询。所以，eureka server肯定要提供上述http的服务端实现，这也是我们本篇文章研究eureka server的一个切入点。另外我们还要关注下，server是怎么剔除一些长时间没有发送心跳的client端，server集群之间是怎么replicate的也是我们需要关注的一个重点。&lt;/p&gt;</summary>
+    
+    
+    
+    <category term="spring cloud" scheme="http://yeming.me/categories/spring-cloud/"/>
+    
+    
+    <category term="spring cloud" scheme="http://yeming.me/tags/spring-cloud/"/>
+    
+    <category term="eureka" scheme="http://yeming.me/tags/eureka/"/>
+    
+  </entry>
+  
+</feed>
