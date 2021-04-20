@@ -1,20 +1,46 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
-  <title>Smartの明</title>
+  <title>叶明の个人博客</title>
   
   <subtitle>苦练基本功，长期有耐心</subtitle>
   <link href="http://yeming.me/atom.xml" rel="self"/>
   
   <link href="http://yeming.me/"/>
-  <updated>2021-04-18T07:38:23.148Z</updated>
+  <updated>2021-04-20T08:58:06.490Z</updated>
   <id>http://yeming.me/</id>
   
   <author>
-    <name>Smartの明</name>
+    <name>叶明</name>
     
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>Mybatis如何从DAO到SQL</title>
+    <link href="http://yeming.me/2021/04/03/mybatis/"/>
+    <id>http://yeming.me/2021/04/03/mybatis/</id>
+    <published>2021-04-03T14:26:38.000Z</published>
+    <updated>2021-04-20T08:58:06.490Z</updated>
+    
+    
+      
+      
+        
+        
+    <summary type="html">&lt;h2 id=&quot;1、Mybatis简介&quot;&gt;&lt;a href=&quot;#1、Mybatis简介&quot; class=&quot;headerlink&quot; title=&quot;1、Mybatis简介&quot;&gt;&lt;/a&gt;1、Mybatis简介&lt;/h2&gt;&lt;hr&gt;
+&lt;p&gt;MyBatis 是一款优秀的持久层框架，它支持自定义</summary>
+        
+      
+    
+    
+    
+    <category term="技术分享" scheme="http://yeming.me/categories/%E6%8A%80%E6%9C%AF%E5%88%86%E4%BA%AB/"/>
+    
+    
+    <category term="Mybatis" scheme="http://yeming.me/tags/Mybatis/"/>
+    
+  </entry>
   
   <entry>
     <title>Postman和Java Client访问K8s</title>
@@ -498,27 +524,6 @@ private static Map&amp;lt;String, Object&amp;gt; consumerProps() &amp;#123;
     <category term="NIO" scheme="http://yeming.me/tags/NIO/"/>
     
     <category term="spring-kafka" scheme="http://yeming.me/tags/spring-kafka/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>spring-cloud-eureka源码分析二(server端)</title>
-    <link href="http://yeming.me/2016/12/02/eureka2/"/>
-    <id>http://yeming.me/2016/12/02/eureka2/</id>
-    <published>2016-12-02T10:41:32.000Z</published>
-    <updated>2021-04-18T07:38:23.169Z</updated>
-    
-    
-    <summary type="html">&lt;p&gt;上一篇文章我们介绍了eureka client的工作模式，我们知道eureka client是通过http rest来与eureka server交互，来注册服务，续约服务，取消服务，服务查询。所以，eureka server肯定要提供上述http的服务端实现，这也是我们本篇文章研究eureka server的一个切入点。另外我们还要关注下，server是怎么剔除一些长时间没有发送心跳的client端，server集群之间是怎么replicate的也是我们需要关注的一个重点。&lt;/p&gt;</summary>
-    
-    
-    
-    <category term="spring cloud" scheme="http://yeming.me/categories/spring-cloud/"/>
-    
-    
-    <category term="spring cloud" scheme="http://yeming.me/tags/spring-cloud/"/>
-    
-    <category term="eureka" scheme="http://yeming.me/tags/eureka/"/>
     
   </entry>
   
