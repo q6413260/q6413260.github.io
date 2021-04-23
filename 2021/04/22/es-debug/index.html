@@ -4,7 +4,7 @@
 
 <head>
     <meta charset="utf-8">
-    <meta name="keywords" content="JedisPool连接池相关配置, 叶明の个人博客">
+    <meta name="keywords" content="IDEA调试Elasticsearch源码, 叶明の个人博客">
     <meta name="description" content="苦练基本功，长期有耐心">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
@@ -27,7 +27,7 @@
 </script>
 
 
-    <title>JedisPool连接池相关配置 | 叶明の个人博客</title>
+    <title>IDEA调试Elasticsearch源码 | 叶明の个人博客</title>
     <link rel="icon" type="image/png" href="/avatar.png">
 
     <link rel="stylesheet" type="text/css" href="/libs/awesome/css/all.css">
@@ -297,12 +297,12 @@
 
 
 
-<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/14.jpg')">
+<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/3.jpg')">
     <div class="container" style="right: 0px;left: 0px;">
         <div class="row">
             <div class="col s12 m12 l12">
                 <div class="brand">
-                    <h1 class="description center-align post-title">JedisPool连接池相关配置</h1>
+                    <h1 class="description center-align post-title">IDEA调试Elasticsearch源码</h1>
                 </div>
             </div>
         </div>
@@ -418,12 +418,12 @@
                     
                     <div class="article-tag">
                         
-                            <a href="/tags/redis-cluster/">
-                                <span class="chip bg-color">redis-cluster</span>
+                            <a href="/tags/Elasticsearch/">
+                                <span class="chip bg-color">Elasticsearch</span>
                             </a>
                         
-                            <a href="/tags/jedis/">
-                                <span class="chip bg-color">jedis</span>
+                            <a href="/tags/docker/">
+                                <span class="chip bg-color">docker</span>
                             </a>
                         
                     </div>
@@ -447,7 +447,7 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-minus fa-fw"></i>发布日期:&nbsp;&nbsp;
-                    2017-07-08
+                    2021-04-22
                 </div>
                 
 
@@ -456,14 +456,14 @@
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    1.5k
+                    1.1k
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
-                    5 分
+                    4 分
                 </div>
                 
 
@@ -486,82 +486,129 @@
 
         <div class="card-content article-card-content">
             <div id="articleContent">
-                <p>最近有些其他业务部门的同学在线上环境redis有出现以下错误Unexpected end of stream，这个错误大致是因为，redis服务器端已经关闭了客户端的连接，而客户端不知道依然拿着原来的连接去访问redis服务器，结果就会报出这个exception。既然我们知道原因是服务器端主动关闭与客户端连接，那么我们下面看下有哪些情况会导致服务器端主动关闭连接。主要在redis.conf中有以下两个参数client-output-buffer-limit、timeout，下面我们分别来介绍下这两个参数的作用。</p>
-<span id="more"></span>
+                <h2 id="1、Mac上安装es"><a href="#1、Mac上安装es" class="headerlink" title="1、Mac上安装es"></a>1、Mac上安装es</h2><hr>
+<p>最近在调研Elasticsearch（后续简称es）的translog，在Mac上安装了es单机版和集群版本，这里推荐使用docker搭建，简单叙述下过程：<br><strong>安装Docker环境</strong><br>首先需要在Mac上安装Docker运行环境，这里推荐直接安装 docker-for-mac，安装完成并启动成功后Mac右上方会显示running<br><img src="https://lightoheaven.coding.net/p/image2/d/image2/git/raw/master/2021/04/docker.png" width=30%/><br>安装完docker-for-mac后，建议修改镜像源，默认镜像源拉取镜像太慢了。修改方式如下：依次点击Preferences -&gt; Docker Engine</p>
+<figure>
+<img src="https://lightoheaven.coding.net/p/image2/d/image2/git/raw/master/2021/04/docker-preference.png" width=30%/>
+<img src="https://lightoheaven.coding.net/p/image2/d/image2/git/raw/master/2021/04/docker-engine.png"/>
+</figure>
 
-<h2 id="client-output-buffer-limit"><a href="#client-output-buffer-limit" class="headerlink" title="client-output-buffer-limit"></a>client-output-buffer-limit</h2><p>对于Redis服务器的输出（也就是命令的返回值）来说，其大小通常是不可控制的。有可能一个简单的命令，能够产生体积庞大的返回数据。另外也有可能因为执行了太多命令，导致产生返回数据的速率超过了往客户端发送的速率，这是也会导致服务器堆积大量消息，从而导致输出缓冲区越来越大，占用过多内存，甚至导致系统崩溃。redis有以下两种限制来避免出现这种情况，并且不同类型的客户端可以采取不同的配置。</p>
+
+<p><strong><a target="_blank" rel="noopener" href="https://www.elastic.co/guide/en/elasticsearch/reference/7.12/docker.html">安装es单机版</a></strong></p>
 <ol>
-<li>大小限制:若客户端缓冲区超过某一个设定的值，直接关闭客户端连接。</li>
-<li>持续性限制:若客户端缓冲区连续一定时间内一直超过某个设定的值时，则关闭客户端连接。</li>
+<li>拉取镜像，docker pull docker.elastic.co/elasticsearch/elasticsearch:7.12.0</li>
+<li>启动容器，docker run –name es01-test -p 9200:9200 -p 9300:9300 -e “discovery.type=single-node” docker.elastic.co/elasticsearch/elasticsearch:7.12.0</li>
+<li>当容器退出后，下次需要启动该容器，可以执行 docker ps -a 显示当前所有容器（docker ps显示运行时容器，-a会显示包括非运行在内所有容器），找到对应的container id名称，然后 docker  start 891f7a68c705<br><img src="https://lightoheaven.coding.net/p/image2/d/image2/git/raw/master/2021/04/docker-ps.png" alt="docker-ps"></li>
 </ol>
-<p>下面是一个配置的demo:</p>
-<pre class="line-numbers language-none"><code class="language-none">client-output-buffer-limit normal 0 0 0
-client-output-buffer-limit slave 256mb 64mb 60
-client-output-buffer-limit pubsub 8mb 2mb 60<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
-<p>redis把客户端分为3种，一种是普通的客户端，比如应用程序获取的jedis连接、普通的redis-cli，上面配置的三个0意思是对于客户端缓冲区无限制；第二种slave客户端，上面配置的3个参数的意思是若缓冲区超过256m则redis服务器直接关闭客户端连接，或者持续60s缓冲区一直超过64m也会关闭客户端连接。第三种是pub/sub客户端配置。</p>
-<p>通过以上几种不同的配置，redis就可以避免客户端缓冲区过大导致占用过大内存引起的问题。后来确认了，其他项目组的同学有一个大key超过了50m(我们配置的是30m)，直接导致redis服务器关闭了连接。但是应用程序还是从jedis连接池中获取到了这个被关闭的连接去get的时候，就抛出了Unexpected end of stream异常。</p>
-<h2 id="timeout配置"><a href="#timeout配置" class="headerlink" title="timeout配置"></a>timeout配置</h2><p>redis为了避免客户端连接数过多，有一个timeout配置，意思是如果连接的空闲时间超过了timeout的值，则关闭连接。默认配置是0，意思是没有超时限制，永远不关闭连接。生产上显然不会配置0，我们生产上配置的是120。这个timeout参数配置，要跟客户端创建的连接池的参数配合起来一起使用。下面我们看下jedis连接池的的一个配置demo。</p>
-<pre class="line-numbers language-none"><code class="language-none"> JedisPool jedisPool &#x3D; new JedisPool(getPoolConfig(), &quot;localhost&quot;);
+<p><strong><a target="_blank" rel="noopener" href="https://www.elastic.co/guide/en/elasticsearch/reference/7.12/docker.html">安装es集群版本</a></strong>  </p>
+<ol>
+<li>创建docker-compose.yml<pre class="line-numbers language-yaml" data-language="yaml"><code class="language-yaml"><span class="token key atrule">version</span><span class="token punctuation">:</span> <span class="token string">'2.2'</span>
+<span class="token key atrule">services</span><span class="token punctuation">:</span>
+  <span class="token key atrule">es01</span><span class="token punctuation">:</span>
+    <span class="token key atrule">image</span><span class="token punctuation">:</span> docker.elastic.co/elasticsearch/elasticsearch<span class="token punctuation">:</span>7.12.0
+    <span class="token key atrule">container_name</span><span class="token punctuation">:</span> es01
+    <span class="token key atrule">environment</span><span class="token punctuation">:</span>
+      <span class="token punctuation">-</span> node.name=es01
+      <span class="token punctuation">-</span> cluster.name=es<span class="token punctuation">-</span>docker<span class="token punctuation">-</span>cluster
+      <span class="token punctuation">-</span> discovery.seed_hosts=es02<span class="token punctuation">,</span>es03
+      <span class="token punctuation">-</span> cluster.initial_master_nodes=es01<span class="token punctuation">,</span>es02<span class="token punctuation">,</span>es03
+      <span class="token punctuation">-</span> bootstrap.memory_lock=true
+      <span class="token punctuation">-</span> <span class="token string">"ES_JAVA_OPTS=-Xms512m -Xmx512m"</span>
+    <span class="token key atrule">ulimits</span><span class="token punctuation">:</span>
+      <span class="token key atrule">memlock</span><span class="token punctuation">:</span>
+        <span class="token key atrule">soft</span><span class="token punctuation">:</span> <span class="token number">-1</span>
+        <span class="token key atrule">hard</span><span class="token punctuation">:</span> <span class="token number">-1</span>
+    <span class="token key atrule">volumes</span><span class="token punctuation">:</span>
+      <span class="token punctuation">-</span> data01<span class="token punctuation">:</span>/usr/share/elasticsearch/data
+    <span class="token key atrule">ports</span><span class="token punctuation">:</span>
+      <span class="token punctuation">-</span> 9200<span class="token punctuation">:</span><span class="token number">9200</span>
+    <span class="token key atrule">networks</span><span class="token punctuation">:</span>
+      <span class="token punctuation">-</span> elastic
+  <span class="token key atrule">es02</span><span class="token punctuation">:</span>
+    <span class="token key atrule">image</span><span class="token punctuation">:</span> docker.elastic.co/elasticsearch/elasticsearch<span class="token punctuation">:</span>7.12.0
+    <span class="token key atrule">container_name</span><span class="token punctuation">:</span> es02
+    <span class="token key atrule">environment</span><span class="token punctuation">:</span>
+      <span class="token punctuation">-</span> node.name=es02
+      <span class="token punctuation">-</span> cluster.name=es<span class="token punctuation">-</span>docker<span class="token punctuation">-</span>cluster
+      <span class="token punctuation">-</span> discovery.seed_hosts=es01<span class="token punctuation">,</span>es03
+      <span class="token punctuation">-</span> cluster.initial_master_nodes=es01<span class="token punctuation">,</span>es02<span class="token punctuation">,</span>es03
+      <span class="token punctuation">-</span> bootstrap.memory_lock=true
+      <span class="token punctuation">-</span> <span class="token string">"ES_JAVA_OPTS=-Xms512m -Xmx512m"</span>
+    <span class="token key atrule">ulimits</span><span class="token punctuation">:</span>
+      <span class="token key atrule">memlock</span><span class="token punctuation">:</span>
+        <span class="token key atrule">soft</span><span class="token punctuation">:</span> <span class="token number">-1</span>
+        <span class="token key atrule">hard</span><span class="token punctuation">:</span> <span class="token number">-1</span>
+    <span class="token key atrule">volumes</span><span class="token punctuation">:</span>
+      <span class="token punctuation">-</span> data02<span class="token punctuation">:</span>/usr/share/elasticsearch/data
+    <span class="token key atrule">networks</span><span class="token punctuation">:</span>
+      <span class="token punctuation">-</span> elastic
+  <span class="token key atrule">es03</span><span class="token punctuation">:</span>
+    <span class="token key atrule">image</span><span class="token punctuation">:</span> docker.elastic.co/elasticsearch/elasticsearch<span class="token punctuation">:</span>7.12.0
+    <span class="token key atrule">container_name</span><span class="token punctuation">:</span> es03
+    <span class="token key atrule">environment</span><span class="token punctuation">:</span>
+      <span class="token punctuation">-</span> node.name=es03
+      <span class="token punctuation">-</span> cluster.name=es<span class="token punctuation">-</span>docker<span class="token punctuation">-</span>cluster
+      <span class="token punctuation">-</span> discovery.seed_hosts=es01<span class="token punctuation">,</span>es02
+      <span class="token punctuation">-</span> cluster.initial_master_nodes=es01<span class="token punctuation">,</span>es02<span class="token punctuation">,</span>es03
+      <span class="token punctuation">-</span> bootstrap.memory_lock=true
+      <span class="token punctuation">-</span> <span class="token string">"ES_JAVA_OPTS=-Xms512m -Xmx512m"</span>
+    <span class="token key atrule">ulimits</span><span class="token punctuation">:</span>
+      <span class="token key atrule">memlock</span><span class="token punctuation">:</span>
+        <span class="token key atrule">soft</span><span class="token punctuation">:</span> <span class="token number">-1</span>
+        <span class="token key atrule">hard</span><span class="token punctuation">:</span> <span class="token number">-1</span>
+    <span class="token key atrule">volumes</span><span class="token punctuation">:</span>
+      <span class="token punctuation">-</span> data03<span class="token punctuation">:</span>/usr/share/elasticsearch/data
+    <span class="token key atrule">networks</span><span class="token punctuation">:</span>
+      <span class="token punctuation">-</span> elastic
 
-private static GenericObjectPoolConfig getPoolConfig() &#123;
-        GenericObjectPoolConfig conf &#x3D; new GenericObjectPoolConfig();
-        &#x2F;&#x2F; 设置获取连接的最大等待时间
-        conf.setMaxWaitMillis(poolWaitMillis);
-        &#x2F;&#x2F; 设置最大连接数
-        conf.setMaxTotal(poolMaxTotal);
-        &#x2F;&#x2F; 设置最大空闲连接数
-        conf.setMaxIdle(poolMaxIdle);
-        &#x2F;&#x2F; 设置最小空闲连接数
-        conf.setMinIdle(poolMinIdle);
-        &#x2F;&#x2F; 设置获取连接时不进行连接验证(通过 PoolableObjectFactory.validateObject() 验证连接是否有效)
-        conf.setTestOnBorrow(false);
-        &#x2F;&#x2F; 设置退还连接时不进行连接验证(通过 PoolableObjectFactory.validateObject() 验证连接是否有效)
-        conf.setTestOnReturn(false);
-        &#x2F;&#x2F; 设置连接空闲时进行连接验证
-        conf.setTestWhileIdle(true);
-        &#x2F;&#x2F; 设置连接被回收前的最大空闲时间
-        conf.setMinEvictableIdleTimeMillis(5 * 60000);
-        &#x2F;&#x2F; 设置检测线程的运行时间间隔
-        conf.setTimeBetweenEvictionRunsMillis(60000);
-        &#x2F;&#x2F; 设置检测线程每次检测的对象数
-        conf.setNumTestsPerEvictionRun(-1);
+<span class="token key atrule">volumes</span><span class="token punctuation">:</span>
+  <span class="token key atrule">data01</span><span class="token punctuation">:</span>
+    <span class="token key atrule">driver</span><span class="token punctuation">:</span> local
+  <span class="token key atrule">data02</span><span class="token punctuation">:</span>
+    <span class="token key atrule">driver</span><span class="token punctuation">:</span> local
+  <span class="token key atrule">data03</span><span class="token punctuation">:</span>
+    <span class="token key atrule">driver</span><span class="token punctuation">:</span> local
 
-        return conf;
-    &#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<p>上述代码构建了一个JedisPool，我们可以看到jedis使用apache common-pool2来创建一个jedis连接池的。创建jedis连接池传入了一个GenericObjectPoolConfig配置参数，我只筛选了其中一些主要的属性来说明，有兴趣的同学可以自己去看common-pool2的源码。我们主要看下最下面的几个参数(第16行到24行)，我们设置了空闲时验证，连接被回收前最大空闲时间为300s，设置检测线程的运行时间间隔是60s，设置线程每次检测的对象数是-1(如果为负数，则检测所有空闲线程)</p>
-<pre class="line-numbers language-none"><code class="language-none">private int getNumTests() &#123;
-        int numTestsPerEvictionRun &#x3D; this.getNumTestsPerEvictionRun();
-        return numTestsPerEvictionRun &gt;&#x3D; 0?
-        Math.min(numTestsPerEvictionRun, this.idleObjects.size()):
-        (int)Math.ceil((double)this.idleObjects.size() &#x2F; Math.abs((double)numTestsPerEvictionRun));
-    &#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<p>我们redis服务端配置了timeout是120s，而我们客户端线程检测间隔是60s，每隔60s就会对所有空闲的连接进行检验，会调用JedisFactory的validateObject方法</p>
-<pre class="line-numbers language-none"><code class="language-none">class JedisFactory implements PooledObjectFactory&lt;Jedis&gt; &#123;
-    @Override
-  public boolean validateObject(PooledObject&lt;Jedis&gt; pooledJedis) &#123;
-    final BinaryJedis jedis &#x3D; pooledJedis.getObject();
-    try &#123;
-      HostAndPort hostAndPort &#x3D; this.hostAndPort.get();
-
-      String connectionHost &#x3D; jedis.getClient().getHost();
-      int connectionPort &#x3D; jedis.getClient().getPort();
-
-      return hostAndPort.getHost().equals(connectionHost)
-          &amp;&amp; hostAndPort.getPort() &#x3D;&#x3D; connectionPort &amp;&amp; jedis.isConnected()
-          &amp;&amp; jedis.ping().equals(&quot;PONG&quot;);
-    &#125; catch (final Exception e) &#123;
-      return false;
-    &#125;
-  &#125;
-&#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<p>可以看到以上代码最后有一个jedis.ping().equals(“PONG”)，这样能保证那些没有被客户端使用的连接每60s之内都能向redis服务端发送心跳，这个时间在我们配置的timeout 120s范围内，redis服务端也就不会关闭这个连接。</p>
-<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
-<li><a target="_blank" rel="noopener" href="http://www.cnblogs.com/kreo/p/4423362.html">redis配置详解</a></li>
-<li><a target="_blank" rel="noopener" href="http://bsr1983.iteye.com/blog/2092467">common-dbcp2数据库连接池参数说明</a></li>
-<li><a target="_blank" rel="noopener" href="http://blog.csdn.net/u011277123/article/details/53943351">common-pool2连接池详解与使用</a></li>
-<li><a target="_blank" rel="noopener" href="https://github.com/xetorthio/jedis/issues/932">jedis Issue 932</a></li>
-<li><a target="_blank" rel="noopener" href="https://github.com/xetorthio/jedis/issues/1029">jedis Issue 1029</a></li>
+<span class="token key atrule">networks</span><span class="token punctuation">:</span>
+  <span class="token key atrule">elastic</span><span class="token punctuation">:</span>
+    <span class="token key atrule">driver</span><span class="token punctuation">:</span> bridge<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></li>
+<li>在同目录下执行 docker-compose up 创建集群</li>
+<li>执行 curl -X GET “localhost:9200/_cat/nodes?v=true&amp;pretty” 确认集群是否启动</li>
+</ol>
+<h2 id="2、IDEA编译es源码"><a href="#2、IDEA编译es源码" class="headerlink" title="2、IDEA编译es源码"></a>2、IDEA编译es源码</h2><p><strong>环境准备：</strong> </p>
+<ul>
+<li>JDK 16：版本要求可以参考CONTRIBUTING.md，es对jdk版本要求较高，建议直接使用最新版本，下载完成后，建议配置JAVA_HOME</li>
+<li>IDEA 2021.1：低版本的IDEA貌似不太支持高版本的JDK，根据自己情况选择。</li>
+<li>ElasticSearch 7.8.1代码分支：刚开始编译master分支代码和7.12.0一直有问题，后改成7.8.1版本</li>
+<li>ElasticSearch 7.8.1服务端：建议下载服务端完整包，后续启动时候一些配置路径可以直接指向完整安装包中的目录</li>
+<li><a target="_blank" rel="noopener" href="https://gradle.org/releases/">Gradle 7.0</a>：下载完成后，建议配置GRADLE_HOME和PATH，最好修改gradle镜像源为阿里云，在 ~/.gradle目录创建 init.gradle 文件</li>
 </ul>
+<p><strong><a target="_blank" rel="noopener" href="https://github.com/elastic/elasticsearch">github pull代码</a></strong><br>es代码挺大的，第一次拉取很慢，后面从google应用商店下载了github加速插件，拉代码速度提升很明显。安装完成后，会有一个加速按钮</p>
+<figure>
+<img src="https://lightoheaven.coding.net/p/image2/d/image2/git/raw/master/2021/04/github-speed.png" width=45%/>
+<img src="https://lightoheaven.coding.net/p/image2/d/image2/git/raw/master/2021/04/github-speed2.png" width=45%/>
+</figure>
+
+<p><strong>编译es代码</strong></p>
+<ol>
+<li>切换分支 git checkout v7.8.1</li>
+<li>两种方式导入IDEA：我是使用第二种方式导入的，第一种一直报错。<ul>
+<li>cd到代码根目录，执行./gradlew idea，会下载6.5版本的gradle来编译源代码（或者执行gradle idea，直接使用之前环境准备配置的es版本），生成 IML, IPR, IWS 3个文件，然后导入 elasticsearch.ipr。</li>
+<li>IDEA直接 File -&gt; Open 打开es根目录的 build.gradle，然后等待编译源码</li>
+</ul>
+</li>
+</ol>
+<p><strong>运行es代码</strong><br>es启动类位于 ：elasticsearch\server\src\main\java\org\elasticsearch\bootstrap\Elasticsearch.java</p>
+<ol>
+<li>ERROR: the system property [es.path.conf] must be set<br>添加VM options： -Des.path.conf=/Users/dianping/Downloads/elasticsearch-7.8.1/config，这里可以直接指向成之前下载的es 7.8.1的config目录<img src="https://lightoheaven.coding.net/p/image2/d/image2/git/raw/master/2021/04/es-vm.png" width=85%/> </li>
+<li>Exception in thread “main” java.lang.IllegalStateException: path.home is not configured<br>添加VM options： -Des.path.home=/Users/dianping/Downloads/elasticsearch-7.8.1</li>
+<li>Exception in thread “main” java.lang.NullPointerException: Cannot invoke “String.hashCode()” because “<local3>“ is null<br>直接注释**InternalSettingsPreparer.checkSettingsForTerminalDeprecation()**for循环代码，不影响启动<img src="https://lightoheaven.coding.net/p/image2/d/image2/git/raw/master/2021/04/InternalSettingsPreparer.png" width=85%/> </li>
+<li>ERROR Could not register mbeans java.security.AccessControlException: access denied (“javax.management.MBeanTrustPermission” “register”)<br>添加VM options：-Dlog4j2.disable.jmx=true 禁用jmx</li>
+<li>java.security.AccessControlException: access denied (“java.lang.RuntimePermission” “createClassLoader”)<br>创建java.policy文件，然后 -Djava.security.policy=/Users/dianping/Downloads/elasticsearch-7.8.1/config/java.policy<pre class="line-numbers language-shell" data-language="shell"><code class="language-shell">grant &#123;
+	permission java.lang.RuntimePermission &quot;createClassLoader&quot;;
+&#125;;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre></li>
+</ol>
+<p>解决上述问题后，es应该就能在IDEA中启动了，后续调试的话即可debug模式启动 Elasticsearch.java main函数   </p>
 
                 
             </div>
@@ -588,7 +635,7 @@ private static GenericObjectPoolConfig getPoolConfig() &#123;
                     </i>
                 </span>
                 <span class="reprint-info">
-                    <a href="http://yeming.me/2017/07/08/jedispoolconfig/">http://yeming.me/2017/07/08/jedispoolconfig/</a>
+                    <a href="http://yeming.me/2021/04/22/es-debug/">http://yeming.me/2021/04/22/es-debug/</a>
                 </span>
             </div>
             <div class="reprint__notice">
@@ -626,12 +673,12 @@ private static GenericObjectPoolConfig getPoolConfig() &#123;
                     
                         <div class="article-tag">
                             
-                                <a href="/tags/redis-cluster/">
-                                    <span class="chip bg-color">redis-cluster</span>
+                                <a href="/tags/Elasticsearch/">
+                                    <span class="chip bg-color">Elasticsearch</span>
                                 </a>
                             
-                                <a href="/tags/jedis/">
-                                    <span class="chip bg-color">jedis</span>
+                                <a href="/tags/docker/">
+                                    <span class="chip bg-color">docker</span>
                                 </a>
                             
                         </div>
@@ -943,29 +990,30 @@ private static GenericObjectPoolConfig getPoolConfig() &#123;
 <article id="prenext-posts" class="prev-next articles">
     <div class="row article-row">
         
-        <div class="article col s12 m6" data-aos="fade-up">
+        <div class="article col s12 m6" data-aos="fade-up" data-aos="fade-up">
             <div class="article-badge left-badge text-color">
-                <i class="fas fa-chevron-left"></i>&nbsp;上一篇</div>
+                <i class="far fa-dot-circle"></i>&nbsp;本篇
+            </div>
             <div class="card">
-                <a href="/2017/09/27/hystrix1/">
+                <a href="/2021/04/22/es-debug/">
                     <div class="card-image">
                         
                         
-                        <img src="/medias/featureimages/12.jpg" class="responsive-img" alt="Hystrix初探">
+                        <img src="/medias/featureimages/3.jpg" class="responsive-img" alt="IDEA调试Elasticsearch源码">
                         
-                        <span class="card-title">Hystrix初探</span>
+                        <span class="card-title">IDEA调试Elasticsearch源码</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
                     <div class="summary block-with-text">
                         
-                            去年在看spring cloud系列的时候，当时就已经了解到了hystrix，这个组件和eureka，zuul等组件一样都是netflix公司开源的。当时由于没有太多的精力，只简单了解了下hystrix的一些简单功能。这半年因为工作关系一直
+                            本文首先会介绍在Mac上如何通过docker来安装es单机版本和集群版本，然后重点叙述如何使用IDEA编译Elasticsearch源码并进行调试
                         
                     </div>
                     <div class="publish-info">
-                        <span class="publish-date">
-                            <i class="far fa-clock fa-fw icon-date"></i>2017-09-27
-                        </span>
+                            <span class="publish-date">
+                                <i class="far fa-clock fa-fw icon-date"></i>2021-04-22
+                            </span>
                         <span class="publish-author">
                             
                             <i class="fas fa-bookmark fa-fw icon-category"></i>
@@ -978,11 +1026,16 @@ private static GenericObjectPoolConfig getPoolConfig() &#123;
                         </span>
                     </div>
                 </div>
+
                 
                 <div class="card-action article-tags">
                     
-                    <a href="/tags/Hystrix/">
-                        <span class="chip bg-color">Hystrix</span>
+                    <a href="/tags/Elasticsearch/">
+                        <span class="chip bg-color">Elasticsearch</span>
+                    </a>
+                    
+                    <a href="/tags/docker/">
+                        <span class="chip bg-color">docker</span>
                     </a>
                     
                 </div>
@@ -996,25 +1049,24 @@ private static GenericObjectPoolConfig getPoolConfig() &#123;
                 下一篇&nbsp;<i class="fas fa-chevron-right"></i>
             </div>
             <div class="card">
-                <a href="/2017/06/18/jedis-cluster/">
+                <a href="/2021/04/03/mybatis/">
                     <div class="card-image">
                         
                         
-                        <img src="/medias/featureimages/18.jpg" class="responsive-img" alt="jedis源码分析">
+                        <img src="/medias/featureimages/8.jpg" class="responsive-img" alt="Mybatis如何从DAO到SQL">
                         
-                        <span class="card-title">jedis源码分析</span>
+                        <span class="card-title">Mybatis如何从DAO到SQL</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
                     <div class="summary block-with-text">
                         
-                            
-创建redisClient BinaryJedisCluster我们可以从jedis给出官方的redis-clusterdemo上可以看到通过构造一个BinaryJedisCluster，这个类就是jedis给我们提供的一个与redis-
+                            MyBatis 是一款优秀的持久层框架，它支持自定义 SQL、存储过程以及高级映射。在项目中通过配置不同的mapper和xml，然后即可方便的对数据库进行操作。对于Mybatis的使用方法大家应该都很熟悉，本文不再赘述，本文重点叙述Mybatis的原理，详细分析Mybatis如何完成从mapper到sql的转化过程
                         
                     </div>
                     <div class="publish-info">
                             <span class="publish-date">
-                                <i class="far fa-clock fa-fw icon-date"></i>2017-06-18
+                                <i class="far fa-clock fa-fw icon-date"></i>2021-04-03
                             </span>
                         <span class="publish-author">
                             
@@ -1031,12 +1083,8 @@ private static GenericObjectPoolConfig getPoolConfig() &#123;
                 
                 <div class="card-action article-tags">
                     
-                    <a href="/tags/redis-cluster/">
-                        <span class="chip bg-color">redis-cluster</span>
-                    </a>
-                    
-                    <a href="/tags/jedis/">
-                        <span class="chip bg-color">jedis</span>
+                    <a href="/tags/Mybatis/">
+                        <span class="chip bg-color">Mybatis</span>
                     </a>
                     
                 </div>
