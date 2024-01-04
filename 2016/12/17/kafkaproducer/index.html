@@ -807,7 +807,7 @@ public KafkaTemplate(ProducerFactory&lt;K, V&gt; producerFactory, boolean autoFl
             key.interestOps(0);
         &#125;
     &#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<p>上述代码我们在之前的博文中<a href="http://yeming.me/2016/02/28/nio/">Nio学习简单理解</a>已经分析过了，首先与kafka serve端建立了一个non blocking 的SocketChannel，然后将该channel注册到一个java.nio.channels.Selector上面，并注册OP_CONNECT事件，可以看到这是很典型的nio selector的用法。</p>
+<p>上述代码我们在之前的博文中<a target="_blank" rel="noopener" href="http://yeming.me/2016/02/28/nio/">Nio学习简单理解</a>已经分析过了，首先与kafka serve端建立了一个non blocking 的SocketChannel，然后将该channel注册到一个java.nio.channels.Selector上面，并注册OP_CONNECT事件，可以看到这是很典型的nio selector的用法。</p>
 <h3 id="真正的向kafka-sever发送消息"><a href="#真正的向kafka-sever发送消息" class="headerlink" title="真正的向kafka sever发送消息"></a>真正的向kafka sever发送消息</h3><p>先来看下KafkaChannel类里面的这个方法</p>
 <pre class="line-numbers language-none"><code class="language-none">public void setSend(Send send) &#123;
         if (this.send !&#x3D; null)
@@ -975,7 +975,7 @@ private boolean send(Send send) throws IOException &#123;
                     </i>
                 </span>
                 <span class="reprint-info">
-                    <a href="http://yeming.me/2016/12/17/kafkaproducer/">http://yeming.me/2016/12/17/kafkaproducer/</a>
+                    <a href="http://yeming.fun/2016/12/17/kafkaproducer/">http://yeming.fun/2016/12/17/kafkaproducer/</a>
                 </span>
             </div>
             <div class="reprint__notice">
@@ -1567,7 +1567,7 @@ ContainerProperties containerProps &#x3D; new ContainerProperties(
         <div class="col s12 m8 l8 copy-right">
             Copyright&nbsp;&copy;
             
-                <span id="year">2019-2021</span>
+                <span id="year">2019-2024</span>
             
             <span id="year">2019</span>
             <a href="/about" target="_blank">叶明</a>
@@ -1576,7 +1576,7 @@ ContainerProperties containerProps &#x3D; new ContainerProperties(
             <br>
             
             &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                class="white-color">67k</span>&nbsp;字
+                class="white-color">78.8k</span>&nbsp;字
             
             
             

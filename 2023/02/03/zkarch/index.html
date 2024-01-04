@@ -1,0 +1,1568 @@
+<!DOCTYPE HTML>
+<html lang="zh-CN">
+
+
+<head>
+    <meta charset="utf-8">
+    <meta name="keywords" content="ZK架构设计与优化, 叶明の个人博客">
+    <meta name="description" content="苦练基本功，长期有耐心">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="renderer" content="webkit|ie-stand|ie-comp">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+
+<script async src="https://www.googletagmanager.com/gtag/js?id="></script>
+<script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() {
+        dataLayer.push(arguments);
+    }
+
+    gtag('js', new Date());
+    gtag('config', '');
+</script>
+
+
+    <title>ZK架构设计与优化 | 叶明の个人博客</title>
+    <link rel="icon" type="image/png" href="/avatar.png">
+
+    <link rel="stylesheet" type="text/css" href="/libs/awesome/css/all.css">
+    <link rel="stylesheet" type="text/css" href="/libs/materialize/materialize.min.css">
+    <link rel="stylesheet" type="text/css" href="/libs/aos/aos.css">
+    <link rel="stylesheet" type="text/css" href="/libs/animate/animate.min.css">
+    <link rel="stylesheet" type="text/css" href="/libs/lightGallery/css/lightgallery.min.css">
+    <link rel="stylesheet" type="text/css" href="/css/matery.css">
+    <link rel="stylesheet" type="text/css" href="/css/my.css">
+
+    <script src="/libs/jquery/jquery.min.js"></script>
+
+<meta name="generator" content="Hexo 5.4.0"><link rel="alternate" href="/atom.xml" title="叶明の个人博客" type="application/atom+xml">
+</head>
+
+
+
+
+<body>
+    <header class="navbar-fixed">
+    <nav id="headNav" class="bg-color nav-transparent">
+        <div id="navContainer" class="nav-wrapper container">
+            <div class="brand-logo">
+                <a href="/" class="waves-effect waves-light">
+                    
+                    <img src="/avatar.png" class="circle logo-img" alt="LOGO">
+                    
+                    <span class="logo-span">叶明の个人博客</span>
+                </a>
+            </div>
+            
+
+<a href="#" data-target="mobile-nav" class="sidenav-trigger button-collapse"><i class="fas fa-bars"></i></a>
+<ul class="right nav-menu">
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/" class="waves-effect waves-light">
+      
+      <i class="fas fa-home" style="zoom: 0.6;"></i>
+      
+      <span>首页</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/tags" class="waves-effect waves-light">
+      
+      <i class="fas fa-tags" style="zoom: 0.6;"></i>
+      
+      <span>标签</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/categories" class="waves-effect waves-light">
+
+      
+      <i class="fas fa-bookmark" style="zoom: 0.6;"></i>
+      
+      <span>分类</span>
+      <i class="fas fa-chevron-down" aria-hidden="true" style="zoom: 0.6;"></i>
+    </a>
+    <ul class="sub-nav menus_item_child ">
+      
+      <li>
+        <a href="/categories/%E6%8A%80%E6%9C%AF%E5%88%86%E4%BA%AB/">
+          
+          <i class="fas fa-book" style="margin-top: -20px; zoom: 0.6;"></i>
+          
+          <span>技术分享</span>
+        </a>
+      </li>
+      
+      <li>
+        <a href="/categories/%E6%97%85%E8%A1%8C%E8%B6%B3%E8%BF%B9">
+          
+          <i class="fas fa-film" style="margin-top: -20px; zoom: 0.6;"></i>
+          
+          <span>旅行足迹</span>
+        </a>
+      </li>
+      
+    </ul>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/archives" class="waves-effect waves-light">
+      
+      <i class="fas fa-archive" style="zoom: 0.6;"></i>
+      
+      <span>归档</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/about" class="waves-effect waves-light">
+      
+      <i class="fas fa-user-circle" style="zoom: 0.6;"></i>
+      
+      <span>关于</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/friends" class="waves-effect waves-light">
+      
+      <i class="fas fa-address-book" style="zoom: 0.6;"></i>
+      
+      <span>友情链接</span>
+    </a>
+    
+  </li>
+  
+  <li>
+    <a href="#searchModal" class="modal-trigger waves-effect waves-light">
+      <i id="searchIcon" class="fas fa-search" title="搜索" style="zoom: 0.85;"></i>
+    </a>
+  </li>
+</ul>
+
+
+<div id="mobile-nav" class="side-nav sidenav">
+
+    <div class="mobile-head bg-color">
+        
+        <img src="/avatar.png" class="logo-img circle responsive-img">
+        
+        <div class="logo-name">叶明の个人博客</div>
+        <div class="logo-desc">
+            
+            苦练基本功，长期有耐心
+            
+        </div>
+    </div>
+
+    
+
+    <ul class="menu-list mobile-menu-list">
+        
+        <li class="m-nav-item">
+	  
+		<a href="/" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-home"></i>
+			
+			首页
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/tags" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-tags"></i>
+			
+			标签
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="javascript:;">
+			
+				<i class="fa-fw fas fa-bookmark"></i>
+			
+			分类
+			<span class="m-icon"><i class="fas fa-chevron-right"></i></span>
+		</a>
+            <ul  style="background:  ;" >
+              
+                <li>
+
+                  <a href="/categories/%E6%8A%80%E6%9C%AF%E5%88%86%E4%BA%AB/ " style="margin-left:75px">
+				  
+				   <i class="fa fas fa-book" style="position: absolute;left:50px" ></i>
+			      
+		          <span>技术分享</span>
+                  </a>
+                </li>
+              
+                <li>
+
+                  <a href="/categories/%E6%97%85%E8%A1%8C%E8%B6%B3%E8%BF%B9 " style="margin-left:75px">
+				  
+				   <i class="fa fas fa-film" style="position: absolute;left:50px" ></i>
+			      
+		          <span>旅行足迹</span>
+                  </a>
+                </li>
+              
+            </ul>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/archives" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-archive"></i>
+			
+			归档
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/about" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-user-circle"></i>
+			
+			关于
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/friends" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-address-book"></i>
+			
+			友情链接
+		</a>
+          
+        </li>
+        
+        
+    </ul>
+</div>
+
+
+        </div>
+
+        
+    </nav>
+
+</header>
+
+    
+<script src="/libs/cryptojs/crypto-js.min.js"></script>
+<script>
+    (function() {
+        let pwd = '';
+        if (pwd && pwd.length > 0) {
+            if (pwd !== CryptoJS.SHA256(prompt('请输入访问本文章的密码')).toString(CryptoJS.enc.Hex)) {
+                alert('密码错误，将返回主页！');
+                location.href = '/';
+            }
+        }
+    })();
+</script>
+
+
+
+
+<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/10.jpg')">
+    <div class="container" style="right: 0px;left: 0px;">
+        <div class="row">
+            <div class="col s12 m12 l12">
+                <div class="brand">
+                    <h1 class="description center-align post-title">ZK架构设计与优化</h1>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+<main class="post-container content">
+
+    
+    <link rel="stylesheet" href="/libs/tocbot/tocbot.css">
+<style>
+    #articleContent h1::before,
+    #articleContent h2::before,
+    #articleContent h3::before,
+    #articleContent h4::before,
+    #articleContent h5::before,
+    #articleContent h6::before {
+        display: block;
+        content: " ";
+        height: 100px;
+        margin-top: -100px;
+        visibility: hidden;
+    }
+
+    #articleContent :focus {
+        outline: none;
+    }
+
+    .toc-fixed {
+        position: fixed;
+        top: 64px;
+    }
+
+    .toc-widget {
+        width: 345px;
+        padding-left: 20px;
+    }
+
+    .toc-widget .toc-title {
+        padding: 35px 0 15px 17px;
+        font-size: 1.5rem;
+        font-weight: bold;
+        line-height: 1.5rem;
+    }
+
+    .toc-widget ol {
+        padding: 0;
+        list-style: none;
+    }
+
+    #toc-content {
+        padding-bottom: 30px;
+        overflow: auto;
+    }
+
+    #toc-content ol {
+        padding-left: 10px;
+    }
+
+    #toc-content ol li {
+        padding-left: 10px;
+    }
+
+    #toc-content .toc-link:hover {
+        color: #42b983;
+        font-weight: 700;
+        text-decoration: underline;
+    }
+
+    #toc-content .toc-link::before {
+        background-color: transparent;
+        max-height: 25px;
+
+        position: absolute;
+        right: 23.5vw;
+        display: block;
+    }
+
+    #toc-content .is-active-link {
+        color: #42b983;
+    }
+
+    #floating-toc-btn {
+        position: fixed;
+        right: 15px;
+        bottom: 76px;
+        padding-top: 15px;
+        margin-bottom: 0;
+        z-index: 998;
+    }
+
+    #floating-toc-btn .btn-floating {
+        width: 48px;
+        height: 48px;
+    }
+
+    #floating-toc-btn .btn-floating i {
+        line-height: 48px;
+        font-size: 1.4rem;
+    }
+</style>
+<div class="row">
+    <div id="main-content" class="col s12 m12 l9">
+        <!-- 文章内容详情 -->
+<div id="artDetail">
+    <div class="card">
+        <div class="card-content article-info">
+            <div class="row tag-cate">
+                <div class="col s7">
+                    
+                    <div class="article-tag">
+                        
+                            <a href="/tags/ZK/">
+                                <span class="chip bg-color">ZK</span>
+                            </a>
+                        
+                            <a href="/tags/CAP/">
+                                <span class="chip bg-color">CAP</span>
+                            </a>
+                        
+                    </div>
+                    
+                </div>
+                <div class="col s5 right-align">
+                    
+                    <div class="post-cate">
+                        <i class="fas fa-bookmark fa-fw icon-category"></i>
+                        
+                            <a href="/categories/%E6%8A%80%E6%9C%AF%E5%88%86%E4%BA%AB/" class="post-category">
+                                技术分享
+                            </a>
+                        
+                    </div>
+                    
+                </div>
+            </div>
+
+            <div class="post-info">
+                
+                <div class="post-date info-break-policy">
+                    <i class="far fa-calendar-minus fa-fw"></i>发布日期:&nbsp;&nbsp;
+                    2023-02-03
+                </div>
+                
+
+                
+
+                
+                <div class="info-break-policy">
+                    <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
+                    7.9k
+                </div>
+                
+
+                
+                <div class="info-break-policy">
+                    <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
+                    29 分
+                </div>
+                
+
+                
+                    <div id="busuanzi_container_page_pv" class="info-break-policy">
+                        <i class="far fa-eye fa-fw"></i>阅读次数:&nbsp;&nbsp;
+                        <span id="busuanzi_value_page_pv"></span>
+                    </div>
+				
+            </div>
+        </div>
+        <hr class="clearfix">
+
+        
+        <!-- 是否加载使用自带的 prismjs. -->
+        <link rel="stylesheet" href="/libs/prism/prism.css">
+        
+
+        
+
+        <div class="card-content article-card-content">
+            <div id="articleContent">
+                <h2 id="一、ZK基础"><a href="#一、ZK基础" class="headerlink" title="一、ZK基础"></a>一、ZK基础</h2><hr>
+<p>ZK，全称为 ZooKeeper，是一个分布式协调服务，由雅虎公司开发并开源。ZK 提供了一个高可用、高性能（Raptor测试链接同机房直连ZK节点Avg耗时0.1ms）、分布式的协调服务，用于解决分布式系统中的一些协调问题，如分布式锁、分布式协调、分布式配置中心、分布式队列等。被广泛地应用于诸如 Hadoop、HBase、Kafka 和 Dubbo 等大型开源分布式系统中，公司内部的Squirrel、MNS、Crane、Mafka、DTS以及一些业务系统也广泛使用ZK来实现数据订阅、Leader选举、分布式锁等。</p>
+<hr>
+<h3 id="1-1、ZK名词解释"><a href="#1-1、ZK名词解释" class="headerlink" title="1.1、ZK名词解释"></a>1.1、ZK名词解释</h3><p>LocalSession：本地会话指客户端与 ZooKeeper 服务器之间的一次连接。当客户端与 ZooKeeper 服务器建立连接时，会创建一个本地会话。本地会话的生命周期与客户端与服务器之间的连接一致。如果客户端与服务器之间的连接断开，那么本地会话也会被关闭。主要用于创建临时节点、处理读请求。<br>GlobalSession：全局会话是指客户端与 ZooKeeper 集群之间的一次连接。当客户端与 ZooKeeper 集群中的任意一个服务器建立连接时，会创建一个全局会话。全局会话的生命周期与客户端与集群之间的连接一致。如果客户端与集群之间的连接断开，那么全局会话也会被关闭。所有的全局会话都会同步到Leader节点，由Leader节点来统一检测其超时时间。</p>
+<ul>
+<li>TxnLog：事务日志文件，每次写请求都会转化成一个事务日志操作，一阶段提交时候会将事务日志顺序写入到事务日志文件.</li>
+<li>SnapLog：内存快照文件，内存Database对应的快照文件，满足一定条件就会将内存Database序列化后生成一份快找文件。</li>
+<li>Zxid：全局事务ID，用于标识 ZooKeeper 中的每个事务。每个 ZooKeeper 事务都有自己的 zxid，用于标识该事务的唯一性和顺序。每次新的事务请求，Zxid都会加1。</li>
+<li>Epoch：纪元，Epoch 用于标识 ZooKeeper 服务器的状态和版本信息，简单理解没新产生一个Leader，Epoch都会加1。</li>
+<li>MyId：节点ID，ZK集群中每个ZK节点的唯一标识。</li>
+<li>Proposal：Leader节点向所有Follower节点发送的一阶段事务提议请求。</li>
+<li>Commit：Leader节点向所有Follower节点发送的二阶段事务提交请求。</li>
+</ul>
+<h3 id="1-2、ZK数据结构模型"><a href="#1-2、ZK数据结构模型" class="headerlink" title="1.2、ZK数据结构模型"></a>1.2、ZK数据结构模型</h3><p>ZooKeeper 中的数据结构模型采用了类似文件系统的树形结构，每个节点都唯一关联一个路径Path，每个节点可能又会存在多个Children节点。如下图，“/mns/prod/com.sankuai.crayfish.sign”代表一个节点的Path，节点详情展示了节点的Value（data字段）以及其他属性字段值。<br><img src="/2023/02/03/zkarch/zktree.png" width="50%/"><br>ZK会将上述树形结构包含的所有节点缓存到内存当中，生成一个内存Database，实现原理特别简单。大体上就是维护了一个 ConcurrentHashMap，其中 Key 是节点的Path，Value是节点数据 DataNode。ZK会将上述所有的节点，例如 “/”、“/leader”、“/mns”、“/mns/sankuai”、“/mns/sankuai/prod”、“/mns/sankuai/prod、com.sankuai.crayfish.sign”等等全部保存到ConcurrentHashMap中。简述下从Database中读、修改、新增数据过程</p>
+<ul>
+<li>读数据：传入Path，从 ConcurrentHashMap 中获取DataNode，若读请求中带有watch标识，需要向该Path注册一个Watcher，后续用来监听数据变更并通知客户端。</li>
+<li>修改数据：传入Path和Value，从 ConcurrentHashMap 中获取DataNode，修改 data 的值，然后修改 stat 信息，最后触发该Path上所有注册的Watcher</li>
+<li>新增数据：传入Path和Value，根据传入Path解析出父节点的Path，根据parentPath从ConcurrentHashMap中获取父节点数据DataNode，父节点的children中添加传入的子节点Path。根据传入Path，创建一个新的DataNode，将其数据插入到ConcurrentHashMap中。完成上述操作后，触发该Path上所有注册的Watcher。<pre class="line-numbers language-java" data-language="java"><code class="language-java"><span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">DataNode</span> <span class="token keyword">implements</span> <span class="token class-name">Record</span> <span class="token punctuation">&#123;</span>
+    <span class="token comment">//节点value</span>
+    <span class="token keyword">byte</span><span class="token punctuation">[</span><span class="token punctuation">]</span> data<span class="token punctuation">;</span>
+    <span class="token comment">//节点stat数据，上图中的czxid、mzxid、ctime等等</span>
+    <span class="token keyword">public</span> <span class="token class-name">StatPersisted</span> stat<span class="token punctuation">;</span>
+    <span class="token comment">//节点children，存储子节点Path列表</span>
+    <span class="token keyword">private</span> <span class="token class-name">Set</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token class-name">String</span><span class="token punctuation">></span></span> children <span class="token operator">=</span> <span class="token keyword">null</span><span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h2 id="二、ZK架构设计"><a href="#二、ZK架构设计" class="headerlink" title="二、ZK架构设计"></a>二、ZK架构设计</h2><h3 id="2-1、整体架构"><a href="#2-1、整体架构" class="headerlink" title="2.1、整体架构"></a>2.1、整体架构</h3><img src="/2023/02/03/zkarch/zkarch.png" width="50%/">
+如上图所示，ZK集群服务端包括一个Leader节点、若干个Follower节点、若干个Observer节点（可选），其中 Leader 和 Follower 节点统称为Voter节点（会参与事务处理、Leader选举投票）。Leader节点会与所有Follower节点和Observer节点建立一个Socket双向通信链接，主要用作集群内部之间的通信，实现Leader选举、数据同步、数据广播和心跳检测等功能。在上述节点中，Voter节点主要有以下两个作用:</li>
+<li>参与Leader选举：所有voter节点会参与Leader竞选和投票</li>
+<li>参与写请求二阶段处理：对于客户端的任意一个写请求，都需要半数以上的 Voter 节点ACK后，才能最终提交。</li>
+</ul>
+<p>由于ZK采用类似二阶段提交协议来处理写请求，故出于性能考虑，不能配置太多的Follower节点，基于此ZK引入了Observer节点，通过水平扩容Observer节点来提升整个ZK集群处理读请求性能。<br>ZK客户端启动后会随机选择一个ZK节点与其建立连接，链接建立好之后，即可发起读、写、监听等各类请求。</p>
+<h3 id="2-2、数据广播"><a href="#2-2、数据广播" class="headerlink" title="2.2、数据广播"></a>2.2、数据广播</h3><p>ZK客户端与集群中的任一ZK节点建立链接之后，即可发起读写请求。对于读请求，不管客户端当前连接的节点是Leader、Follower还是Observer，收到客户端请求之后，直接从内存Database中查到数据返回给客户端即可。对于写请求，ZK集群处理逻辑较为复杂，整体上类似一个二阶段提交的过程，详细过程参考 <a href="/2023/01/15/zkprocess/">ZK处理客户端请求流程梳理</a> ：<br><img src="/2023/02/03/zkarch/guangbo.png" width="50%/"></p>
+<ol>
+<li>假设客户端与ZK集群一个Follower节点已经建立了链接，于是向该节点发送一个写请求来更新指定ZK节点的Value。</li>
+<li>Follower收到请求后，判断是写请求，需要向Leader发送Request请求，将写请求转发给Leader。</li>
+<li>Leader收到Follower的Request后，先生成一个全局事务Zxid，然后将该写请求转化成一个事务请求Proposal。</li>
+<li>Leader自身完成一阶段处理，并向集群中的所有Follower节点发送一阶段Propose请求，同时记录向每个Follower节点发送请求的具体时间（心跳检测会用到），然后等待Follower节点响应。</li>
+<li>Follower节点收到Propose后，开始一阶段处理，主要会完成两件事情：<ul>
+<li>事务日志落盘：将事务请求Proposal同步写入事务日志文件TxnLog，类似于MySQL WAL机制，将随机读写磁盘转换成一个顺序写磁盘的记录日志操作。</li>
+<li>生成快照文件（根据条件触发）：从上次生成快照文件之后，新增的事务日志条数或者事务日志占用的内存大小是否超过一定阈值，若超过阈值，开启一个子线程将当前内存中的Database数据序列化后生成一个快照文件SnapLog。</li>
+<li>完成上述操作后，会在内存中记录当前处理的Zxid</li>
+</ul>
+</li>
+<li>Follower节点向Leader节点发送ACK，表示一阶段已经成功执行。</li>
+<li>Leader节点陆续接受到Follower节点的ACK，若加上Leader节点自己处理成功的个数超过Voter节点总数的一半，则判断一阶段整体执行成功。（Leader节点要么收到从节点的ACK，要么在规定超时时间内没有收到从节点ACK请求，不存在从节点发送操作失败情况，所以不存在主动通知Follower节点回滚逻辑）</li>
+<li>Leader节点自身完成二阶段处理，同时向所有Follower节点发送二阶段Commit请求，向所有Observer节点发送Inform请求，此过程Leader节点不关注其他节点处理结果。</li>
+<li>Follower节点收到Commit请求后，会先判断Zxid是否与一阶段Pending的Zxid是否相同<ul>
+<li>若不同，表示由于网络丢包或者其他异常，Follower节点可能遗漏掉一些事务请求，Follower节点会直接关闭与客户端的所有链接，同时会断开和Leader的链接，直接进入“重启过程”。</li>
+<li>若相同，根据事务请求的Path和Value，更新内存中Database 的数据。同时将当前已经成功Commit的事务日志缓存到内存队列committedLog（默认500条）中，并修改内存队列中的minCommittedLog 和 maxCommittedLog。</li>
+<li>Observer节点收到Inform请求，处理逻辑与Follower节点基本相似，不再赘述。</li>
+</ul>
+</li>
+<li>Follower节点二阶段处理成功后，返回客户端操作成功（只会由最初收到客户端写请求的那个Follower节点来返回给客户端Response）。</li>
+</ol>
+<p>综述，ZK基于共识协议，对于任意写请求，都交由Leader节点来协调，采用两阶段提交，第一阶段完成事务日志落盘，第二阶段完成内存Database数据更新。在不明显降低写性能的情况下，保证极端故障情况下只要Commit的数据都不会出现丢失。</p>
+<h3 id="2-3、心跳同步检测"><a href="#2-3、心跳同步检测" class="headerlink" title="2.3、心跳同步检测"></a>2.3、心跳同步检测</h3><p>Leader节点与Follower节点启动后会相互创建Socket来与对方进行通信，主要是通过相互发送Ping来实现心跳检测，心跳检测主要包含两个作用：</p>
+<ul>
+<li>检测节点维度是否超时或者故障：以Leader为例，若发现读写Socket失败，会认为Follower异常而关闭Socket；对于Follower节点，若发现读写Socket失败，会认为Leader节点已经失效，会将自己的状态从 Following 状态变为 Looking 状态，进而发起一轮新的选举过程。</li>
+<li>检测全局会话维度是否出现超时：在 ZK 集群中，客户端与ZK节点会建立一个本地Session，若客户端存在写请求，则会将该本地Session升级为全局Session，即ZK节点会将该Session信息同步到Leader节点，后续由Leader节点统一来检测所有的全局会话是否超时。</li>
+</ul>
+<p>梳理下Leader和Follower节点心跳同步的过程：</p>
+<ol>
+<li>Leader每次向Follower节点发起Ping之前，会判断当前时间与上次收到Follower节点请求的时间之差是否大于超时时间，若超时，Leader节点会认为Follower节点已经失效，会主动关闭Socket链接。</li>
+<li>Leader向Follower节点发送Ping请求。</li>
+<li>Follower节点收到请求后，将本机的全局会话信息封装到 Ping 请求中。</li>
+<li>Follower节点向Leader节点发送Ping请求。</li>
+<li>Leader节点收到Ping请求，更新维护的全局会话信息（会单独启动一个线程基于该信息来检测全局会话是否超时）</li>
+</ol>
+<p>间隔0.5*TickTime后，会进入到下一次心跳同步阶段，以此循环往复。</p>
+<img src="/2023/02/03/zkarch/heartbeat.png" width="50%/">
+
+<h3 id="2-4、Leader选举"><a href="#2-4、Leader选举" class="headerlink" title="2.4、Leader选举"></a>2.4、Leader选举</h3><p>ZK节点在运行过程中存在以下几个状态：LOOKING（竞选或者寻找Leader状态）、FOLLOWING（Follower节点状态）、LEADING（Leader节点状态）、OBSERVING（Observer节点状态）。上文已经提到，当Leader正常运行时候，Follower节点会以阻塞的方式循环读取与Leader之间创建的Socket数据；一旦Leader出现故障，读取Socket会抛异常，导致循环中断，Leader会从FOLLOWING状态变更到LOOKING 状态，进而会发起一次新的Leader选举，具体选举过程如下：</p>
+<ol>
+<li>Leader出现故障，Follower1和Follower2两个节点感知到Leader故障，然后相继发起新的Leader选举。</li>
+<li>初次投票，Follower节点默认都会提议自身作为Leader候选人，会将自身的Epoch、Zxid、节点ID信息同步给集群中的其他Follower。<ul>
+<li>先以Follower1的视角来分析第一轮选举的结果，Follower1提议自己作为Leader候选，后续又收到了Follower2提议的候选人Follower2，Follower1节点判断自身的Zxid较大，故依然维持自己的判断，但是由于获得票数只有1票，未超过集群 Voter节点的一半2个（3个Voter），故还需要等待。</li>
+<li>然后以Follower2的视角来分析第一轮选举的结果，Follower2同样提议自己作为Leader候选，后续又收到了Follower1提议的候选人Follower1，Follower2节点判断Follower1节点Zxid较大，会修改自己的Leader候选人，并将最新提议的候选人广播给集群中其他节点，然后进行等待。</li>
+</ul>
+</li>
+<li>Follower2重新投票后，Follower1节点收到消息后，此时Follower1节点判断自身已经得到了2票，超过集群Voter节点一半，故Follower1当选为Leader节点，然后会发出广播告知其他节点已经完成Leader选举</li>
+<li>Follower2节点接受到广播消息后，就会与新的Leader节点建立链接。</li>
+</ol>
+<img src="/2023/02/03/zkarch/elect.png" width="50%/">
+
+<h3 id="2-5、数据同步"><a href="#2-5、数据同步" class="headerlink" title="2.5、数据同步"></a>2.5、数据同步</h3><p>此处提到的数据同步主要指节点初始化需要与Leader节点进行数据同步以保证数据一致，完成数据同步后，该节点才能对外提供服务。数据同步包含以下几种形式：</p>
+<ul>
+<li>新节点加入集群：新的节点加入到一个ZK集群，该节点需要与Leader进行数据同步。</li>
+<li>原先故障节点重新加入集群：同新节点加入集群类似，只是在数据同步之前需要先从快照文件SnapLog和事务日志文件TxnLog中恢复数据，然后同Leader进行数据同步。</li>
+<li>集群选出新的Leader：集群重新选举出新的Leader后，其余所有节点都要与Leader进行数据同步。</li>
+</ul>
+<p>Follower启动数据同步过程如下：</p>
+<ol>
+<li>从磁盘上加载快照文件到内存，生成内存Database，并记录当前处理的最大maxZxid。</li>
+<li>从磁盘上加载事务日志文件，对于事务日志文件中Zxid大于步骤1中maxZxid的事务，都需要按照顺序加载到Database（同二阶段处理Commit请求类似直接修改Database中的数据），记录下此时最新的Zxid。</li>
+<li>加载数据完成后Follower节点开始加入集群，寻找到Leader后，与其建立连接，并发送当前最新的Zxid。</li>
+<li>Leader接受建链请求，创建Socket，读取到Follower传过来的Zxid，将其与minCommittedLog和maxCommittedLog进行比较，比较逻辑如下：<ul>
+<li>Zxid == maxCommittedLog，Leader 节点发送一个空的DIFF请求给Follower，Follower 收到该请求后，无需处理，直接结束数据同步过程，可以对外提供服务。</li>
+<li>Zxid &gt; maxCommittedLog，说明Follower节点数据比当前Leader还新，不合理。此时，Leader节点会发送TRUNC请求给 Follower，Follower收到请求后，根据Leader传过来的maxCommittedLog，从事务日志文件中删除大于其的事务日志，然后根据快照文件和事务日志文件恢复数据。</li>
+<li>minCommittedLog&lt;=Zxid&lt;maxCommittedLog，那么Leader 节点会遍历内存队列committedLog中的事务日志，对于大于Zxid的事务日志，Leader会向Follower节点发起Commit请求，Follower节点接受到请求后，将其顺序加载到Database。</li>
+<li>Zxid &lt; minCommittedLog，说明Follower节点数据太旧，Leader内存队列中已经没有缓存该事务日志，Leader节点会先从事务日志文件中找到事务ID=Zxid的日志，若事务日志文件中可以找到该Zxid的日志，且从该Zxid的日志开始到maxCommittedLog总的日志大小在制定阈值范围之内，那么Leader节点会将这些事务日志按照顺序向Follower节点发起Commit请求；若不满足上述条件，Leader节点需要向Follower节点发起一个SNAP请求，然后会将内存Database中的数据全部序列化进行发送，Follower节点接收到SNAP请求后，从Socket中读取Leader发过来的数据，将其加载到内存。加载完成后即完成了数据同步过程。</li>
+</ul>
+</li>
+</ol>
+<img src="/2023/02/03/zkarch/sync.png" width="50%/">
+
+<h2 id="三、ZK数据一致性分析"><a href="#三、ZK数据一致性分析" class="headerlink" title="三、ZK数据一致性分析"></a>三、ZK数据一致性分析</h2><h3 id="3-1、CAP简介"><a href="#3-1、CAP简介" class="headerlink" title="3.1、CAP简介"></a>3.1、CAP简介</h3><p>ZooKeeper 是一个分布式协调服务，它的设计目标是提供高可用性和一致性的服务。从 CAP 系统定义的角度来看，ZooKeeper 更加注重一致性和分区容错性，而在可用性方面做了一定的牺牲。</p>
+<ul>
+<li>分区容器性（Partition Tolerance）：ZooKeeper 采用了主从复制的架构，将数据复制到多个节点上，以保证数据的可靠性和容错性。当主节点发生故障时，ZooKeeper 会自动切换到备用节点，保证系统的可用性和稳定性</li>
+<li>一致性（Consistency）：因为 ZooKeeper 主要用于实现分布式锁、配置管理、服务发现等功能，这些功能对数据的一致性要求非常高。ZooKeeper 通过使用 Paxos 算法和 ZAB 协议来保证数据的一致性和可靠性，即使在网络分区或节点故障的情况下，ZooKeeper 也能够保持数据的一致性。</li>
+<li>可用性（Availability）：ZooKeeper 采用了一些措施来保证系统的可用性，例如使用心跳机制来检测节点的健康状态，使用多个备用节点来保证系统的容错性，以及使用会话超时机制来避免死锁等问题。但是，为了保证数据的一致性和可靠性，ZooKeeper 在某些情况下可能会牺牲一定的可用性，例如在进行 leader 选举时，ZooKeeper 会暂停对外服务，直到选举完成。<h3 id="3-2、ZK一致性讨论"><a href="#3-2、ZK一致性讨论" class="headerlink" title="3.2、ZK一致性讨论"></a>3.2、ZK一致性讨论</h3>根据 <a target="_blank" rel="noopener" href="https://zookeeper.apache.org/doc/current/zookeeperInternals.html">ZK官方</a> 的描述，其数据一致性实际是处于强一致性和顺序一致性之间。下文简述下一致性的各个级别，严格级别从上到下层层降低。</li>
+</ul>
+<pre class="line-numbers language-text" data-language="text"><code class="language-text">The consistency guarantees of ZooKeeper lie between sequential consistency and linearizability. In this section,
+we explain the exact consistency guarantees that ZooKeeper provides.
+
+Write operations in ZooKeeper are linearizable. In other words, each write will appear to take effect atomically at some 
+point between when the client issues the request and receives the corresponding response. This means that the writes 
+performed by all the clients in ZooKeeper can be totally ordered in such a way that respects the real-time ordering 
+of these writes. However, merely stating that write operations are linearizable is meaningless unless we also talk about 
+read operations.
+
+Read operations in ZooKeeper are not linearizable since they can return potentially stale data. This is because a read 
+in ZooKeeper is not a quorum operation and a server will respond immediately to a client that is performing a read. 
+ZooKeeper does this because it prioritizes performance over consistency for the read use case. However, reads in ZooKeeper 
+are sequentially consistent, because read operations will appear to take effect in some sequential order that furthermore 
+respects the order of each client&#39;s operations. A common pattern to work around this is to issue a sync before issuing a read.
+This too does not strictly guarantee up-to-date data because sync is not currently a quorum operation. To illustrate, 
+consider a scenario where two servers simultaneously think they are the leader, something that could occur if the TCP 
+connection timeout is smaller than syncLimit * tickTime. Note that this is unlikely to occur in practice, but should be 
+kept in mind nevertheless when discussing strict theoretical guarantees. Under this scenario, it is possible that the 
+sync is served by the “leader” with stale data, thereby allowing the following read to be stale as well. The stronger 
+guarantee of linearizability is provided if an actual quorum operation (e.g., a write) is performed before a read.
+
+Overall, the consistency guarantees of ZooKeeper are formally captured by the notion of ordered sequential consistency or OSC(U) to be exact, which lies between sequential consistency and linearizability.<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<ul>
+<li>强一致性/线性一致性（linearizability）：所有操作不论读写、不论是来自哪个客户端session，都是全局有序的，因为全局有序，所以需要有全局时钟，并且一定能读到最新数据。ZK写请求达到了强一致性</li>
+<li>顺序一致性（Sequential consistency）：每个session的请求是保证严格有序的，但是不需要全局时钟。所有的session看到数据的顺序都必须和全局操作的执行顺序一致。也就是说，虽然所有操作并不是按照严格时序执行的，但是所有session读取时看到的顺序都是唯一确定的。你也可以这么理解：线性一致性会把所有请求按请求时间戳排队，任何时刻读取都能读取到最新的数据。而顺序一致性保证任何时刻读取的数据顺序都是一致的即可，也就是不要求一定读到最新数据。ZK读请求实现了顺序一致性</li>
+<li>因果一致性（Causal consistency）：每个session的请求是保证严格有序的，其他session读到的数据不一定是按全局顺序的，但是一个session发出的请求顺序一定是确定的。比如某个session更新a=2后再更新a=1,其他session可以拿不到a=1这个最新值,但是不能拿到a=1之后又拿到a=2，因为这和更新者发起的顺序不相符。但是如果a=2和a=1是不同session发出的，那对于其他session来说，谁先谁后就无任何要求<br><br>顺序一致性和因果一致性的区别就在于：系统是否需要对多个来源的数据重新排队，需要重排队的就是顺序一致。不需要重排队，保证每个数据来源顺序一致就可以的话，是因果一致。</li>
+<li>最终一致性（Eventual consistency）：最终一致性只是定义了系统停止新的写入后，在一段时间内，任何session读取的数据都将一致。此外什么也不保证，“一段时间”是多久也没说，属于最弱的一致性。</li>
+</ul>
+<p>ZK Leader节点和Follower节点基于TCP链接的FIFO特性来保证节点接受到的读写请求一定能按照顺序被节点执行。对于写请求来说，由于都会经由Follower节点转发到Leader节点统一处理，Leader节点根据接受到的请求顺序来执行两阶段提交过程。由于在二阶段Commit阶段，节点对于写请求的处理是单线程串行执行，所以对于写请求，不会出现旧数据覆盖新数据的情况。<br>对于读请求，出于性能考虑，集群中任一ZK节点都能直接响应客户端的读请求，直接从内存Database查询到数据后即可返回给客户端，故读请求有可能读到旧的数据，同数据库、Redis其他存储组件读取从库也有概率读取到旧数据类似。当然ZK也提供了解决方案，在每次读请求之前，客户端可以先发起一个Sync请求，收到Sync请求后的ZK节点会从Leader节点同步最新数据，显然该操作会降读请求的性能，同时给Leader带来较大压力，一般不建议使用。</p>
+<h2 id="四、ZK中潜在优化点"><a href="#四、ZK中潜在优化点" class="headerlink" title="四、ZK中潜在优化点"></a>四、ZK中潜在优化点</h2><h3 id="4-1、事务日志同步落盘影响写入性能"><a href="#4-1、事务日志同步落盘影响写入性能" class="headerlink" title="4.1、事务日志同步落盘影响写入性能"></a>4.1、事务日志同步落盘影响写入性能</h3><p>我们知道ZK一般更适合于读多写少的业务，根据线下环境对一个类似MNS的集群进行压测，该集群能支撑最高1000QPS的写入请求（ZK集群机器配置、以及写入数据大小不一导致性能可能会有差异）。上次机房故障，MNS集群和外卖公用集群由于整体写入明显增加导致集群近乎不可用。</p>
+<p><b>性能瓶颈原因</b>：通过上文对ZK写入过程的剖析以及测试，我们不难发现影响整体写入的瓶颈主要是在一阶段，Leader节点和Follower节点对于每条事务日志请求都需要同步落盘。根据测试结果，每条事务日志落盘大致耗时10ms（取决于写入大小），两阶段提交网络通信耗时2ms，其他过程耗时几乎可以忽略。</p>
+<pre class="line-numbers language-java" data-language="java"><code class="language-java"><span class="token keyword">public</span> <span class="token keyword">synchronized</span> <span class="token keyword">void</span> <span class="token function">commit</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token keyword">throws</span> <span class="token class-name">IOException</span> <span class="token punctuation">&#123;</span>
+    <span class="token class-name">Transaction</span> transaction <span class="token operator">=</span> <span class="token class-name">Cat</span><span class="token punctuation">.</span><span class="token function">newTransaction</span><span class="token punctuation">(</span><span class="token string">"ZK"</span><span class="token punctuation">,</span> <span class="token string">"commitTxnLog"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">try</span><span class="token punctuation">&#123;</span>
+      <span class="token keyword">if</span> <span class="token punctuation">(</span>logStream <span class="token operator">!=</span> <span class="token keyword">null</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+        logStream<span class="token punctuation">.</span><span class="token function">flush</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+      <span class="token punctuation">&#125;</span>
+      <span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token class-name">FileOutputStream</span> log <span class="token operator">:</span> streamsToFlush<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+        log<span class="token punctuation">.</span><span class="token function">flush</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token comment">//forceSync默认为true，每次写请求都需要将事务日志刷盘</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>forceSync<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+          <span class="token keyword">long</span> startSyncNS <span class="token operator">=</span> <span class="token class-name">System</span><span class="token punctuation">.</span><span class="token function">nanoTime</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+          <span class="token class-name">FileChannel</span> channel <span class="token operator">=</span> log<span class="token punctuation">.</span><span class="token function">getChannel</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+          channel<span class="token punctuation">.</span><span class="token function">force</span><span class="token punctuation">(</span><span class="token boolean">false</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+          syncElapsedMS <span class="token operator">=</span> <span class="token class-name">TimeUnit</span><span class="token punctuation">.</span>NANOSECONDS<span class="token punctuation">.</span><span class="token function">toMillis</span><span class="token punctuation">(</span><span class="token class-name">System</span><span class="token punctuation">.</span><span class="token function">nanoTime</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">-</span> startSyncNS<span class="token punctuation">)</span><span class="token punctuation">;</span>
+          <span class="token keyword">if</span> <span class="token punctuation">(</span>syncElapsedMS <span class="token operator">></span> fsyncWarningThresholdMS<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+            <span class="token keyword">if</span> <span class="token punctuation">(</span>serverStats <span class="token operator">!=</span> <span class="token keyword">null</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+              serverStats<span class="token punctuation">.</span><span class="token function">incrementFsyncThresholdExceedCount</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token punctuation">&#125;</span>
+
+            LOG<span class="token punctuation">.</span><span class="token function">warn</span><span class="token punctuation">(</span>
+              <span class="token string">"fsync-ing the write ahead log in &#123;&#125; took &#123;&#125;ms which will adversely effect operation latency."</span>
+              <span class="token operator">+</span> <span class="token string">"File size is &#123;&#125; bytes. See the ZooKeeper troubleshooting guide"</span><span class="token punctuation">,</span>
+              <span class="token class-name">Thread</span><span class="token punctuation">.</span><span class="token function">currentThread</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">getName</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+              syncElapsedMS<span class="token punctuation">,</span>
+              channel<span class="token punctuation">.</span><span class="token function">size</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+          <span class="token punctuation">&#125;</span>
+
+          <span class="token class-name">ServerMetrics</span><span class="token punctuation">.</span><span class="token function">getMetrics</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span>FSYNC_TIME<span class="token punctuation">.</span><span class="token function">add</span><span class="token punctuation">(</span>syncElapsedMS<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">&#125;</span>
+      <span class="token punctuation">&#125;</span>
+      <span class="token keyword">while</span> <span class="token punctuation">(</span>streamsToFlush<span class="token punctuation">.</span><span class="token function">size</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">></span> <span class="token number">1</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+        streamsToFlush<span class="token punctuation">.</span><span class="token function">poll</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">close</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+      <span class="token punctuation">&#125;</span>
+
+      <span class="token comment">// Roll the log file if we exceed the size limit</span>
+      <span class="token keyword">if</span> <span class="token punctuation">(</span>txnLogSizeLimit <span class="token operator">></span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+        <span class="token keyword">long</span> logSize <span class="token operator">=</span> <span class="token function">getCurrentLogSize</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>logSize <span class="token operator">></span> txnLogSizeLimit<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+          LOG<span class="token punctuation">.</span><span class="token function">debug</span><span class="token punctuation">(</span><span class="token string">"Log size limit reached: &#123;&#125;"</span><span class="token punctuation">,</span> logSize<span class="token punctuation">)</span><span class="token punctuation">;</span>
+          <span class="token function">rollLog</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">&#125;</span>
+      <span class="token punctuation">&#125;</span>
+    <span class="token punctuation">&#125;</span><span class="token keyword">catch</span> <span class="token punctuation">(</span><span class="token class-name">Exception</span> e<span class="token punctuation">)</span><span class="token punctuation">&#123;</span>
+      transaction<span class="token punctuation">.</span><span class="token function">setStatus</span><span class="token punctuation">(</span>e<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span><span class="token keyword">finally</span> <span class="token punctuation">&#123;</span>
+      transaction<span class="token punctuation">.</span><span class="token function">complete</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<img src="/2023/02/03/zkarch/disk.png" width="50%/">
+
+<p><b>优化方案</b>：一阶段提交，每次只需要将事务日志写入到文件Buffer，即返回给Leader节点ACK。单独启动一个线程来异步的Buffer中的数据输入到磁盘，刷入策略支持每收集到N条事务日志或者每间隔N秒将一批事务日志写入到磁盘。以上策略类似MySQL  sync_binlog配置，sync_binlog支持0、1、N三种不同配置</p>
+<ul>
+<li>0：binlog sync磁盘由操作系统负责，性能最好，有较大概率丢失数据。</li>
+<li>1：每次事务请求都需要将Binlog刷盘，适合于对数据一致性有严格要求。</li>
+<li>N：每收到N次事务请求将Binlog批量刷盘，兼顾性能和数据一致性。</li>
+</ul>
+<p>ZK的事务日志写入当前支持类似0和1两种配置，尚不支持N配置。<br><b>改造收益评估</b>：采用优化方案，相同机器配置集群支撑最大写入QPS预计从1000至少提升到5000，端到端平均耗时也从10ms降低到2ms，集群整体稳定性会有明显提升。<br><b>改造风险评估</b>：极端情况下，Leader和Follower节点同时故障情况下，集群最多会丢失N条数据。当前现在线上集群一般是1个Leader2个Follower配置，Leader和其中一个Follower节点同时故障出现的情况概率极低。假设真的出现，相较于集群整体会不可用，丢失几条数据带来的影响几乎可以忽略。</p>
+<h3 id="4-2、Leader节点压力较大"><a href="#4-2、Leader节点压力较大" class="headerlink" title="4.2、Leader节点压力较大"></a>4.2、Leader节点压力较大</h3><p>ZK Leader节点对于集群整体可用性尤其关键，一旦Leader节点出现故障，集群会重新选举Leader，在重新选出Leader节点之前的这段时间，集群都处于不可用的状态。而在以下方面，由于现在架构的设计，导致Leader节点承担了较大的压力。</p>
+<ul>
+<li>ZK Leader节点接收到过半数Voter节点的ACK后，需要通知所有Follower节点进行二阶段Commit，同时还需要通知所有的Observer节点。现在线上多数集群都是1个Leader、2个Follower，但是Observer节点数特别多，以MNS集群为例，有100多个Observer节点，相当于每次写请求，Leader节点通知次数都需要放大100多倍。<br><br>解决方案：升级到3.6版本，开启ObserverMaster模式，开启该模式后，Follower会作为Observer的代理Leader，后续Leader不再负责二阶段Observer数据的同步，由余下的Follower节点来均衡的负责Observer节点数据的同步，显著降低了Leader的压力（Leader节点网卡出入流量成比例下降，由于压测QPS不高、Observer节点个数不多，cpu降低不明显）。</li>
+<li>全局会话GlobalSession超时会由Leader广播给所有ZK节点，一旦Leader处理大量连接超时、断开时，会将断链请求传导到全集群，导致全集群节点因处理“断链请求”繁忙，不能响应客户端keepalive请求，诱发客户端超时重连。之前线上MNS集群出现过类似情况，值得注意的是，由于之前线上Sgagent会直连ZK集群，导致全局会话过多，加大了上述现象出现的概率。（当前MNS集群出现该Case概率明显降低）<br><br>解决方案：修改代码，Leader发现GlobalSession超时，只需要向该Session关联的节点发起断链请求，无需向其他节点发起断链请求。</li>
+</ul>
+<h3 id="4-3、不太合理的重启机制"><a href="#4-3、不太合理的重启机制" class="headerlink" title="4.3、不太合理的重启机制"></a>4.3、不太合理的重启机制</h3><p>ZK现有设计中，较多异常场景下都会触发各种重启操作，例如以下场景：</p>
+<ol>
+<li>客户端写入或者读取数据超过1MB，服务端会直接断开客户端链接（并不能从根本上解决问题，断开链接后，客户端重连依然会读取或者写入大数据）</li>
+<li>代码很多地方抛了一个异常，就会触发系统退出</li>
+<li>Follower节点Commit阶段与Propose阶段Zxid不一致，Follower节点直接退出JVM进程</li>
+</ol>
+<p>目前线上没有统计出异常情况导致进程退出的具体数目，同线上其他Java服务类似，当前ZK进程被supervisord托管，即使出现进程退出，也会很快被重新拉起来，所以这个问题暂时没有造成太大影响。个人猜测，ZK直接退出进程可能是由于当前架构较为复杂，客户端、主从之间需要频繁进行通信来保持集群数据一致，对于一些特殊的异常，没有思考清楚应该如何优雅处理。只能依赖进程退出，节点重启后加入集群会经过数据同步而恢复到可用状态。<br>优化方案：可以针对这类情况，先添加Raptor打点，后面出现问题再分析具体报错日志，针对性解决问题，尽可能缩小影响范围。（例如对于场景3，可以采用上文提到的数据同步来恢复不一致数据，从而无需机器重启）</p>
+<h3 id="4-4、3-4版本ZK集群每次初始化都需要重新加载快照文件"><a href="#4-4、3-4版本ZK集群每次初始化都需要重新加载快照文件" class="headerlink" title="4.4、3.4版本ZK集群每次初始化都需要重新加载快照文件"></a>4.4、3.4版本ZK集群每次初始化都需要重新加载快照文件</h3><p>ZK 3.4.X版本在以下场景下：1节点宕机重启、2集群产生了新的Leader节点需要连接到新Leader、3节点与Leader由于网络故障恢复后重连等场景下节点都需要重新加载磁盘上的快照文件，加载快照文件会消耗大量的磁盘IO和CPU资源，同时整个过程耗时较长。实际上除了场景1，场景2和场景3由于节点内存Database数据还在，理论上并不需要重新加载快照文件。在3.6.X版本，ZK已经进行了优化，仅仅只有宕机重启才需要加载快照文件，其他场景已经无需加载快照文件。<br>后续优化方案：尽快推动3.4.X版本集群尽快升级到3.6.X。</p>
+<h3 id="4-5、Zxid超过2亿会溢出"><a href="#4-5、Zxid超过2亿会溢出" class="headerlink" title="4.5、Zxid超过2亿会溢出"></a>4.5、Zxid超过2亿会溢出</h3><p>Zxid包含8个字节，共64位，高32位用来表示Epoch，低32位表示事务序列号，如果没有产生过新的Leader，则Zxid最多只能2^32（2亿多） 个事务；若产生了一个新的Leader，则高32位自增加1，低32位重新置为0。线上DTS集群由于写入较多（不太合理），每间隔一段时间就可能会出现 Zxid溢出情况<br><img src="/2023/02/03/zkarch/zxid.png" width="50%/"></p>
+<h3 id="4-6、不支持客户端批量读取功能"><a href="#4-6、不支持客户端批量读取功能" class="headerlink" title="4.6、不支持客户端批量读取功能"></a>4.6、不支持客户端批量读取功能</h3><p>当前ZK服务端和C语言客户端暂不支持一些常用API的批量读取功能，诸如MNS一些重度依赖ZK的组件在服务启动阶段往往需要读取大量配置，导致启动过程耗时较长。目前我们已经对ZK服务端源码和C语言客户端源码做了二次开发来支持批量读取功能，目前本地测试功能OK，预计下个Q会开始在线下环境进行测试。</p>
+
+                
+            </div>
+            <hr/>
+
+            
+
+    <div class="reprint" id="reprint-statement">
+        
+            <div class="reprint__author">
+                <span class="reprint-meta" style="font-weight: bold;">
+                    <i class="fas fa-user">
+                        文章作者:
+                    </i>
+                </span>
+                <span class="reprint-info">
+                    <a href="/about" rel="external nofollow noreferrer">叶明</a>
+                </span>
+            </div>
+            <div class="reprint__type">
+                <span class="reprint-meta" style="font-weight: bold;">
+                    <i class="fas fa-link">
+                        文章链接:
+                    </i>
+                </span>
+                <span class="reprint-info">
+                    <a href="http://yeming.fun/2023/02/03/zkarch/">http://yeming.fun/2023/02/03/zkarch/</a>
+                </span>
+            </div>
+            <div class="reprint__notice">
+                <span class="reprint-meta" style="font-weight: bold;">
+                    <i class="fas fa-copyright">
+                        版权声明:
+                    </i>
+                </span>
+                <span class="reprint-info">
+                    本博客所有文章除特別声明外，均采用
+                    <a href="https://creativecommons.org/licenses/by/4.0/deed.zh" rel="external nofollow noreferrer" target="_blank">CC BY 4.0</a>
+                    许可协议。转载请注明来源
+                    <a href="/about" target="_blank">叶明</a>
+                    !
+                </span>
+            </div>
+        
+    </div>
+
+    <script async defer>
+      document.addEventListener("copy", function (e) {
+        let toastHTML = '<span>复制成功，请遵循本文的转载规则</span><button class="btn-flat toast-action" onclick="navToReprintStatement()" style="font-size: smaller">查看</a>';
+        M.toast({html: toastHTML})
+      });
+
+      function navToReprintStatement() {
+        $("html, body").animate({scrollTop: $("#reprint-statement").offset().top - 80}, 800);
+      }
+    </script>
+
+
+
+            <div class="tag_share" style="display: block;">
+                <div class="post-meta__tag-list" style="display: inline-block;">
+                    
+                        <div class="article-tag">
+                            
+                                <a href="/tags/ZK/">
+                                    <span class="chip bg-color">ZK</span>
+                                </a>
+                            
+                                <a href="/tags/CAP/">
+                                    <span class="chip bg-color">CAP</span>
+                                </a>
+                            
+                        </div>
+                    
+                </div>
+                <div class="post_share" style="zoom: 80%; width: fit-content; display: inline-block; float: right; margin: -0.15rem 0;">
+                    <link rel="stylesheet" type="text/css" href="/libs/share/css/share.min.css">
+<div id="article-share">
+
+    
+    <div class="social-share" data-sites="twitter,facebook,google,qq,qzone,wechat,weibo,douban,linkedin" data-wechat-qrcode-helper="<p>微信扫一扫即可分享！</p>"></div>
+    <script src="/libs/share/js/social-share.min.js"></script>
+    
+
+    
+
+</div>
+
+                </div>
+            </div>
+            
+        </div>
+    </div>
+
+    
+
+    
+
+    
+
+    
+
+    
+        <style>
+    .valine-card {
+        margin: 1.5rem auto;
+    }
+
+    .valine-card .card-content {
+        padding: 20px 20px 5px 20px;
+    }
+
+    #vcomments textarea {
+        box-sizing: border-box;
+        background: url("/medias/comment_bg.png") 100% 100% no-repeat;
+    }
+
+    #vcomments p {
+        margin: 2px 2px 10px;
+        font-size: 1.05rem;
+        line-height: 1.78rem;
+    }
+
+    #vcomments blockquote p {
+        text-indent: 0.2rem;
+    }
+
+    #vcomments a {
+        padding: 0 2px;
+        color: #4cbf30;
+        font-weight: 500;
+        text-decoration: none;
+    }
+
+    #vcomments img {
+        max-width: 100%;
+        height: auto;
+        cursor: pointer;
+    }
+
+    #vcomments ol li {
+        list-style-type: decimal;
+    }
+
+    #vcomments ol,
+    ul {
+        display: block;
+        padding-left: 2em;
+        word-spacing: 0.05rem;
+    }
+
+    #vcomments ul li,
+    ol li {
+        display: list-item;
+        line-height: 1.8rem;
+        font-size: 1rem;
+    }
+
+    #vcomments ul li {
+        list-style-type: disc;
+    }
+
+    #vcomments ul ul li {
+        list-style-type: circle;
+    }
+
+    #vcomments table, th, td {
+        padding: 12px 13px;
+        border: 1px solid #dfe2e5;
+    }
+
+    #vcomments table, th, td {
+        border: 0;
+    }
+
+    table tr:nth-child(2n), thead {
+        background-color: #fafafa;
+    }
+
+    #vcomments table th {
+        background-color: #f2f2f2;
+        min-width: 80px;
+    }
+
+    #vcomments table td {
+        min-width: 80px;
+    }
+
+    #vcomments h1 {
+        font-size: 1.85rem;
+        font-weight: bold;
+        line-height: 2.2rem;
+    }
+
+    #vcomments h2 {
+        font-size: 1.65rem;
+        font-weight: bold;
+        line-height: 1.9rem;
+    }
+
+    #vcomments h3 {
+        font-size: 1.45rem;
+        font-weight: bold;
+        line-height: 1.7rem;
+    }
+
+    #vcomments h4 {
+        font-size: 1.25rem;
+        font-weight: bold;
+        line-height: 1.5rem;
+    }
+
+    #vcomments h5 {
+        font-size: 1.1rem;
+        font-weight: bold;
+        line-height: 1.4rem;
+    }
+
+    #vcomments h6 {
+        font-size: 1rem;
+        line-height: 1.3rem;
+    }
+
+    #vcomments p {
+        font-size: 1rem;
+        line-height: 1.5rem;
+    }
+
+    #vcomments hr {
+        margin: 12px 0;
+        border: 0;
+        border-top: 1px solid #ccc;
+    }
+
+    #vcomments blockquote {
+        margin: 15px 0;
+        border-left: 5px solid #42b983;
+        padding: 1rem 0.8rem 0.3rem 0.8rem;
+        color: #666;
+        background-color: rgba(66, 185, 131, .1);
+    }
+
+    #vcomments pre {
+        font-family: monospace, monospace;
+        padding: 1.2em;
+        margin: .5em 0;
+        background: #272822;
+        overflow: auto;
+        border-radius: 0.3em;
+        tab-size: 4;
+    }
+
+    #vcomments code {
+        font-family: monospace, monospace;
+        padding: 1px 3px;
+        font-size: 0.92rem;
+        color: #e96900;
+        background-color: #f8f8f8;
+        border-radius: 2px;
+    }
+
+    #vcomments pre code {
+        font-family: monospace, monospace;
+        padding: 0;
+        color: #e8eaf6;
+        background-color: #272822;
+    }
+
+    #vcomments pre[class*="language-"] {
+        padding: 1.2em;
+        margin: .5em 0;
+    }
+
+    #vcomments code[class*="language-"],
+    pre[class*="language-"] {
+        color: #e8eaf6;
+    }
+
+    #vcomments [type="checkbox"]:not(:checked), [type="checkbox"]:checked {
+        position: inherit;
+        margin-left: -1.3rem;
+        margin-right: 0.4rem;
+        margin-top: -1px;
+        vertical-align: middle;
+        left: unset;
+        visibility: visible;
+    }
+
+    #vcomments b,
+    strong {
+        font-weight: bold;
+    }
+
+    #vcomments dfn {
+        font-style: italic;
+    }
+
+    #vcomments small {
+        font-size: 85%;
+    }
+
+    #vcomments cite {
+        font-style: normal;
+    }
+
+    #vcomments mark {
+        background-color: #fcf8e3;
+        padding: .2em;
+    }
+
+    #vcomments table, th, td {
+        padding: 12px 13px;
+        border: 1px solid #dfe2e5;
+    }
+
+    table tr:nth-child(2n), thead {
+        background-color: #fafafa;
+    }
+
+    #vcomments table th {
+        background-color: #f2f2f2;
+        min-width: 80px;
+    }
+
+    #vcomments table td {
+        min-width: 80px;
+    }
+
+    #vcomments [type="checkbox"]:not(:checked), [type="checkbox"]:checked {
+        position: inherit;
+        margin-left: -1.3rem;
+        margin-right: 0.4rem;
+        margin-top: -1px;
+        vertical-align: middle;
+        left: unset;
+        visibility: visible;
+    }
+</style>
+
+<div class="card valine-card" data-aos="fade-up">
+    <div class="comment_headling" style="font-size: 20px; font-weight: 700; position: relative; padding-left: 20px; top: 15px; padding-bottom: 5px;">
+        <i class="fas fa-comments fa-fw" aria-hidden="true"></i>
+        <span>评论</span>
+    </div>
+    <div id="vcomments" class="card-content" style="display: grid">
+    </div>
+</div>
+
+<script src="/libs/valine/av-min.js"></script>
+<script src="/libs/valine/Valine.min.js"></script>
+<script>
+    new Valine({
+        el: '#vcomments',
+        appId: 'Y2lqjwOrlt5p333cMSW3HNxD-gzGzoHsz',
+        appKey: 'Y6lssmQDLyXlT0HE1pgVn0UK',
+        notify: 'true' === 'true',
+        verify: 'false' === 'true',
+        visitor: 'true' === 'true',
+        avatar: 'mm',
+        pageSize: '10',
+        lang: 'zh-cn',
+        placeholder: 'just go go'
+    });
+</script>
+
+<!--酷Q推送-->
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+<article id="prenext-posts" class="prev-next articles">
+    <div class="row article-row">
+        
+        <div class="article col s12 m6" data-aos="fade-up" data-aos="fade-up">
+            <div class="article-badge left-badge text-color">
+                <i class="far fa-dot-circle"></i>&nbsp;本篇
+            </div>
+            <div class="card">
+                <a href="/2023/02/03/zkarch/">
+                    <div class="card-image">
+                        
+                        
+                        <img src="/medias/featureimages/10.jpg" class="responsive-img" alt="ZK架构设计与优化">
+                        
+                        <span class="card-title">ZK架构设计与优化</span>
+                    </div>
+                </a>
+                <div class="card-content article-content">
+                    <div class="summary block-with-text">
+                        
+                            ZK，全称为 ZooKeeper，是一个分布式协调服务，由雅虎公司开发并开源。ZK 提供了一个高可用、高性能（Raptor测试链接同机房直连ZK节点Avg耗时0.1ms）、分布式的协调服务，用于解决分布式系统中的一些协调问题，如分布式锁、分布式协调、分布式配置中心、分布式队列等。被广泛地应用于诸如 Hadoop、HBase、Kafka 和 Dubbo 等大型开源分布式系统中，公司内部的Squirrel、MNS、Crane、Mafka、DTS以及一些业务系统也广泛使用ZK来实现数据订阅、Leader选举、分布式锁等。
+                        
+                    </div>
+                    <div class="publish-info">
+                            <span class="publish-date">
+                                <i class="far fa-clock fa-fw icon-date"></i>2023-02-03
+                            </span>
+                        <span class="publish-author">
+                            
+                            <i class="fas fa-bookmark fa-fw icon-category"></i>
+                            
+                            <a href="/categories/%E6%8A%80%E6%9C%AF%E5%88%86%E4%BA%AB/" class="post-category">
+                                    技术分享
+                                </a>
+                            
+                            
+                        </span>
+                    </div>
+                </div>
+
+                
+                <div class="card-action article-tags">
+                    
+                    <a href="/tags/ZK/">
+                        <span class="chip bg-color">ZK</span>
+                    </a>
+                    
+                    <a href="/tags/CAP/">
+                        <span class="chip bg-color">CAP</span>
+                    </a>
+                    
+                </div>
+                
+            </div>
+        </div>
+        
+        
+        <div class="article col s12 m6" data-aos="fade-up">
+            <div class="article-badge right-badge text-color">
+                下一篇&nbsp;<i class="fas fa-chevron-right"></i>
+            </div>
+            <div class="card">
+                <a href="/2023/01/15/zkprocess/">
+                    <div class="card-image">
+                        
+                        
+                        <img src="/medias/featureimages/1.jpg" class="responsive-img" alt="ZK处理客户端请求流程梳理">
+                        
+                        <span class="card-title">ZK处理客户端请求流程梳理</span>
+                    </div>
+                </a>
+                <div class="card-content article-content">
+                    <div class="summary block-with-text">
+                        
+                            ZK整体构成包括Leader、Follower、Observer以及客户端，其中Leader、Follower参与Leader竞选，并负责对于写请求进行投票。由于每次写请求，Leader都必须和所有Follower基于类似两阶段提交协议来决定写入是否成功，所以Follower节点不能过多。同时为了提高集群整体的读性能，进而引入了Observer节点。下图描述了从客户端发起一次请求到服务端响应的整个过程（假设客户端此时连接的是Follower节点，相比于连接Leader处理过程更为复杂）
+                        
+                    </div>
+                    <div class="publish-info">
+                            <span class="publish-date">
+                                <i class="far fa-clock fa-fw icon-date"></i>2023-01-15
+                            </span>
+                        <span class="publish-author">
+                            
+                            <i class="fas fa-bookmark fa-fw icon-category"></i>
+                            
+                            <a href="/categories/%E6%8A%80%E6%9C%AF%E5%88%86%E4%BA%AB/" class="post-category">
+                                    技术分享
+                                </a>
+                            
+                            
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="card-action article-tags">
+                    
+                    <a href="/tags/ZK/">
+                        <span class="chip bg-color">ZK</span>
+                    </a>
+                    
+                </div>
+                
+            </div>
+        </div>
+        
+    </div>
+</article>
+
+</div>
+
+
+
+<!-- 代码块功能依赖 -->
+<script type="text/javascript" src="/libs/codeBlock/codeBlockFuction.js"></script>
+
+<!-- 代码语言 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeLang.js"></script>
+
+
+<!-- 代码块复制 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeCopy.js"></script>
+
+
+<!-- 代码块收缩 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeShrink.js"></script>
+
+
+    </div>
+    <div id="toc-aside" class="expanded col l3 hide-on-med-and-down">
+        <div class="toc-widget card" style="background-color: white;">
+            <div class="toc-title"><i class="far fa-list-alt"></i>&nbsp;&nbsp;目录</div>
+            <div id="toc-content"></div>
+        </div>
+    </div>
+</div>
+
+<!-- TOC 悬浮按钮. -->
+
+<div id="floating-toc-btn" class="hide-on-med-and-down">
+    <a class="btn-floating btn-large bg-color">
+        <i class="fas fa-list-ul"></i>
+    </a>
+</div>
+
+
+<script src="/libs/tocbot/tocbot.min.js"></script>
+<script>
+    $(function () {
+        tocbot.init({
+            tocSelector: '#toc-content',
+            contentSelector: '#articleContent',
+            headingsOffset: -($(window).height() * 0.4 - 45),
+            collapseDepth: Number('0'),
+            headingSelector: 'h2, h3, h4'
+        });
+
+        // modify the toc link href to support Chinese.
+        let i = 0;
+        let tocHeading = 'toc-heading-';
+        $('#toc-content a').each(function () {
+            $(this).attr('href', '#' + tocHeading + (++i));
+        });
+
+        // modify the heading title id to support Chinese.
+        i = 0;
+        $('#articleContent').children('h2, h3, h4').each(function () {
+            $(this).attr('id', tocHeading + (++i));
+        });
+
+        // Set scroll toc fixed.
+        let tocHeight = parseInt($(window).height() * 0.4 - 64);
+        let $tocWidget = $('.toc-widget');
+        $(window).scroll(function () {
+            let scroll = $(window).scrollTop();
+            /* add post toc fixed. */
+            if (scroll > tocHeight) {
+                $tocWidget.addClass('toc-fixed');
+            } else {
+                $tocWidget.removeClass('toc-fixed');
+            }
+        });
+
+        
+        /* 修复文章卡片 div 的宽度. */
+        let fixPostCardWidth = function (srcId, targetId) {
+            let srcDiv = $('#' + srcId);
+            if (srcDiv.length === 0) {
+                return;
+            }
+
+            let w = srcDiv.width();
+            if (w >= 450) {
+                w = w + 21;
+            } else if (w >= 350 && w < 450) {
+                w = w + 18;
+            } else if (w >= 300 && w < 350) {
+                w = w + 16;
+            } else {
+                w = w + 14;
+            }
+            $('#' + targetId).width(w);
+        };
+
+        // 切换TOC目录展开收缩的相关操作.
+        const expandedClass = 'expanded';
+        let $tocAside = $('#toc-aside');
+        let $mainContent = $('#main-content');
+        $('#floating-toc-btn .btn-floating').click(function () {
+            if ($tocAside.hasClass(expandedClass)) {
+                $tocAside.removeClass(expandedClass).hide();
+                $mainContent.removeClass('l9');
+            } else {
+                $tocAside.addClass(expandedClass).show();
+                $mainContent.addClass('l9');
+            }
+            fixPostCardWidth('artDetail', 'prenext-posts');
+        });
+        
+    });
+</script>
+
+    
+
+</main>
+
+
+
+
+    <footer class="page-footer bg-color">
+    
+    <div class="container row center-align" style="margin-bottom: 0px !important;">
+        <div class="col s12 m8 l8 copy-right">
+            Copyright&nbsp;&copy;
+            
+                <span id="year">2019-2024</span>
+            
+            <span id="year">2019</span>
+            <a href="/about" target="_blank">叶明</a>
+            |&nbsp;Powered by&nbsp;<a href="https://hexo.io/" target="_blank">Hexo</a>
+            |&nbsp;Theme&nbsp;<a href="https://github.com/blinkfox/hexo-theme-matery" target="_blank">Matery</a>
+            <br>
+            
+            &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
+                class="white-color">78.8k</span>&nbsp;字
+            
+            
+            
+            
+            
+            
+            <span id="busuanzi_container_site_pv">
+                |&nbsp;<i class="far fa-eye"></i>&nbsp;总访问量:&nbsp;<span id="busuanzi_value_site_pv"
+                    class="white-color"></span>&nbsp;次
+            </span>
+            
+            
+            <span id="busuanzi_container_site_uv">
+                |&nbsp;<i class="fas fa-users"></i>&nbsp;总访问人数:&nbsp;<span id="busuanzi_value_site_uv"
+                    class="white-color"></span>&nbsp;人
+            </span>
+            
+            <br>
+            
+            <br>
+            
+        </div>
+        <div class="col s12 m4 l4 social-link social-statis">
+    <a href="https://github.com/q6413260" class="tooltipped" target="_blank" data-tooltip="访问我的GitHub" data-position="top" data-delay="50">
+        <i class="fab fa-github"></i>
+    </a>
+
+
+
+    <a href="mailto:228160255@qq.com" class="tooltipped" target="_blank" data-tooltip="邮件联系我" data-position="top" data-delay="50">
+        <i class="fas fa-envelope-open"></i>
+    </a>
+
+
+
+
+
+
+
+    <a href="tencent://AddContact/?fromId=50&fromSubId=1&subcmd=all&uin=228160255" class="tooltipped" target="_blank" data-tooltip="QQ联系我: 228160255" data-position="top" data-delay="50">
+        <i class="fab fa-qq"></i>
+    </a>
+
+
+
+
+
+
+
+    <a href="/atom.xml" class="tooltipped" target="_blank" data-tooltip="RSS 订阅" data-position="top" data-delay="50">
+        <i class="fas fa-rss"></i>
+    </a>
+
+</div>
+    </div>
+</footer>
+
+<div class="progress-bar"></div>
+
+
+    <!-- 搜索遮罩框 -->
+<div id="searchModal" class="modal">
+    <div class="modal-content">
+        <div class="search-header">
+            <span class="title"><i class="fas fa-search"></i>&nbsp;&nbsp;搜索</span>
+            <input type="search" id="searchInput" name="s" placeholder="请输入搜索的关键字"
+                   class="search-input">
+        </div>
+        <div id="searchResult"></div>
+    </div>
+</div>
+
+<script type="text/javascript">
+$(function () {
+    var searchFunc = function (path, search_id, content_id) {
+        'use strict';
+        $.ajax({
+            url: path,
+            dataType: "xml",
+            success: function (xmlResponse) {
+                // get the contents from search data
+                var datas = $("entry", xmlResponse).map(function () {
+                    return {
+                        title: $("title", this).text(),
+                        content: $("content", this).text(),
+                        url: $("url", this).text()
+                    };
+                }).get();
+                var $input = document.getElementById(search_id);
+                var $resultContent = document.getElementById(content_id);
+                $input.addEventListener('input', function () {
+                    var str = '<ul class=\"search-result-list\">';
+                    var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+                    $resultContent.innerHTML = "";
+                    if (this.value.trim().length <= 0) {
+                        return;
+                    }
+                    // perform local searching
+                    datas.forEach(function (data) {
+                        var isMatch = true;
+                        var data_title = data.title.trim().toLowerCase();
+                        var data_content = data.content.trim().replace(/<[^>]+>/g, "").toLowerCase();
+                        var data_url = data.url;
+                        data_url = data_url.indexOf('/') === 0 ? data.url : '/' + data_url;
+                        var index_title = -1;
+                        var index_content = -1;
+                        var first_occur = -1;
+                        // only match artiles with not empty titles and contents
+                        if (data_title !== '' && data_content !== '') {
+                            keywords.forEach(function (keyword, i) {
+                                index_title = data_title.indexOf(keyword);
+                                index_content = data_content.indexOf(keyword);
+                                if (index_title < 0 && index_content < 0) {
+                                    isMatch = false;
+                                } else {
+                                    if (index_content < 0) {
+                                        index_content = 0;
+                                    }
+                                    if (i === 0) {
+                                        first_occur = index_content;
+                                    }
+                                }
+                            });
+                        }
+                        // show search results
+                        if (isMatch) {
+                            str += "<li><a href='" + data_url + "' class='search-result-title'>" + data_title + "</a>";
+                            var content = data.content.trim().replace(/<[^>]+>/g, "");
+                            if (first_occur >= 0) {
+                                // cut out 100 characters
+                                var start = first_occur - 20;
+                                var end = first_occur + 80;
+                                if (start < 0) {
+                                    start = 0;
+                                }
+                                if (start === 0) {
+                                    end = 100;
+                                }
+                                if (end > content.length) {
+                                    end = content.length;
+                                }
+                                var match_content = content.substr(start, end);
+                                // highlight all keywords
+                                keywords.forEach(function (keyword) {
+                                    var regS = new RegExp(keyword, "gi");
+                                    match_content = match_content.replace(regS, "<em class=\"search-keyword\">" + keyword + "</em>");
+                                });
+
+                                str += "<p class=\"search-result\">" + match_content + "...</p>"
+                            }
+                            str += "</li>";
+                        }
+                    });
+                    str += "</ul>";
+                    $resultContent.innerHTML = str;
+                });
+            }
+        });
+    };
+
+    searchFunc('/search.xml', 'searchInput', 'searchResult');
+});
+</script>
+
+    <!-- 回到顶部按钮 -->
+<div id="backTop" class="top-scroll">
+    <a class="btn-floating btn-large waves-effect waves-light" href="#!">
+        <i class="fas fa-arrow-up"></i>
+    </a>
+</div>
+
+
+    <script src="/libs/materialize/materialize.min.js"></script>
+    <script src="/libs/masonry/masonry.pkgd.min.js"></script>
+    <script src="/libs/aos/aos.js"></script>
+    <script src="/libs/scrollprogress/scrollProgress.min.js"></script>
+    <script src="/libs/lightGallery/js/lightgallery-all.min.js"></script>
+    <script src="/js/matery.js"></script>
+
+    <!-- Baidu Analytics -->
+
+<script>
+    var _hmt = _hmt || [];
+    (function () {
+        var hm = document.createElement("script");
+        hm.src = "https://hm.baidu.com/hm.js?";
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(hm, s);
+    })();
+</script>
+
+    <!-- Baidu Push -->
+
+<script>
+    (function () {
+        var bp = document.createElement('script');
+        var curProtocol = window.location.protocol.split(':')[0];
+        if (curProtocol === 'https') {
+            bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+        } else {
+            bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+        }
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(bp, s);
+    })();
+</script>
+
+    
+    <script src="/libs/others/clicklove.js" async="async"></script>
+    
+    
+    <script async src="/libs/others/busuanzi.pure.mini.js"></script>
+    
+
+    
+
+    
+
+    <!--腾讯兔小巢-->
+    
+    
+
+    
+    
+    <script type="text/javascript" size="150" alpha='0.6'
+        zIndex="-1" src="/libs/background/ribbon-refresh.min.js" async="async"></script>
+    
+
+    
+
+    
+    <script src="/libs/instantpage/instantpage.js" type="module"></script>
+    
+
+</body>
+
+</html>

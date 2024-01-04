@@ -486,7 +486,7 @@
 
         <div class="card-content article-card-content">
             <div id="articleContent">
-                <h2 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h2><p>最近一周，一直在做squirrel-ha-service高可用的改进。简单介绍下squirrel-ha-service。squirrel-ha-service(后文都简写为ha)是线上持续监控redis集群，保证redis集群高可用的一个服务。会通过redis cluster nodes命令获取redis集群所有节点的状态，如果某个节点宕机了，ha一旦发现宕机节点，首先会通过修改zk通知redis客户端不再访问该节点，然后自动替换宕机节点。替换完节点后，再次通过修改zk通知redis客户端刷新本地路由，将新添加的节点加入本地路由表。<br><img src="https://lightoheaven.coding.net/p/image2/d/image2/git/raw/master/201808/arch.jpeg" width="400" hegiht="250"/>&nbsp;&nbsp;<img src="https://lightoheaven.coding.net/p/image2/d/image2/git/raw/master/201808/multiIdc.jpeg" width="400" hegiht="250"/><br>上述左图是我们目前线上ha大致架构，基本能保证redis集群的整体可用性。但是最近我们在做机房容灾相关，这个架构就有问题了。</p>
+                <h2 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h2><p>最近一周，一直在做squirrel-ha-service高可用的改进。简单介绍下squirrel-ha-service。squirrel-ha-service(后文都简写为ha)是线上持续监控redis集群，保证redis集群高可用的一个服务。会通过redis cluster nodes命令获取redis集群所有节点的状态，如果某个节点宕机了，ha一旦发现宕机节点，首先会通过修改zk通知redis客户端不再访问该节点，然后自动替换宕机节点。替换完节点后，再次通过修改zk通知redis客户端刷新本地路由，将新添加的节点加入本地路由表。<br><img src="https://lightoheaven.coding.net/p/image2/d/image2/git/raw/master/201808/arch.jpeg" width="400" hegiht="250">&nbsp;&nbsp;<img src="https://lightoheaven.coding.net/p/image2/d/image2/git/raw/master/201808/multiIdc.jpeg" width="400" hegiht="250"><br>上述左图是我们目前线上ha大致架构，基本能保证redis集群的整体可用性。但是最近我们在做机房容灾相关，这个架构就有问题了。</p>
 <p>上述是右图我们线上一个redis集群的部署情况，基本都是3机房部署。图中是dx，yf，gh三个机房，每个机房都有一个主节点一个从节点。redis集群这样部署，能保证最高的可用性。即使线上某个机房发生故障，剩下的两个机房也能继续提供服务。<br>这里我们假设现在gh机房发生网络故障，先忽视图中红色框。gh-master节点原来有一个dx-slave节点，一旦光环机房不可用，dx-slave节点会发起提升自己为master的请求，dx和yf机房的两个主节点投票通过，这样一个新的集群dx(2个master节点)，yf(一个master，一个slave)可以继续对外提供服务。<br>从redis集群角度看，如果机房是三机房主从均匀部署，单个机房发生故障另外两个机房依然能继续提供服务。但是此时我们的squirrel-ha服务因为也处于gh机房(我们线上一个redis集群唯一对应一个ha监控服务)，由于gh机房和另外两个机房dx，yf网络不通，此时ha服务无法刷新zk，通知dx和yf的redis客户端更新路由了。之所以发生这个问题，是因为ha自身没有保证高可用，所以我们考虑引进zk选举来保证ha服务的可用性。如上图红框，当gh机房发生网络故障，之前dx-ha-watcher会替代gh-ha成为新的leader，开始监控redis集群。</p>
 <span id="more"></span>
 <h2 id="Curator选主"><a href="#Curator选主" class="headerlink" title="Curator选主"></a>Curator选主</h2><p>上面我们说了，在发生机房网络分区时候，ha自身不能保证高可用。所以接下来我们会将ha接入zk，通过zk的选举功能保证ha自身的高可用。我们会使用Netflix开源的curator来实现选主，这个框架解决了原生zookeeper client断线重连相关问题，并且提供了2套选主方案。</p>
@@ -748,7 +748,7 @@ haLeaderService 0 is leader<span aria-hidden="true" class="line-numbers-rows"><s
                     </i>
                 </span>
                 <span class="reprint-info">
-                    <a href="http://yeming.me/2018/08/24/curatorleader/">http://yeming.me/2018/08/24/curatorleader/</a>
+                    <a href="http://yeming.fun/2018/08/24/curatorleader/">http://yeming.fun/2018/08/24/curatorleader/</a>
                 </span>
             </div>
             <div class="reprint__notice">
@@ -1342,7 +1342,7 @@ Mac OS系统上安
         <div class="col s12 m8 l8 copy-right">
             Copyright&nbsp;&copy;
             
-                <span id="year">2019-2021</span>
+                <span id="year">2019-2024</span>
             
             <span id="year">2019</span>
             <a href="/about" target="_blank">叶明</a>
@@ -1351,7 +1351,7 @@ Mac OS系统上安
             <br>
             
             &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                class="white-color">67k</span>&nbsp;字
+                class="white-color">78.8k</span>&nbsp;字
             
             
             

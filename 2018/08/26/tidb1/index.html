@@ -501,8 +501,8 @@
 <h2 id="安装Docker-for-Mac"><a href="#安装Docker-for-Mac" class="headerlink" title="安装Docker for Mac"></a>安装Docker for Mac</h2><ul>
 <li>下载<a target="_blank" rel="noopener" href="https://download.docker.com/mac/stable/Docker.dmg">Docker for Mac</a></li>
 <li>下载完成后，双击Docker.dmg，安装Docker for Mac。</li>
-<li>安装完成后，Mac右上角会出现一个鲨鱼的标志<img src="https://lightoheaven.coding.net/p/image2/d/image2/git/raw/master/201808/macBar.jpeg" width="300" hegiht="50"/> </li>
-<li>点击上述鲨鱼标志的About Docker，可以看到docker和docker compose都安装成功<img src="https://lightoheaven.coding.net/p/image2/d/image2/git/raw/master/201808/docker.jpeg" width="300" hegiht="150"/></li>
+<li>安装完成后，Mac右上角会出现一个鲨鱼的标志<img src="https://lightoheaven.coding.net/p/image2/d/image2/git/raw/master/201808/macBar.jpeg" width="300" hegiht="50"> </li>
+<li>点击上述鲨鱼标志的About Docker，可以看到docker和docker compose都安装成功<img src="https://lightoheaven.coding.net/p/image2/d/image2/git/raw/master/201808/docker.jpeg" width="300" hegiht="150"></li>
 </ul>
 <h2 id="使用Docker-Compose快速构建集群"><a href="#使用Docker-Compose快速构建集群" class="headerlink" title="使用Docker Compose快速构建集群"></a>使用Docker Compose快速构建集群</h2><h3 id="Docker-Compose介绍"><a href="#Docker-Compose介绍" class="headerlink" title="Docker Compose介绍"></a>Docker Compose介绍</h3><p>Docker Compose 是 Docker 官方编排（Orchestration）项目之一，负责快速在集群中部署分布式应用。Compose 定位是定义和运行多个 Docker 容器的应用</p>
 <p>我们知道通过创建一个Dockerfile模板文件，可以很方便的定义一个单独的应用容器。然而，我们在日常工作中，经常需要多个容器配合来完成某项任务。例如我们想要搭建一套TIDB集群，我们需要创建3 个 PD，3 个 TiKV，1 个 TiDB。<br>Compose 恰好满足了这样的需求。它允许用户通过一个单独的 docker-compose.yml 模板文件（YAML 格式）来定义一组相关联的应用容器为一个项目（project），下面是TIDB的YAML文件</p>
@@ -712,14 +712,14 @@ services:
 <li><p>拉取镜像</p>
 <pre class="line-numbers language-none"><code class="language-none">cd tidb-docker-compose &amp;&amp; docker-compose pull # Get the latest Docker images<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 <p>通过docker images可以看到pd，tikv，tidb的镜像已经被拉下来了。</p>
-<img src="https://lightoheaven.coding.net/p/image2/d/image2/git/raw/master/201808/image.jpeg" width="600" hegiht="350"/></li>
+<img src="https://lightoheaven.coding.net/p/image2/d/image2/git/raw/master/201808/image.jpeg" width="600" hegiht="350"></li>
 <li><p>启动容器</p>
 <pre class="line-numbers language-none"><code class="language-none">docker-compose up -d<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 <p>通过docker ps -a可以看到pd，tikv，tidb容器已经启动了，启动了3 个 PD，3 个 TiKV，1 个 TiDB。</p>
-<img src="https://lightoheaven.coding.net/p/image2/d/image2/git/raw/master/201808/container.jpeg" width="600" hegiht="350"/></li>
+<img src="https://lightoheaven.coding.net/p/image2/d/image2/git/raw/master/201808/container.jpeg" width="600" hegiht="350"></li>
 <li><p>访问集群</p>
 <pre class="line-numbers language-none"><code class="language-none">mysql -h 127.0.0.1 -P 4000 -u root<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-<img src="https://lightoheaven.coding.net/p/image2/d/image2/git/raw/master/201808/mysql.jpeg" width="600" hegiht="350"/>
+<img src="https://lightoheaven.coding.net/p/image2/d/image2/git/raw/master/201808/mysql.jpeg" width="600" hegiht="350">
 可以看到tidb已经启动了，我们通过mysql命令已经可以访问集群了。</li>
 </ul>
 
@@ -748,7 +748,7 @@ services:
                     </i>
                 </span>
                 <span class="reprint-info">
-                    <a href="http://yeming.me/2018/08/26/tidb1/">http://yeming.me/2018/08/26/tidb1/</a>
+                    <a href="http://yeming.fun/2018/08/26/tidb1/">http://yeming.fun/2018/08/26/tidb1/</a>
                 </span>
             </div>
             <div class="reprint__notice">
@@ -1336,7 +1336,7 @@ TIDB 简介TIDB是pingca
         <div class="col s12 m8 l8 copy-right">
             Copyright&nbsp;&copy;
             
-                <span id="year">2019-2021</span>
+                <span id="year">2019-2024</span>
             
             <span id="year">2019</span>
             <a href="/about" target="_blank">叶明</a>
@@ -1345,7 +1345,7 @@ TIDB 简介TIDB是pingca
             <br>
             
             &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                class="white-color">67k</span>&nbsp;字
+                class="white-color">78.8k</span>&nbsp;字
             
             
             

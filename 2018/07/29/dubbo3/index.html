@@ -483,14 +483,14 @@
         <div class="card-content article-card-content">
             <div id="articleContent">
                 <p>我们知道Dubbo逻辑上由以下几个模块组成(不考虑Monitor和Container)</p>
-<center><img src="https://lightoheaven.coding.net/p/image2/d/image2/git/raw/master/201807/dubboArch.jpeg" width="400" hegiht="200"/></center>
+<center><img src="https://lightoheaven.coding.net/p/image2/d/image2/git/raw/master/201807/dubboArch.jpeg" width="400" hegiht="200"></center>
 
 <ul>
 <li>Provider：服务提供方</li>
 <li>Consumer：服务消费方</li>
 <li>Registry：服务注册与发现的注册中心</li>
 </ul>
-<p>上一篇文章<a href="http://yeming.me/2018/07/28/dubbo2/">Dubbo源码学习二(服务注册)</a>我们分析了服务提供方启动时候怎么向注册中心注册服务，本文我们就来看下Consumer启动时候怎么引用服务的</p>
+<p>上一篇文章<a target="_blank" rel="noopener" href="http://yeming.me/2018/07/28/dubbo2/">Dubbo源码学习二(服务注册)</a>我们分析了服务提供方启动时候怎么向注册中心注册服务，本文我们就来看下Consumer启动时候怎么引用服务的</p>
 <span id="more"></span>
 
 <h2 id="consumer-demo"><a href="#consumer-demo" class="headerlink" title="consumer demo"></a>consumer demo</h2><pre class="line-numbers language-none"><code class="language-none">&lt;beans xmlns:xsi&#x3D;&quot;http:&#x2F;&#x2F;www.w3.org&#x2F;2001&#x2F;XMLSchema-instance&quot;
@@ -710,7 +710,7 @@ protected void doOpen() throws Throwable &#123;
         &#125;
     &#125;);
 &#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<p>可以看到经过上述一系列调用，最终又是通过Netty与提供服务的Provider建立一个长连接(之前Provider也是通过netty监听20880端口从而监听客户端请求)。这里如果同一个服务有多个不同的Provider，就和所有的Provider通过netty建立了连接。这样就完成了从URL到Invoker的转化，并缓存到Map&lt;String, Invoker<T>&gt; urlInvokerMap(key是URL，value是转换成的invoker)。</p>
+<p>可以看到经过上述一系列调用，最终又是通过Netty与提供服务的Provider建立一个长连接(之前Provider也是通过netty监听20880端口从而监听客户端请求)。这里如果同一个服务有多个不同的Provider，就和所有的Provider通过netty建立了连接。这样就完成了从URL到Invoker的转化，并缓存到Map&lt;String, Invoker<T>&gt; urlInvokerMap(key是URL，value是转换成的invoker)。</T></p>
 <h2 id="ReferenceConfig"><a href="#ReferenceConfig" class="headerlink" title="ReferenceConfig"></a>ReferenceConfig</h2><p>回到ReferenceConfig的createProxy()方法</p>
 <pre class="line-numbers language-none"><code class="language-none">private static final ProxyFactory proxyFactory &#x3D; ExtensionLoader.getExtensionLoader(ProxyFactory.class).getAdaptiveExtension();
 
@@ -846,7 +846,7 @@ public interface ProxyFactory &#123;
                     </i>
                 </span>
                 <span class="reprint-info">
-                    <a href="http://yeming.me/2018/07/29/dubbo3/">http://yeming.me/2018/07/29/dubbo3/</a>
+                    <a href="http://yeming.fun/2018/07/29/dubbo3/">http://yeming.fun/2018/07/29/dubbo3/</a>
                 </span>
             </div>
             <div class="reprint__notice">
@@ -1438,7 +1438,7 @@ Registry：服务注册与发现的注册中心
         <div class="col s12 m8 l8 copy-right">
             Copyright&nbsp;&copy;
             
-                <span id="year">2019-2021</span>
+                <span id="year">2019-2024</span>
             
             <span id="year">2019</span>
             <a href="/about" target="_blank">叶明</a>
@@ -1447,7 +1447,7 @@ Registry：服务注册与发现的注册中心
             <br>
             
             &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                class="white-color">67k</span>&nbsp;字
+                class="white-color">78.8k</span>&nbsp;字
             
             
             

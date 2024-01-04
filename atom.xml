@@ -3,11 +3,11 @@
   <title>叶明の个人博客</title>
   
   <subtitle>苦练基本功，长期有耐心</subtitle>
-  <link href="http://yeming.me/atom.xml" rel="self"/>
+  <link href="http://yeming.fun/atom.xml" rel="self"/>
   
-  <link href="http://yeming.me/"/>
-  <updated>2021-04-23T03:50:56.644Z</updated>
-  <id>http://yeming.me/</id>
+  <link href="http://yeming.fun/"/>
+  <updated>2024-01-04T06:23:59.137Z</updated>
+  <id>http://yeming.fun/</id>
   
   <author>
     <name>叶明</name>
@@ -17,11 +17,64 @@
   <generator uri="https://hexo.io/">Hexo</generator>
   
   <entry>
+    <title>ZK架构设计与优化</title>
+    <link href="http://yeming.fun/2023/02/03/zkarch/"/>
+    <id>http://yeming.fun/2023/02/03/zkarch/</id>
+    <published>2023-02-03T12:58:23.000Z</published>
+    <updated>2024-01-04T06:23:59.137Z</updated>
+    
+    
+      
+      
+        
+        
+    <summary type="html">&lt;h2 id=&quot;一、ZK基础&quot;&gt;&lt;a href=&quot;#一、ZK基础&quot; class=&quot;headerlink&quot; title=&quot;一、ZK基础&quot;&gt;&lt;/a&gt;一、ZK基础&lt;/h2&gt;&lt;hr&gt;
+&lt;p&gt;ZK，全称为 ZooKeeper，是一个分布式协调服务，由雅虎公司开发并开源。ZK</summary>
+        
+      
+    
+    
+    
+    <category term="技术分享" scheme="http://yeming.fun/categories/%E6%8A%80%E6%9C%AF%E5%88%86%E4%BA%AB/"/>
+    
+    
+    <category term="ZK" scheme="http://yeming.fun/tags/ZK/"/>
+    
+    <category term="CAP" scheme="http://yeming.fun/tags/CAP/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>ZK处理客户端请求流程梳理</title>
+    <link href="http://yeming.fun/2023/01/15/zkprocess/"/>
+    <id>http://yeming.fun/2023/01/15/zkprocess/</id>
+    <published>2023-01-15T12:00:23.000Z</published>
+    <updated>2024-01-04T06:04:20.448Z</updated>
+    
+    
+      
+      
+        
+        
+    <summary type="html">&lt;h2 id=&quot;一、简介&quot;&gt;&lt;a href=&quot;#一、简介&quot; class=&quot;headerlink&quot;</summary>
+        
+      
+    
+    
+    
+    <category term="技术分享" scheme="http://yeming.fun/categories/%E6%8A%80%E6%9C%AF%E5%88%86%E4%BA%AB/"/>
+    
+    
+    <category term="ZK" scheme="http://yeming.fun/tags/ZK/"/>
+    
+  </entry>
+  
+  <entry>
     <title>IDEA调试Elasticsearch源码</title>
-    <link href="http://yeming.me/2021/04/22/es-debug/"/>
-    <id>http://yeming.me/2021/04/22/es-debug/</id>
+    <link href="http://yeming.fun/2021/04/22/es-debug/"/>
+    <id>http://yeming.fun/2021/04/22/es-debug/</id>
     <published>2021-04-22T10:26:17.000Z</published>
-    <updated>2021-04-23T03:50:56.644Z</updated>
+    <updated>2024-01-04T02:10:12.143Z</updated>
     
     
       
@@ -34,21 +87,21 @@
     
     
     
-    <category term="技术分享" scheme="http://yeming.me/categories/%E6%8A%80%E6%9C%AF%E5%88%86%E4%BA%AB/"/>
+    <category term="技术分享" scheme="http://yeming.fun/categories/%E6%8A%80%E6%9C%AF%E5%88%86%E4%BA%AB/"/>
     
     
-    <category term="Elasticsearch" scheme="http://yeming.me/tags/Elasticsearch/"/>
+    <category term="Elasticsearch" scheme="http://yeming.fun/tags/Elasticsearch/"/>
     
-    <category term="docker" scheme="http://yeming.me/tags/docker/"/>
+    <category term="docker" scheme="http://yeming.fun/tags/docker/"/>
     
   </entry>
   
   <entry>
     <title>Mybatis如何从DAO到SQL</title>
-    <link href="http://yeming.me/2021/04/03/mybatis/"/>
-    <id>http://yeming.me/2021/04/03/mybatis/</id>
+    <link href="http://yeming.fun/2021/04/03/mybatis/"/>
+    <id>http://yeming.fun/2021/04/03/mybatis/</id>
     <published>2021-04-03T14:26:38.000Z</published>
-    <updated>2021-04-23T03:50:56.636Z</updated>
+    <updated>2024-01-04T02:15:56.186Z</updated>
     
     
       
@@ -62,17 +115,17 @@
     
     
     
-    <category term="技术分享" scheme="http://yeming.me/categories/%E6%8A%80%E6%9C%AF%E5%88%86%E4%BA%AB/"/>
+    <category term="技术分享" scheme="http://yeming.fun/categories/%E6%8A%80%E6%9C%AF%E5%88%86%E4%BA%AB/"/>
     
     
-    <category term="Mybatis" scheme="http://yeming.me/tags/Mybatis/"/>
+    <category term="Mybatis" scheme="http://yeming.fun/tags/Mybatis/"/>
     
   </entry>
   
   <entry>
     <title>Postman和Java Client访问K8s</title>
-    <link href="http://yeming.me/2018/11/11/k8s/"/>
-    <id>http://yeming.me/2018/11/11/k8s/</id>
+    <link href="http://yeming.fun/2018/11/11/k8s/"/>
+    <id>http://yeming.fun/2018/11/11/k8s/</id>
     <published>2018-11-10T17:43:10.000Z</published>
     <updated>2021-04-23T03:51:24.807Z</updated>
     
@@ -81,17 +134,42 @@
     
     
     
-    <category term="技术分享" scheme="http://yeming.me/categories/%E6%8A%80%E6%9C%AF%E5%88%86%E4%BA%AB/"/>
+    <category term="技术分享" scheme="http://yeming.fun/categories/%E6%8A%80%E6%9C%AF%E5%88%86%E4%BA%AB/"/>
     
     
-    <category term="k8s" scheme="http://yeming.me/tags/k8s/"/>
+    <category term="k8s" scheme="http://yeming.fun/tags/k8s/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Redis热点Key解决方案</title>
+    <link href="http://yeming.fun/2018/10/01/redishotkey/"/>
+    <id>http://yeming.fun/2018/10/01/redishotkey/</id>
+    <published>2018-10-01T08:00:36.000Z</published>
+    <updated>2024-01-04T05:55:41.445Z</updated>
+    
+    
+      
+      
+        
+        
+    <summary type="html">&lt;h2 id=&quot;一、背景&quot;&gt;&lt;a href=&quot;#一、背景&quot; class=&quot;headerlink&quot; title=&quot;一、背景&quot;&gt;&lt;/a&gt;一、背景&lt;/h2&gt;&lt;p&gt;Squirrel是基于redis</summary>
+        
+      
+    
+    
+    
+    <category term="技术分享" scheme="http://yeming.fun/categories/%E6%8A%80%E6%9C%AF%E5%88%86%E4%BA%AB/"/>
+    
+    
+    <category term="Redis" scheme="http://yeming.fun/tags/Redis/"/>
     
   </entry>
   
   <entry>
     <title>从零开始学TIDB二(TIDB简介与整体架构)</title>
-    <link href="http://yeming.me/2018/08/27/tidb2/"/>
-    <id>http://yeming.me/2018/08/27/tidb2/</id>
+    <link href="http://yeming.fun/2018/08/27/tidb2/"/>
+    <id>http://yeming.fun/2018/08/27/tidb2/</id>
     <published>2018-08-27T14:58:17.000Z</published>
     <updated>2021-04-18T07:38:23.145Z</updated>
     
@@ -105,21 +183,21 @@
 &lt;/li&gt;
 &lt;li&gt;&lt;p&gt;分布式事物：TIDB支持分布式事物。&lt;/p&gt;
 &lt;/li&gt;
-&lt;li&gt;&lt;p&gt;高可用数据强一致：TIDB基于raft的多数派选举保证了数据的强一致性，并且在不丢失大部分副本的情况下，可以自动failover。&lt;/p&gt;</summary>
+&lt;li&gt;&lt;p&gt;高可用数据强一致：TIDB基于raft的多数派选举保证了数据的强一致性，并且在不丢失大部分副本的情况下，可以自动failover。&lt;/p&gt;&lt;/li&gt;&lt;/ul&gt;</summary>
     
     
     
-    <category term="技术分享" scheme="http://yeming.me/categories/%E6%8A%80%E6%9C%AF%E5%88%86%E4%BA%AB/"/>
+    <category term="技术分享" scheme="http://yeming.fun/categories/%E6%8A%80%E6%9C%AF%E5%88%86%E4%BA%AB/"/>
     
     
-    <category term="TIDB" scheme="http://yeming.me/tags/TIDB/"/>
+    <category term="TIDB" scheme="http://yeming.fun/tags/TIDB/"/>
     
   </entry>
   
   <entry>
     <title>从零开始学TIDB一(搭建TIDB集群)</title>
-    <link href="http://yeming.me/2018/08/26/tidb1/"/>
-    <id>http://yeming.me/2018/08/26/tidb1/</id>
+    <link href="http://yeming.fun/2018/08/26/tidb1/"/>
+    <id>http://yeming.fun/2018/08/26/tidb1/</id>
     <published>2018-08-26T04:31:31.000Z</published>
     <updated>2021-04-18T07:38:23.142Z</updated>
     
@@ -132,69 +210,69 @@
     
     
     
-    <category term="技术分享" scheme="http://yeming.me/categories/%E6%8A%80%E6%9C%AF%E5%88%86%E4%BA%AB/"/>
+    <category term="技术分享" scheme="http://yeming.fun/categories/%E6%8A%80%E6%9C%AF%E5%88%86%E4%BA%AB/"/>
     
     
-    <category term="docker" scheme="http://yeming.me/tags/docker/"/>
+    <category term="docker" scheme="http://yeming.fun/tags/docker/"/>
     
-    <category term="TIDB" scheme="http://yeming.me/tags/TIDB/"/>
+    <category term="TIDB" scheme="http://yeming.fun/tags/TIDB/"/>
     
   </entry>
   
   <entry>
     <title>Curator leader选举</title>
-    <link href="http://yeming.me/2018/08/24/curatorleader/"/>
-    <id>http://yeming.me/2018/08/24/curatorleader/</id>
+    <link href="http://yeming.fun/2018/08/24/curatorleader/"/>
+    <id>http://yeming.fun/2018/08/24/curatorleader/</id>
     <published>2018-08-24T13:45:37.000Z</published>
     <updated>2021-04-18T07:38:23.094Z</updated>
     
     
-    <summary type="html">&lt;h2 id=&quot;背景&quot;&gt;&lt;a href=&quot;#背景&quot; class=&quot;headerlink&quot; title=&quot;背景&quot;&gt;&lt;/a&gt;背景&lt;/h2&gt;&lt;p&gt;最近一周，一直在做squirrel-ha-service高可用的改进。简单介绍下squirrel-ha-service。squirrel-ha-service(后文都简写为ha)是线上持续监控redis集群，保证redis集群高可用的一个服务。会通过redis cluster nodes命令获取redis集群所有节点的状态，如果某个节点宕机了，ha一旦发现宕机节点，首先会通过修改zk通知redis客户端不再访问该节点，然后自动替换宕机节点。替换完节点后，再次通过修改zk通知redis客户端刷新本地路由，将新添加的节点加入本地路由表。&lt;br&gt;&lt;img src=&quot;https://lightoheaven.coding.net/p/image2/d/image2/git/raw/master/201808/arch.jpeg&quot; width=&quot;400&quot; hegiht=&quot;250&quot;/&gt;&amp;nbsp;&amp;nbsp;&lt;img src=&quot;https://lightoheaven.coding.net/p/image2/d/image2/git/raw/master/201808/multiIdc.jpeg&quot; width=&quot;400&quot; hegiht=&quot;250&quot;/&gt;&lt;br&gt;上述左图是我们目前线上ha大致架构，基本能保证redis集群的整体可用性。但是最近我们在做机房容灾相关，这个架构就有问题了。&lt;/p&gt;
+    <summary type="html">&lt;h2 id=&quot;背景&quot;&gt;&lt;a href=&quot;#背景&quot; class=&quot;headerlink&quot; title=&quot;背景&quot;&gt;&lt;/a&gt;背景&lt;/h2&gt;&lt;p&gt;最近一周，一直在做squirrel-ha-service高可用的改进。简单介绍下squirrel-ha-service。squirrel-ha-service(后文都简写为ha)是线上持续监控redis集群，保证redis集群高可用的一个服务。会通过redis cluster nodes命令获取redis集群所有节点的状态，如果某个节点宕机了，ha一旦发现宕机节点，首先会通过修改zk通知redis客户端不再访问该节点，然后自动替换宕机节点。替换完节点后，再次通过修改zk通知redis客户端刷新本地路由，将新添加的节点加入本地路由表。&lt;br&gt;&lt;img src=&quot;https://lightoheaven.coding.net/p/image2/d/image2/git/raw/master/201808/arch.jpeg&quot; width=&quot;400&quot; hegiht=&quot;250&quot;&gt;&amp;nbsp;&amp;nbsp;&lt;img src=&quot;https://lightoheaven.coding.net/p/image2/d/image2/git/raw/master/201808/multiIdc.jpeg&quot; width=&quot;400&quot; hegiht=&quot;250&quot;&gt;&lt;br&gt;上述左图是我们目前线上ha大致架构，基本能保证redis集群的整体可用性。但是最近我们在做机房容灾相关，这个架构就有问题了。&lt;/p&gt;
 &lt;p&gt;上述是右图我们线上一个redis集群的部署情况，基本都是3机房部署。图中是dx，yf，gh三个机房，每个机房都有一个主节点一个从节点。redis集群这样部署，能保证最高的可用性。即使线上某个机房发生故障，剩下的两个机房也能继续提供服务。&lt;br&gt;这里我们假设现在gh机房发生网络故障，先忽视图中红色框。gh-master节点原来有一个dx-slave节点，一旦光环机房不可用，dx-slave节点会发起提升自己为master的请求，dx和yf机房的两个主节点投票通过，这样一个新的集群dx(2个master节点)，yf(一个master，一个slave)可以继续对外提供服务。&lt;br&gt;从redis集群角度看，如果机房是三机房主从均匀部署，单个机房发生故障另外两个机房依然能继续提供服务。但是此时我们的squirrel-ha服务因为也处于gh机房(我们线上一个redis集群唯一对应一个ha监控服务)，由于gh机房和另外两个机房dx，yf网络不通，此时ha服务无法刷新zk，通知dx和yf的redis客户端更新路由了。之所以发生这个问题，是因为ha自身没有保证高可用，所以我们考虑引进zk选举来保证ha服务的可用性。如上图红框，当gh机房发生网络故障，之前dx-ha-watcher会替代gh-ha成为新的leader，开始监控redis集群。&lt;/p&gt;</summary>
     
     
     
-    <category term="技术分享" scheme="http://yeming.me/categories/%E6%8A%80%E6%9C%AF%E5%88%86%E4%BA%AB/"/>
+    <category term="技术分享" scheme="http://yeming.fun/categories/%E6%8A%80%E6%9C%AF%E5%88%86%E4%BA%AB/"/>
     
     
-    <category term="curator" scheme="http://yeming.me/tags/curator/"/>
+    <category term="curator" scheme="http://yeming.fun/tags/curator/"/>
     
-    <category term="zookeeper" scheme="http://yeming.me/tags/zookeeper/"/>
+    <category term="zookeeper" scheme="http://yeming.fun/tags/zookeeper/"/>
     
   </entry>
   
   <entry>
     <title>Dubbo源码学习四(Consumer，Provider通信)</title>
-    <link href="http://yeming.me/2018/07/31/dubbo4/"/>
-    <id>http://yeming.me/2018/07/31/dubbo4/</id>
+    <link href="http://yeming.fun/2018/07/31/dubbo4/"/>
+    <id>http://yeming.fun/2018/07/31/dubbo4/</id>
     <published>2018-07-31T14:03:58.000Z</published>
     <updated>2021-04-18T07:38:23.089Z</updated>
     
     
     <summary type="html">&lt;p&gt;之前我们介绍了Provider启动时候向注册中心注册服务&lt;br&gt;&lt;a href=&quot;http://yeming.me/2018/07/28/dubbo2/&quot;&gt;Dubbo源码学习二(服务注册)&lt;/a&gt;，Consumer启动时候向注册中心订阅服务&lt;a href=&quot;http://yeming.me/2018/07/29/dubbo3/&quot;&gt;Dubbo源码学习三(服务引用)&lt;/a&gt;，本文我们就来看下Consumer端和Provider是怎么通信的。&lt;/p&gt;
-&lt;center&gt;&lt;img src=&quot;https://lightoheaven.coding.net/p/image2/d/image2/git/raw/master/201807/communicate.jpeg&quot; width=&quot;700&quot; hegiht=&quot;350&quot;/&gt;&lt;/center&gt;</summary>
+&lt;center&gt;&lt;img src=&quot;https://lightoheaven.coding.net/p/image2/d/image2/git/raw/master/201807/communicate.jpeg&quot; width=&quot;700&quot; hegiht=&quot;350&quot;&gt;&lt;/center&gt;</summary>
     
     
     
-    <category term="技术分享" scheme="http://yeming.me/categories/%E6%8A%80%E6%9C%AF%E5%88%86%E4%BA%AB/"/>
+    <category term="技术分享" scheme="http://yeming.fun/categories/%E6%8A%80%E6%9C%AF%E5%88%86%E4%BA%AB/"/>
     
     
-    <category term="netty" scheme="http://yeming.me/tags/netty/"/>
+    <category term="netty" scheme="http://yeming.fun/tags/netty/"/>
     
-    <category term="Dubbo" scheme="http://yeming.me/tags/Dubbo/"/>
+    <category term="Dubbo" scheme="http://yeming.fun/tags/Dubbo/"/>
     
   </entry>
   
   <entry>
     <title>Dubbo源码学习三(服务引用)</title>
-    <link href="http://yeming.me/2018/07/29/dubbo3/"/>
-    <id>http://yeming.me/2018/07/29/dubbo3/</id>
+    <link href="http://yeming.fun/2018/07/29/dubbo3/"/>
+    <id>http://yeming.fun/2018/07/29/dubbo3/</id>
     <published>2018-07-29T02:03:58.000Z</published>
     <updated>2021-04-18T07:38:23.155Z</updated>
     
     
     <summary type="html">&lt;p&gt;我们知道Dubbo逻辑上由以下几个模块组成(不考虑Monitor和Container)&lt;/p&gt;
-&lt;center&gt;&lt;img src=&quot;https://lightoheaven.coding.net/p/image2/d/image2/git/raw/master/201807/dubboArch.jpeg&quot; width=&quot;400&quot; hegiht=&quot;200&quot;/&gt;&lt;/center&gt;
+&lt;center&gt;&lt;img src=&quot;https://lightoheaven.coding.net/p/image2/d/image2/git/raw/master/201807/dubboArch.jpeg&quot; width=&quot;400&quot; hegiht=&quot;200&quot;&gt;&lt;/center&gt;
 
 &lt;ul&gt;
 &lt;li&gt;Provider：服务提供方&lt;/li&gt;
@@ -205,23 +283,23 @@
     
     
     
-    <category term="技术分享" scheme="http://yeming.me/categories/%E6%8A%80%E6%9C%AF%E5%88%86%E4%BA%AB/"/>
+    <category term="技术分享" scheme="http://yeming.fun/categories/%E6%8A%80%E6%9C%AF%E5%88%86%E4%BA%AB/"/>
     
     
-    <category term="Dubbo" scheme="http://yeming.me/tags/Dubbo/"/>
+    <category term="Dubbo" scheme="http://yeming.fun/tags/Dubbo/"/>
     
   </entry>
   
   <entry>
     <title>Dubbo源码学习二(服务注册)</title>
-    <link href="http://yeming.me/2018/07/28/dubbo2/"/>
-    <id>http://yeming.me/2018/07/28/dubbo2/</id>
+    <link href="http://yeming.fun/2018/07/28/dubbo2/"/>
+    <id>http://yeming.fun/2018/07/28/dubbo2/</id>
     <published>2018-07-28T03:58:46.000Z</published>
     <updated>2021-04-18T07:38:23.133Z</updated>
     
     
     <summary type="html">&lt;p&gt;我们知道Dubbo逻辑上由以下几个模块组成(不考虑Monitor和Container)&lt;/p&gt;
-&lt;center&gt;&lt;img src=&quot;https://lightoheaven.coding.net/p/image2/d/image2/git/raw/master/201807/dubboArch.jpeg&quot; width=&quot;400&quot; hegiht=&quot;200&quot;/&gt;&lt;/center&gt;
+&lt;center&gt;&lt;img src=&quot;https://lightoheaven.coding.net/p/image2/d/image2/git/raw/master/201807/dubboArch.jpeg&quot; width=&quot;400&quot; hegiht=&quot;200&quot;&gt;&lt;/center&gt;
 
 &lt;ul&gt;
 &lt;li&gt;Provider：服务提供方&lt;/li&gt;
@@ -233,17 +311,17 @@
     
     
     
-    <category term="技术分享" scheme="http://yeming.me/categories/%E6%8A%80%E6%9C%AF%E5%88%86%E4%BA%AB/"/>
+    <category term="技术分享" scheme="http://yeming.fun/categories/%E6%8A%80%E6%9C%AF%E5%88%86%E4%BA%AB/"/>
     
     
-    <category term="Dubbo" scheme="http://yeming.me/tags/Dubbo/"/>
+    <category term="Dubbo" scheme="http://yeming.fun/tags/Dubbo/"/>
     
   </entry>
   
   <entry>
     <title>Dubbo源码学习一(扩展点ExtensionLoader)</title>
-    <link href="http://yeming.me/2018/07/25/dubbo1/"/>
-    <id>http://yeming.me/2018/07/25/dubbo1/</id>
+    <link href="http://yeming.fun/2018/07/25/dubbo1/"/>
+    <id>http://yeming.fun/2018/07/25/dubbo1/</id>
     <published>2018-07-25T14:00:00.000Z</published>
     <updated>2021-04-18T07:38:23.086Z</updated>
     
@@ -256,41 +334,41 @@
     
     
     
-    <category term="技术分享" scheme="http://yeming.me/categories/%E6%8A%80%E6%9C%AF%E5%88%86%E4%BA%AB/"/>
+    <category term="技术分享" scheme="http://yeming.fun/categories/%E6%8A%80%E6%9C%AF%E5%88%86%E4%BA%AB/"/>
     
     
-    <category term="Dubbo" scheme="http://yeming.me/tags/Dubbo/"/>
+    <category term="Dubbo" scheme="http://yeming.fun/tags/Dubbo/"/>
     
-    <category term="OCP" scheme="http://yeming.me/tags/OCP/"/>
+    <category term="OCP" scheme="http://yeming.fun/tags/OCP/"/>
     
-    <category term="JAVA设计原则" scheme="http://yeming.me/tags/JAVA%E8%AE%BE%E8%AE%A1%E5%8E%9F%E5%88%99/"/>
+    <category term="JAVA设计原则" scheme="http://yeming.fun/tags/JAVA%E8%AE%BE%E8%AE%A1%E5%8E%9F%E5%88%99/"/>
     
   </entry>
   
   <entry>
     <title>数据库访问层中间件Zebra</title>
-    <link href="http://yeming.me/2017/11/29/zebra/"/>
-    <id>http://yeming.me/2017/11/29/zebra/</id>
+    <link href="http://yeming.fun/2017/11/29/zebra/"/>
+    <id>http://yeming.fun/2017/11/29/zebra/</id>
     <published>2017-11-29T13:00:50.000Z</published>
-    <updated>2021-04-18T07:38:23.136Z</updated>
+    <updated>2024-01-04T06:34:38.856Z</updated>
     
     
     <summary type="html">&lt;p&gt;zebra是一个基于JDBC API协议上开发出的高可用、高性能的数据库访问层解决方案。类似阿里的tddl，zebra是一个smart客户端，提供了诸如动态配置、监控、读写分离、分库分表等功能。下图是zebra的整体架构图&lt;/p&gt;
-&lt;h2 id=&quot;zebra整体架构&quot;&gt;&lt;a href=&quot;#zebra整体架构&quot; class=&quot;headerlink&quot; title=&quot;zebra整体架构&quot;&gt;&lt;/a&gt;zebra整体架构&lt;/h2&gt;&lt;p&gt;&lt;img src=&quot;https://lightoheaven.coding.net/p/image2/d/image2/git/raw/master/201711/zebra.jpeg&quot; alt=&quot;zebra整体架构&quot;&gt;&lt;/p&gt;</summary>
+&lt;h2 id=&quot;zebra整体架构&quot;&gt;&lt;a href=&quot;#zebra整体架构&quot; class=&quot;headerlink&quot; title=&quot;zebra整体架构&quot;&gt;&lt;/a&gt;zebra整体架构&lt;/h2&gt;&lt;img src=&quot;/2017/11/29/zebra/zebra.jpeg&quot; width=&quot;60%/&quot;&gt;</summary>
     
     
     
-    <category term="技术分享" scheme="http://yeming.me/categories/%E6%8A%80%E6%9C%AF%E5%88%86%E4%BA%AB/"/>
+    <category term="技术分享" scheme="http://yeming.fun/categories/%E6%8A%80%E6%9C%AF%E5%88%86%E4%BA%AB/"/>
     
     
-    <category term="数据库访问层DAL" scheme="http://yeming.me/tags/%E6%95%B0%E6%8D%AE%E5%BA%93%E8%AE%BF%E9%97%AE%E5%B1%82DAL/"/>
+    <category term="数据库访问层DAL" scheme="http://yeming.fun/tags/%E6%95%B0%E6%8D%AE%E5%BA%93%E8%AE%BF%E9%97%AE%E5%B1%82DAL/"/>
     
   </entry>
   
   <entry>
     <title>配置中心Lion</title>
-    <link href="http://yeming.me/2017/11/27/lion/"/>
-    <id>http://yeming.me/2017/11/27/lion/</id>
+    <link href="http://yeming.fun/2017/11/27/lion/"/>
+    <id>http://yeming.fun/2017/11/27/lion/</id>
     <published>2017-11-27T13:00:50.000Z</published>
     <updated>2021-04-18T07:38:23.139Z</updated>
     
@@ -301,17 +379,17 @@
     
     
     
-    <category term="技术分享" scheme="http://yeming.me/categories/%E6%8A%80%E6%9C%AF%E5%88%86%E4%BA%AB/"/>
+    <category term="技术分享" scheme="http://yeming.fun/categories/%E6%8A%80%E6%9C%AF%E5%88%86%E4%BA%AB/"/>
     
     
-    <category term="配置中心" scheme="http://yeming.me/tags/%E9%85%8D%E7%BD%AE%E4%B8%AD%E5%BF%83/"/>
+    <category term="配置中心" scheme="http://yeming.fun/tags/%E9%85%8D%E7%BD%AE%E4%B8%AD%E5%BF%83/"/>
     
   </entry>
   
   <entry>
     <title>Hystrix源码分析</title>
-    <link href="http://yeming.me/2017/10/01/hystrix3/"/>
-    <id>http://yeming.me/2017/10/01/hystrix3/</id>
+    <link href="http://yeming.fun/2017/10/01/hystrix3/"/>
+    <id>http://yeming.fun/2017/10/01/hystrix3/</id>
     <published>2017-10-01T13:00:50.000Z</published>
     <updated>2021-04-18T07:38:23.083Z</updated>
     
@@ -320,17 +398,17 @@
     
     
     
-    <category term="技术分享" scheme="http://yeming.me/categories/%E6%8A%80%E6%9C%AF%E5%88%86%E4%BA%AB/"/>
+    <category term="技术分享" scheme="http://yeming.fun/categories/%E6%8A%80%E6%9C%AF%E5%88%86%E4%BA%AB/"/>
     
     
-    <category term="Hystrix" scheme="http://yeming.me/tags/Hystrix/"/>
+    <category term="Hystrix" scheme="http://yeming.fun/tags/Hystrix/"/>
     
   </entry>
   
   <entry>
     <title>Hystrix使用</title>
-    <link href="http://yeming.me/2017/09/30/hystrix2/"/>
-    <id>http://yeming.me/2017/09/30/hystrix2/</id>
+    <link href="http://yeming.fun/2017/09/30/hystrix2/"/>
+    <id>http://yeming.fun/2017/09/30/hystrix2/</id>
     <published>2017-09-30T13:00:50.000Z</published>
     <updated>2021-04-17T14:57:30.115Z</updated>
     
@@ -339,17 +417,17 @@
     
     
     
-    <category term="技术分享" scheme="http://yeming.me/categories/%E6%8A%80%E6%9C%AF%E5%88%86%E4%BA%AB/"/>
+    <category term="技术分享" scheme="http://yeming.fun/categories/%E6%8A%80%E6%9C%AF%E5%88%86%E4%BA%AB/"/>
     
     
-    <category term="Hystrix" scheme="http://yeming.me/tags/Hystrix/"/>
+    <category term="Hystrix" scheme="http://yeming.fun/tags/Hystrix/"/>
     
   </entry>
   
   <entry>
     <title>Hystrix初探</title>
-    <link href="http://yeming.me/2017/09/27/hystrix1/"/>
-    <id>http://yeming.me/2017/09/27/hystrix1/</id>
+    <link href="http://yeming.fun/2017/09/27/hystrix1/"/>
+    <id>http://yeming.fun/2017/09/27/hystrix1/</id>
     <published>2017-09-27T13:00:50.000Z</published>
     <updated>2021-04-18T07:38:23.070Z</updated>
     
@@ -358,17 +436,17 @@
     
     
     
-    <category term="技术分享" scheme="http://yeming.me/categories/%E6%8A%80%E6%9C%AF%E5%88%86%E4%BA%AB/"/>
+    <category term="技术分享" scheme="http://yeming.fun/categories/%E6%8A%80%E6%9C%AF%E5%88%86%E4%BA%AB/"/>
     
     
-    <category term="Hystrix" scheme="http://yeming.me/tags/Hystrix/"/>
+    <category term="Hystrix" scheme="http://yeming.fun/tags/Hystrix/"/>
     
   </entry>
   
   <entry>
     <title>JedisPool连接池相关配置</title>
-    <link href="http://yeming.me/2017/07/08/jedispoolconfig/"/>
-    <id>http://yeming.me/2017/07/08/jedispoolconfig/</id>
+    <link href="http://yeming.fun/2017/07/08/jedispoolconfig/"/>
+    <id>http://yeming.fun/2017/07/08/jedispoolconfig/</id>
     <published>2017-07-08T06:37:50.000Z</published>
     <updated>2021-04-17T14:57:30.111Z</updated>
     
@@ -377,19 +455,19 @@
     
     
     
-    <category term="技术分享" scheme="http://yeming.me/categories/%E6%8A%80%E6%9C%AF%E5%88%86%E4%BA%AB/"/>
+    <category term="技术分享" scheme="http://yeming.fun/categories/%E6%8A%80%E6%9C%AF%E5%88%86%E4%BA%AB/"/>
     
     
-    <category term="redis-cluster" scheme="http://yeming.me/tags/redis-cluster/"/>
+    <category term="redis-cluster" scheme="http://yeming.fun/tags/redis-cluster/"/>
     
-    <category term="jedis" scheme="http://yeming.me/tags/jedis/"/>
+    <category term="jedis" scheme="http://yeming.fun/tags/jedis/"/>
     
   </entry>
   
   <entry>
     <title>jedis源码分析</title>
-    <link href="http://yeming.me/2017/06/18/jedis-cluster/"/>
-    <id>http://yeming.me/2017/06/18/jedis-cluster/</id>
+    <link href="http://yeming.fun/2017/06/18/jedis-cluster/"/>
+    <id>http://yeming.fun/2017/06/18/jedis-cluster/</id>
     <published>2017-06-18T15:56:49.000Z</published>
     <updated>2021-04-18T07:38:23.080Z</updated>
     
@@ -403,133 +481,12 @@ BinaryJedisCluster client &amp;#x3D; new BinaryJedisCluster(set);&lt;span aria-h
     
     
     
-    <category term="技术分享" scheme="http://yeming.me/categories/%E6%8A%80%E6%9C%AF%E5%88%86%E4%BA%AB/"/>
+    <category term="技术分享" scheme="http://yeming.fun/categories/%E6%8A%80%E6%9C%AF%E5%88%86%E4%BA%AB/"/>
     
     
-    <category term="redis-cluster" scheme="http://yeming.me/tags/redis-cluster/"/>
+    <category term="redis-cluster" scheme="http://yeming.fun/tags/redis-cluster/"/>
     
-    <category term="jedis" scheme="http://yeming.me/tags/jedis/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>spring容器启动@Value属性无法注入</title>
-    <link href="http://yeming.me/2017/04/16/springvalueannotation/"/>
-    <id>http://yeming.me/2017/04/16/springvalueannotation/</id>
-    <published>2017-04-16T02:57:40.000Z</published>
-    <updated>2021-04-18T07:38:23.075Z</updated>
-    
-    
-    <summary type="html">&lt;h2 id=&quot;问题&quot;&gt;&lt;a href=&quot;#问题&quot; class=&quot;headerlink&quot; title=&quot;问题&quot;&gt;&lt;/a&gt;问题&lt;/h2&gt;&lt;p&gt;一个同事基于Annotation配置了一段代码，结果有一个Configuration类的两个@Value标注的属性值没有注入进来，代码如下:&lt;/p&gt;
-&lt;pre class=&quot;line-numbers language-none&quot;&gt;&lt;code class=&quot;language-none&quot;&gt;@Configuration
-@PropertySource(&amp;quot;mysql.properties&amp;quot;)
-public class GroupDataSourceAnatationSample &amp;#123;
-    @Value(&amp;quot;$&amp;#123;zebra.jdbcref&amp;#125;&amp;quot;)
-    private String jdbcRef;
-
-    @Value(&amp;quot;$&amp;#123;zebra.pooltype&amp;#125;&amp;quot;)
-    private String poolType;
-
-    @Bean(destroyMethod &amp;#x3D; &amp;quot;close&amp;quot;)
-    public DataSource dataSource() &amp;#123;
-        。。。。。。
-    &amp;#125;
-
-    @Bean
-    public ZebraMapperScannerConfigurer mapperScannerConfigurer() &amp;#123;
-        ZebraMapperScannerConfigurer mapperScannerConfigurer &amp;#x3D; new ZebraMapperScannerConfigurer();
-        mapperScannerConfigurer.setBasePackage(&amp;quot;com.sankuai.flight.flagship.mapper&amp;quot;);
-        return mapperScannerConfigurer;
-    &amp;#125;
-
-    @Bean
-    public SqlSessionFactory sqlSessionFactoryBean() throws Exception &amp;#123;
-        。。。。。。
-    &amp;#125;
-&amp;#125;&lt;span aria-hidden=&quot;true&quot; class=&quot;line-numbers-rows&quot;&gt;&lt;span&gt;&lt;/span&gt;&lt;span&gt;&lt;/span&gt;&lt;span&gt;&lt;/span&gt;&lt;span&gt;&lt;/span&gt;&lt;span&gt;&lt;/span&gt;&lt;span&gt;&lt;/span&gt;&lt;span&gt;&lt;/span&gt;&lt;span&gt;&lt;/span&gt;&lt;span&gt;&lt;/span&gt;&lt;span&gt;&lt;/span&gt;&lt;span&gt;&lt;/span&gt;&lt;span&gt;&lt;/span&gt;&lt;span&gt;&lt;/span&gt;&lt;span&gt;&lt;/span&gt;&lt;span&gt;&lt;/span&gt;&lt;span&gt;&lt;/span&gt;&lt;span&gt;&lt;/span&gt;&lt;span&gt;&lt;/span&gt;&lt;span&gt;&lt;/span&gt;&lt;span&gt;&lt;/span&gt;&lt;span&gt;&lt;/span&gt;&lt;span&gt;&lt;/span&gt;&lt;span&gt;&lt;/span&gt;&lt;span&gt;&lt;/span&gt;&lt;span&gt;&lt;/span&gt;&lt;span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;</summary>
-    
-    
-    
-    <category term="技术分享" scheme="http://yeming.me/categories/%E6%8A%80%E6%9C%AF%E5%88%86%E4%BA%AB/"/>
-    
-    
-    <category term="Spring" scheme="http://yeming.me/tags/Spring/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>elastic-job源码分析</title>
-    <link href="http://yeming.me/2017/01/24/elasticjob/"/>
-    <id>http://yeming.me/2017/01/24/elasticjob/</id>
-    <published>2017-01-24T13:08:40.000Z</published>
-    <updated>2021-04-17T14:57:30.121Z</updated>
-    
-    
-    <summary type="html">&lt;p&gt;先简单介绍下&lt;a href=&quot;https://github.com/dangdangdotcom/elastic-job&quot;&gt;elastic-job&lt;/a&gt;，它是当当公司开源的一个分布式调度解决方案。大家都知道，当数据量比较小的时候，我们可以只用quartz只在一台服务器上处理所有的数据。随着业务发展，数据量越来越大，一台机器已经不足以支撑，就必须想办法将一个任务分成多个小任务，拆分到不同的服务器上并行的执行。例如：有一个遍历数据库某张表的作业，现有2台服务器。为了快速的执行作业，那么每台服务器应执行作业的50%。 为满足此需求，可将作业分成2片，每台服务器执行1片。需要注意的是elastic-job并不直接提供数据处理的功能，框架只会将分片项分配至各个运行中的作业服务器，开发者需要自行处理分片项与真实数据的对应关系。&lt;/p&gt;</summary>
-    
-    
-    
-    <category term="技术分享" scheme="http://yeming.me/categories/%E6%8A%80%E6%9C%AF%E5%88%86%E4%BA%AB/"/>
-    
-    
-    <category term="elastic-job" scheme="http://yeming.me/tags/elastic-job/"/>
-    
-    <category term="分布式调度" scheme="http://yeming.me/tags/%E5%88%86%E5%B8%83%E5%BC%8F%E8%B0%83%E5%BA%A6/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>spring-kafka源码分析二(Consumer)</title>
-    <link href="http://yeming.me/2016/12/30/kafkaconsumer/"/>
-    <id>http://yeming.me/2016/12/30/kafkaconsumer/</id>
-    <published>2016-12-30T13:05:07.000Z</published>
-    <updated>2021-04-17T14:57:30.126Z</updated>
-    
-    
-    <summary type="html">&lt;p&gt;上一篇文章我们分析了spring-kafka的producer，这篇文章我们就要来分析下consumer。&lt;/p&gt;
-&lt;pre class=&quot;line-numbers language-none&quot;&gt;&lt;code class=&quot;language-none&quot;&gt;ContainerProperties containerProps &amp;#x3D; new ContainerProperties(&amp;quot;topic1&amp;quot;, &amp;quot;topic2&amp;quot;);
-containerProps.setMessageListener(new MessageListener&amp;lt;Integer, String&amp;gt;() &amp;#123;
-
-    @Override
-    public void onMessage(ConsumerRecord&amp;lt;Integer, String&amp;gt; message) &amp;#123;
-        System.out.println(&amp;quot;received: &amp;quot; + message);
-    &amp;#125;
-
-&amp;#125;);
-KafkaMessageListenerContainer&amp;lt;Integer, String&amp;gt; container &amp;#x3D; createContainer(containerProps);
-container.setBeanName(&amp;quot;testAuto&amp;quot;);
-container.start();
-
-private static KafkaMessageListenerContainer&amp;lt;Integer, String&amp;gt; createContainer(ContainerProperties containerProps) &amp;#123;
-    Map&amp;lt;String, Object&amp;gt; props &amp;#x3D; consumerProps();
-    DefaultKafkaConsumerFactory&amp;lt;Integer, String&amp;gt; cf &amp;#x3D;
-            new DefaultKafkaConsumerFactory&amp;lt;Integer, String&amp;gt;(props);
-    KafkaMessageListenerContainer&amp;lt;Integer, String&amp;gt; container &amp;#x3D;
-            new KafkaMessageListenerContainer&amp;lt;Integer, String&amp;gt;(cf, containerProps);
-    return container;
-&amp;#125;
-
-private static Map&amp;lt;String, Object&amp;gt; consumerProps() &amp;#123;
-        Map&amp;lt;String, Object&amp;gt; props &amp;#x3D; new HashMap&amp;lt;String, Object&amp;gt;();
-        props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, &amp;quot;localhost:9092&amp;quot;);
-        props.put(ConsumerConfig.GROUP_ID_CONFIG, &amp;quot;group&amp;quot;);
-        props.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, true);
-        props.put(ConsumerConfig.AUTO_COMMIT_INTERVAL_MS_CONFIG, &amp;quot;100&amp;quot;);
-        props.put(ConsumerConfig.SESSION_TIMEOUT_MS_CONFIG, &amp;quot;15000&amp;quot;);
-        props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, IntegerDeserializer.class);
-        props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
-        return props;
-&amp;#125;&lt;span aria-hidden=&quot;true&quot; class=&quot;line-numbers-rows&quot;&gt;&lt;span&gt;&lt;/span&gt;&lt;span&gt;&lt;/span&gt;&lt;span&gt;&lt;/span&gt;&lt;span&gt;&lt;/span&gt;&lt;span&gt;&lt;/span&gt;&lt;span&gt;&lt;/span&gt;&lt;span&gt;&lt;/span&gt;&lt;span&gt;&lt;/span&gt;&lt;span&gt;&lt;/span&gt;&lt;span&gt;&lt;/span&gt;&lt;span&gt;&lt;/span&gt;&lt;span&gt;&lt;/span&gt;&lt;span&gt;&lt;/span&gt;&lt;span&gt;&lt;/span&gt;&lt;span&gt;&lt;/span&gt;&lt;span&gt;&lt;/span&gt;&lt;span&gt;&lt;/span&gt;&lt;span&gt;&lt;/span&gt;&lt;span&gt;&lt;/span&gt;&lt;span&gt;&lt;/span&gt;&lt;span&gt;&lt;/span&gt;&lt;span&gt;&lt;/span&gt;&lt;span&gt;&lt;/span&gt;&lt;span&gt;&lt;/span&gt;&lt;span&gt;&lt;/span&gt;&lt;span&gt;&lt;/span&gt;&lt;span&gt;&lt;/span&gt;&lt;span&gt;&lt;/span&gt;&lt;span&gt;&lt;/span&gt;&lt;span&gt;&lt;/span&gt;&lt;span&gt;&lt;/span&gt;&lt;span&gt;&lt;/span&gt;&lt;span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;可以看到我们需要创建一个KafkaMessageListenerContainer，而创建上述container又需要创建一个DefaultKafkaConsumerFactory和一个ContainerProperties。注意ContainerProperties必须设置一个MessageListener，这个listener有个onMessage方法，如果consumer收到消息，就会调用这个方法。创建了上述container之后，然后调用container.start方法就可以开启consumer了。&lt;/p&gt;</summary>
-    
-    
-    
-    <category term="技术分享" scheme="http://yeming.me/categories/%E6%8A%80%E6%9C%AF%E5%88%86%E4%BA%AB/"/>
-    
-    
-    <category term="NIO" scheme="http://yeming.me/tags/NIO/"/>
-    
-    <category term="spring-kafka" scheme="http://yeming.me/tags/spring-kafka/"/>
+    <category term="jedis" scheme="http://yeming.fun/tags/jedis/"/>
     
   </entry>
   

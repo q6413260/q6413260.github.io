@@ -486,8 +486,8 @@
 
         <div class="card-content article-card-content">
             <div id="articleContent">
-                <p>之前我们介绍了Provider启动时候向注册中心注册服务<br><a href="http://yeming.me/2018/07/28/dubbo2/">Dubbo源码学习二(服务注册)</a>，Consumer启动时候向注册中心订阅服务<a href="http://yeming.me/2018/07/29/dubbo3/">Dubbo源码学习三(服务引用)</a>，本文我们就来看下Consumer端和Provider是怎么通信的。</p>
-<center><img src="https://lightoheaven.coding.net/p/image2/d/image2/git/raw/master/201807/communicate.jpeg" width="700" hegiht="350"/></center>
+                <p>之前我们介绍了Provider启动时候向注册中心注册服务<br><a target="_blank" rel="noopener" href="http://yeming.me/2018/07/28/dubbo2/">Dubbo源码学习二(服务注册)</a>，Consumer启动时候向注册中心订阅服务<a target="_blank" rel="noopener" href="http://yeming.me/2018/07/29/dubbo3/">Dubbo源码学习三(服务引用)</a>，本文我们就来看下Consumer端和Provider是怎么通信的。</p>
+<center><img src="https://lightoheaven.coding.net/p/image2/d/image2/git/raw/master/201807/communicate.jpeg" width="700" hegiht="350"></center>
 <span id="more"></span>
 
 <h2 id="Consumer"><a href="#Consumer" class="headerlink" title="Consumer"></a>Consumer</h2><pre class="line-numbers language-java" data-language="java"><code class="language-java"><span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">main</span><span class="token punctuation">(</span><span class="token class-name">String</span><span class="token punctuation">[</span><span class="token punctuation">]</span> args<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
@@ -627,7 +627,7 @@
     <span class="token punctuation">&#125;</span>
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
-<p><font color="red">过程6</font>channel.writeAndFlush(message)这个channel是NioSocketChannel(<a href="http://yeming.me/2016/04/02/netty2/">netty源码研究二(请求处理)</a>是客户端用来发送消息的)</p>
+<p><font color="red">过程6</font>channel.writeAndFlush(message)这个channel是NioSocketChannel(<a target="_blank" rel="noopener" href="http://yeming.me/2016/04/02/netty2/">netty源码研究二(请求处理)</a>是客户端用来发送消息的)</p>
 <p><b>NettyChannel</b></p>
 <pre class="line-numbers language-java" data-language="java"><code class="language-java"><span class="token annotation punctuation">@Override</span>
 <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">send</span><span class="token punctuation">(</span><span class="token class-name">Object</span> message<span class="token punctuation">,</span> <span class="token keyword">boolean</span> sent<span class="token punctuation">)</span> <span class="token keyword">throws</span> <span class="token class-name">RemotingException</span> <span class="token punctuation">&#123;</span>
@@ -907,7 +907,7 @@
 <p>上述方法以及后续DubboCountCodec.decode和ExchangeCodec.decode方法大致逻辑如下：</p>
 <ul>
 <li>发送过来的buffer的可读字节数小于header长度或者小于header+消息体body的长度，直接返回NEED_MORE_INPUT，并设置<font color="red">message.readerIndex(saveReaderIndex);</font></li>
-<li>满足上述规则，直接经过反序列化解析出消息体，添加到List<Object> out列表</li>
+<li>满足上述规则，直接经过反序列化解析出消息体，添加到List<Object> out列表</Object></li>
 </ul>
 <p><b>ByteToMessageDecoder</b></p>
 <pre class="line-numbers language-java" data-language="java"><code class="language-java"><span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">channelRead</span><span class="token punctuation">(</span><span class="token class-name">ChannelHandlerContext</span> ctx<span class="token punctuation">,</span> <span class="token class-name">Object</span> msg<span class="token punctuation">)</span> <span class="token keyword">throws</span> <span class="token class-name">Exception</span> <span class="token punctuation">&#123;</span>
@@ -1110,7 +1110,7 @@
                     </i>
                 </span>
                 <span class="reprint-info">
-                    <a href="http://yeming.me/2018/07/31/dubbo4/">http://yeming.me/2018/07/31/dubbo4/</a>
+                    <a href="http://yeming.fun/2018/07/31/dubbo4/">http://yeming.fun/2018/07/31/dubbo4/</a>
                 </span>
             </div>
             <div class="reprint__notice">
@@ -1705,7 +1705,7 @@ Registry：服务注册与发现的注册中心
         <div class="col s12 m8 l8 copy-right">
             Copyright&nbsp;&copy;
             
-                <span id="year">2019-2021</span>
+                <span id="year">2019-2024</span>
             
             <span id="year">2019</span>
             <a href="/about" target="_blank">叶明</a>
@@ -1714,7 +1714,7 @@ Registry：服务注册与发现的注册中心
             <br>
             
             &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                class="white-color">67k</span>&nbsp;字
+                class="white-color">78.8k</span>&nbsp;字
             
             
             

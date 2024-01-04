@@ -483,7 +483,8 @@
         <div class="card-content article-card-content">
             <div id="articleContent">
                 <p>zebra是一个基于JDBC API协议上开发出的高可用、高性能的数据库访问层解决方案。类似阿里的tddl，zebra是一个smart客户端，提供了诸如动态配置、监控、读写分离、分库分表等功能。下图是zebra的整体架构图</p>
-<h2 id="zebra整体架构"><a href="#zebra整体架构" class="headerlink" title="zebra整体架构"></a>zebra整体架构</h2><p><img src="https://lightoheaven.coding.net/p/image2/d/image2/git/raw/master/201711/zebra.jpeg" alt="zebra整体架构"></p>
+<h2 id="zebra整体架构"><a href="#zebra整体架构" class="headerlink" title="zebra整体架构"></a>zebra整体架构</h2><img src="/2017/11/29/zebra/zebra.jpeg" width="60%/">
+
 <span id="more"></span>
 <ul>
 <li>zookeeper中存储着每一个数据库的路由信息、用户名密码等信息</li>
@@ -498,13 +499,16 @@
 <li>GroupDataSource：负责读写分离的连接池，它主要负责判断SQL的读写操作，然后把相应的SQL发送给SingleDataSource。它负责连接一个数据库集群，因此它会包含若干个SingleDataSource。</li>
 <li>SingleDataSource：负责抽象底层使用的连接池类型（c3p0,druid,tomcat-jdbc等），然后直连每一个数据库实例。在上图中，每一个Master或者Slave，都对应一个SingleDataSource。</li>
 </ul>
-<p><img src="https://lightoheaven.coding.net/p/image2/d/image2/git/raw/master/201711/dataSource.jpeg" alt="zebra dataSource"></p>
+<img src="/2017/11/29/zebra/dataSource.jpeg" width="60%/">
+
 <h3 id="客户端源码分析"><a href="#客户端源码分析" class="headerlink" title="客户端源码分析"></a>客户端源码分析</h3><p>客户端源码主要包括两个部分启动阶段的初始化和sql请求的处理</p>
 <ul>
 <li>初始化：主要是应用启动阶段，对上述3个dataSource实例化，初始化相关配置，主要包括初始化上述3个dataSource的关系，建立与物理数据库之间的连接，添加一些配置变更的listener(通过zk监听配置，failover时候重建本地数据源，限流，流量路由)</li>
 <li>sql处理：主要包括sql解析，路由，改写，执行，结果合并几个步骤</li>
 </ul>
-<h3 id="初始化"><a href="#初始化" class="headerlink" title="初始化"></a>初始化</h3><h4 id="SingleDataSource初始化"><a href="#SingleDataSource初始化" class="headerlink" title="SingleDataSource初始化"></a>SingleDataSource初始化</h4><p><img src="https://lightoheaven.coding.net/p/image2/d/image2/git/raw/master/201711/singleDataSource.jpeg" alt="SingleDataSource配置"><br>上图是一个SingDataSource的xml配置，最开始的jdbcUrl，password，user，driver这个是连接mysql服务端需要的，后面的一些参数就是配置数据库连接池(c3p0,tomcat-jdbc,dbcp,druid)的一些通用的参数配置</p>
+<h3 id="初始化"><a href="#初始化" class="headerlink" title="初始化"></a>初始化</h3><h4 id="SingleDataSource初始化"><a href="#SingleDataSource初始化" class="headerlink" title="SingleDataSource初始化"></a>SingleDataSource初始化</h4><img src="/2017/11/29/zebra/singleDataSource.jpeg" width="60%/">
+上图是一个SingDataSource的xml配置，最开始的jdbcUrl，password，user，driver这个是连接mysql服务端需要的，后面的一些参数就是配置数据库连接池(c3p0,tomcat-jdbc,dbcp,druid)的一些通用的参数配置
+
 <pre class="line-numbers language-none"><code class="language-none">public synchronized void init() &#123;
     if (!init) &#123;
         mergeDataSourceConfig();
@@ -569,11 +573,16 @@ private DataSource initDataSourceOrigin(DataSourceConfig value) &#123;
 &#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <p>上面的代码init方法中的this.dataSourcePool = DataSourcePoolFactory.buildDataSourcePool(this.config);这里是通过xml中的参数创建一个对应的数据库连接池(c3p0,tomcat-jdbc,dbcp,druid)，然后最后一个initDataSourceOrigin方法，判断是否是lazyInit；如果不是，直接建立一个与mysql服务端的一个长连接。<font color="red">所以SingleDataSource初始化主要是创建一个真实的数据库连接池dataSourcePool，后续从SingleDataSource获取连接其实都是从dataSourcePool获取一个Connection</font></p>
 <h4 id="GroupDataSource初始化"><a href="#GroupDataSource初始化" class="headerlink" title="GroupDataSource初始化"></a>GroupDataSource初始化</h4><p>负责读写分离的连接池，它主要负责判断SQL的读写操作，然后把相应的SQL发送给SingleDataSource。它负责连接一个数据库集群，因此它会包含若干个SingleDataSource</p>
-<p><img src="https://lightoheaven.coding.net/p/image2/d/image2/git/raw/master/201711/groupDataSource.jpeg" alt="GroupDataSource配置"><br>上图里面我们要说明下jdbcRef，如果要使用读写分离功能，需要在我们管理平台RDS上申请一组读写数据库，比如DB-1-WRITE,DB-1-REDAD,DB-2-READ，这里DB-1负责所有写请求，DB-1和DB-2共同负责读请求(流量可以配置)。以上2个数据库会关联一个jdbcRef保存在zk上面，所以上述xml里面直接配置了jdbcRef，启动时候从zk获取对应的主从结构。</p>
-<p><img src="https://lightoheaven.coding.net/p/image2/d/image2/git/raw/master/201711/groupDataSourceInit.jpeg" alt="GroupDataSource初始化"><br><font color="red">GroupDataSource初始化从先从zk获取group相关的配置，主要是读写分离，路由负载均衡策略，限流熔断策略，并注册对这些配置的实时监听，然后从zk获取jdbc对应的若干个SingleDataSource并分别初始化</font></p>
+<img src="/2017/11/29/zebra/groupDataSource.jpeg" width="60%/">
+上图里面我们要说明下jdbcRef，如果要使用读写分离功能，需要在我们管理平台RDS上申请一组读写数据库，比如DB-1-WRITE,DB-1-REDAD,DB-2-READ，这里DB-1负责所有写请求，DB-1和DB-2共同负责读请求(流量可以配置)。以上2个数据库会关联一个jdbcRef保存在zk上面，所以上述xml里面直接配置了jdbcRef，启动时候从zk获取对应的主从结构。
+
+<img src="/2017/11/29/zebra/groupDataSourceInit.jpeg" width="60%/">
+<font color="red">GroupDataSource初始化从先从zk获取group相关的配置，主要是读写分离，路由负载均衡策略，限流熔断策略，并注册对这些配置的实时监听，然后从zk获取jdbc对应的若干个SingleDataSource并分别初始化</font>
+
 <h4 id="ShardDataSource初始化"><a href="#ShardDataSource初始化" class="headerlink" title="ShardDataSource初始化"></a>ShardDataSource初始化</h4><p>负责分库分表的连接池，它主要判断SQL的落到哪个分片上，然后把相应的SQL经过处理后发送给GroupDataSource。它负责连接多个数据库集群，因此它会包含若干个GroupDataSource(或者直接多个SingDataSource)</p>
-<p><img src="https://lightoheaven.coding.net/p/image2/d/image2/git/raw/master/201711/shardDataSource.jpeg" alt="ShardDataSource配置"></p>
-<p>上面的配置稍微解释下</p>
+<img src="/2017/11/29/zebra/shardDataSource.jpeg" width="60%/">
+上面的配置稍微解释下
+
 <ul>
 <li>ruleName：分表分表规则，集中式配置在zk上面</li>
 <li>dataSourcePool：配置若干个GroupDataSource或者SingleDataSource</li>
@@ -679,8 +688,9 @@ private Statement prepareStatement(StatementHandler handler, Log statementLog) t
     return stmt;
 &#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <p>上述是mybatis中的SimpleExecutor类封装好了jdbc的操作。上述的Connection connection = getConnection(statementLog);最终会调用上述初始化的DataSource的getConnection方法。</p>
-<h4 id="sql解析，路由，改写，执行，结果合并"><a href="#sql解析，路由，改写，执行，结果合并" class="headerlink" title="sql解析，路由，改写，执行，结果合并"></a>sql解析，路由，改写，执行，结果合并</h4><p><img src="https://lightoheaven.coding.net/p/image2/d/image2/git/raw/master/201711/sql.jpeg" alt="获取conn"></p>
-<p>最终调用ShardPreparedStatement的execute方法</p>
+<h4 id="sql解析，路由，改写，执行，结果合并"><a href="#sql解析，路由，改写，执行，结果合并" class="headerlink" title="sql解析，路由，改写，执行，结果合并"></a>sql解析，路由，改写，执行，结果合并</h4><img src="/2017/11/29/zebra/sql.jpeg" width="60%/">
+最终调用ShardPreparedStatement的execute方法
+
 <pre class="line-numbers language-none"><code class="language-none">public boolean execute() throws SQLException &#123;
     SqlType sqlType &#x3D; getSqlType(sql);
     
@@ -735,21 +745,24 @@ private Statement prepareStatement(StatementHandler handler, Log statementLog) t
 <li>sql执行：如果改写后的sql对应多条物理db的sql，那么后台创建多个任务提交到线程池并行的去执行，若只有一条sql则直接执行</li>
 <li>结果合并：将上述sql执行的结果根据指定条件合并返回</li>
 </ul>
-<h2 id="zebra高可用"><a href="#zebra高可用" class="headerlink" title="zebra高可用"></a>zebra高可用</h2><h3 id="基本架构"><a href="#基本架构" class="headerlink" title="基本架构"></a>基本架构</h3><p><img src="https://lightoheaven.coding.net/p/image2/d/image2/git/raw/master/201711/ha.jpeg" alt="zebra高可用"><br>其中MHA负责主库切换，从库监控服务负责从库切换。<br>主库和从库均使用实体IP。</p>
+<h2 id="zebra高可用"><a href="#zebra高可用" class="headerlink" title="zebra高可用"></a>zebra高可用</h2><h3 id="基本架构"><a href="#基本架构" class="headerlink" title="基本架构"></a>基本架构</h3><img src="/2017/11/29/zebra/ha.jpeg" width="60%/">
+其中MHA负责主库切换，从库监控服务负责从库切换。
+主库和从库均使用实体IP。
+
 <h3 id="主库的高可用"><a href="#主库的高可用" class="headerlink" title="主库的高可用"></a>主库的高可用</h3><p>利用MHA进行master节点的可用性监控，在发生故障，master节点不可用时，MHA进行mysql层的主从切换，切换成功后通知zebra新master节点的IP，由zebra负责应用访问层的切换。切换流程如下：</p>
-<p><img src="https://lightoheaven.coding.net/p/image2/d/image2/git/raw/master/201711/mha.jpeg" alt="mha"></p>
-<ul>
-<li>MHA对MySQL集群进行监控管理</li>
-<li>当主库发生故障时，MHA通知zebra对主库的写进行关闭，并进行MySQL集群的主从切换（切换期间应用无法写数据）</li>
-<li>zebra禁止掉对故障集群的写操作</li>
-<li>MHA切换成功，通知zebra新的写数据IP</li>
-<li>zebra用新的写IP替换老IP，开放应用访问。</li>
-</ul>
+<img src="/2017/11/29/zebra/mha.jpeg" width="60%/">
+ - MHA对MySQL集群进行监控管理
+ - 当主库发生故障时，MHA通知zebra对主库的写进行关闭，并进行MySQL集群的主从切换（切换期间应用无法写数据）
+ - zebra禁止掉对故障集群的写操作
+ - MHA切换成功，通知zebra新的写数据IP
+ - zebra用新的写IP替换老IP，开放应用访问。
+
 <h3 id="从库的高可用"><a href="#从库的高可用" class="headerlink" title="从库的高可用"></a>从库的高可用</h3><p>由zebra-monitor的监控服务负责，时时监控线上MySQL从库的健康状况，如果出现从库“故障”，将会通知zebra将读流量转移到其他可读节点，实现从库的“故障”转移。</p>
 <h4 id="分配粒度"><a href="#分配粒度" class="headerlink" title="分配粒度"></a>分配粒度</h4><p>根据集群进行分配 同一个集群上的所有实例在一台机器上监控</p>
 <h4 id="负载方式"><a href="#负载方式" class="headerlink" title="负载方式"></a>负载方式</h4><p>根据机房位置进行分配： 北京侧集群由北京侧机器监控，上海侧集群由上海侧机器监控。<br>(同侧集群id%监控机器数)结果为当前机器所需监控的集群，保存在数据库中，如果有新机器上线则对数据库中的数据进行刷新并通知所有活跃机器重新加载监控集群。加载集群的同时加载对应集群上的所有实例，实例信息由单独线程动态更新，刷新频率为10min。</p>
-<h4 id="监控逻辑"><a href="#监控逻辑" class="headerlink" title="监控逻辑"></a>监控逻辑</h4><p><img src="https://lightoheaven.coding.net/p/image2/d/image2/git/raw/master/201711/slaveha.jpeg" alt="mha"></p>
-<p>监控首先使用’select 1’ 测试是否可以连通数据库， 连接没有问题则使用 ‘show slave status’ 获取到’second_behind_master’字段来得到该从库上的延迟，从而做出判断。</p>
+<h4 id="监控逻辑"><a href="#监控逻辑" class="headerlink" title="监控逻辑"></a>监控逻辑</h4><img src="/2017/11/29/zebra/slaveha.jpeg" width="60%/">
+监控首先使用'select 1' 测试是否可以连通数据库， 连接没有问题则使用 'show slave status' 获取到'second_behind_master'字段来得到该从库上的延迟，从而做出判断。
+
 <p>markdown的场景<br>(1)30s内从库连续ping不通。 (从库宕机)<br>(2)30s内 second_behind_master取到的延迟为null。 (主从同步中断)<br>(3)延迟超过阈值。（可根据每个库的敏感程度进行个性化配置，需要进行另外配置）<br>markup的场景<br>30s内能够连续ping通并且主从延迟为0.</p>
 <h4 id="使用情况"><a href="#使用情况" class="headerlink" title="使用情况"></a>使用情况</h4><p>从库被markdown之后，zebra客户端会收到zk的通知进行动态刷新，重建本地数据源配置，新的流量会导入到正常的从库上。老的数据源会在全部sql执行完成后被close。<br>目前以实例为单位进行配置，即如果一个实例延迟到达阈值，则该实例上所有从库都会被markdown。<br>但是考虑到每个库对延迟的敏感程度不同，我们支持库级的配置，一个实例上的不同库可以有不同的延迟阈值。</p>
 
@@ -778,7 +791,7 @@ private Statement prepareStatement(StatementHandler handler, Log statementLog) t
                     </i>
                 </span>
                 <span class="reprint-info">
-                    <a href="http://yeming.me/2017/11/29/zebra/">http://yeming.me/2017/11/29/zebra/</a>
+                    <a href="http://yeming.fun/2017/11/29/zebra/">http://yeming.fun/2017/11/29/zebra/</a>
                 </span>
             </div>
             <div class="reprint__notice">
@@ -1365,7 +1378,7 @@ private Statement prepareStatement(StatementHandler handler, Log statementLog) t
         <div class="col s12 m8 l8 copy-right">
             Copyright&nbsp;&copy;
             
-                <span id="year">2019-2021</span>
+                <span id="year">2019-2024</span>
             
             <span id="year">2019</span>
             <a href="/about" target="_blank">叶明</a>
@@ -1374,7 +1387,7 @@ private Statement prepareStatement(StatementHandler handler, Log statementLog) t
             <br>
             
             &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                class="white-color">67k</span>&nbsp;字
+                class="white-color">78.8k</span>&nbsp;字
             
             
             

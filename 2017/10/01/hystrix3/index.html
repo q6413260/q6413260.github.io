@@ -555,8 +555,8 @@ public Future&lt;R&gt; queue() &#123;
 
         return f;
     &#125;    <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<p>上述代码，我们通过GetUserAccountCommand.execute来执行命令，debug源码可以看到，execute命令其实也是调用了上面的queue方法返回一个future，然后通过future.get阻塞获取response。继续深入future方法，我们可以先不用管那个代理的future(主要用来实现中断的)，final Future<R> delegate = toObservable().toBlocking().toFuture();可以看到这里其实也是调用了上面提到的toObservable()方法返回一个Observable，然后通过toBlocking().toFuture()返回一个future。</p>
-<p><font color='red'>事实上，不管是execute，queue最终都会调用toObservable。也就是说同步的HystrixCommand最终都会依赖Observable，尽管HystrixCommand是用来发射单个事件的</font></p>
+<p>上述代码，我们通过GetUserAccountCommand.execute来执行命令，debug源码可以看到，execute命令其实也是调用了上面的queue方法返回一个future，然后通过future.get阻塞获取response。继续深入future方法，我们可以先不用管那个代理的future(主要用来实现中断的)，final Future<R> delegate = toObservable().toBlocking().toFuture();可以看到这里其实也是调用了上面提到的toObservable()方法返回一个Observable，然后通过toBlocking().toFuture()返回一个future。</R></p>
+<p><font color="red">事实上，不管是execute，queue最终都会调用toObservable。也就是说同步的HystrixCommand最终都会依赖Observable，尽管HystrixCommand是用来发射单个事件的</font></p>
 <h2 id="Is-the-Response-Cached"><a href="#Is-the-Response-Cached" class="headerlink" title="Is the Response Cached"></a>Is the Response Cached</h2><p><b>AbstractCommand</b></p>
 <pre class="line-numbers language-none"><code class="language-none">return Observable.defer(new Func0&lt;Observable&lt;R&gt;&gt;() &#123;
             @Override
@@ -619,7 +619,7 @@ public Future&lt;R&gt; queue() &#123;
                         .doOnCompleted(fireOnCompletedHook);
             &#125;
         &#125;);<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<p>上述代码中有个判断final boolean requestCacheEnabled = isRequestCachingEnabled();可以看到如果我们的Command实现了getCacheKey方法，并且requestCacheEnabled(这个属性默认是true，可以通过调用HystrixCommand的构造方法传入一个setter对象修改默认属性)这样就不会执行后续的run方法，就会直接返回一个缓存的Observable。(<font color='red'>上一篇文章我们已经提到，必须是同一个request context里面的两个command才能用到缓存</font>)</p>
+<p>上述代码中有个判断final boolean requestCacheEnabled = isRequestCachingEnabled();可以看到如果我们的Command实现了getCacheKey方法，并且requestCacheEnabled(这个属性默认是true，可以通过调用HystrixCommand的构造方法传入一个setter对象修改默认属性)这样就不会执行后续的run方法，就会直接返回一个缓存的Observable。(<font color="red">上一篇文章我们已经提到，必须是同一个request context里面的两个command才能用到缓存</font>)</p>
 <pre class="line-numbers language-none"><code class="language-none">protected boolean isRequestCachingEnabled() &#123;
         return properties.requestCacheEnabled().get() &amp;&amp; getCacheKey() !&#x3D; null;
     &#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
@@ -914,7 +914,7 @@ public void markNonSuccess() &#123;
         &#125;);
     &#125;
 &#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<p>上述代码可以看到首先判断是不是ExecutionIsolationStrategy.THREAD模式，如果不是，说明是Semaphore模式，就走到最后面的逻辑，直接调用getUserExecutionObservable；如果是THREAD模式，可以看到最终会对返回的Observable.subscribeOn(Func0<Boolean> shouldInterruptThread)，这也就是对于外部服务的隔离，让最终产生事件的方法(run或者construct方法)发生在一个单独的线程池里面。</p>
+<p>上述代码可以看到首先判断是不是ExecutionIsolationStrategy.THREAD模式，如果不是，说明是Semaphore模式，就走到最后面的逻辑，直接调用getUserExecutionObservable；如果是THREAD模式，可以看到最终会对返回的Observable.subscribeOn(Func0<Boolean> shouldInterruptThread)，这也就是对于外部服务的隔离，让最终产生事件的方法(run或者construct方法)发生在一个单独的线程池里面。</Boolean></p>
 <p>继续来看getUserExecutionObservable方法</p>
 <pre class="line-numbers language-none"><code class="language-none">private Observable&lt;R&gt; getUserExecutionObservable(final AbstractCommand&lt;R&gt; _cmd) &#123;
     Observable&lt;R&gt; userObservable;
@@ -989,7 +989,7 @@ final protected Observable&lt;R&gt; getExecutionObservable() &#123;
                     </i>
                 </span>
                 <span class="reprint-info">
-                    <a href="http://yeming.me/2017/10/01/hystrix3/">http://yeming.me/2017/10/01/hystrix3/</a>
+                    <a href="http://yeming.fun/2017/10/01/hystrix3/">http://yeming.fun/2017/10/01/hystrix3/</a>
                 </span>
             </div>
             <div class="reprint__notice">
@@ -1568,7 +1568,7 @@ final protected Observable&lt;R&gt; getExecutionObservable() &#123;
         <div class="col s12 m8 l8 copy-right">
             Copyright&nbsp;&copy;
             
-                <span id="year">2019-2021</span>
+                <span id="year">2019-2024</span>
             
             <span id="year">2019</span>
             <a href="/about" target="_blank">叶明</a>
@@ -1577,7 +1577,7 @@ final protected Observable&lt;R&gt; getExecutionObservable() &#123;
             <br>
             
             &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                class="white-color">67k</span>&nbsp;字
+                class="white-color">78.8k</span>&nbsp;字
             
             
             

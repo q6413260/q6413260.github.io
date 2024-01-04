@@ -845,7 +845,7 @@ private void addToStagedReceives(KafkaChannel channel, NetworkReceive receive) &
     Deque&lt;NetworkReceive&gt; deque &#x3D; stagedReceives.get(channel);
     deque.add(receive);
 &#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<p>我们看到如果当前channel已经准备好并且SelectionKey已经可以读取并且没有staged receive，那么就把收到的消息缓存到Map&lt;KafkaChannel, Deque<NetworkReceive>&gt; stagedReceives这个里面。然后我们看下后续是怎么处理这些缓存的消息的。<br>上面poll方法处理完了pollSelectionKeys之后，就会调用addToCompletedReceives，从方法名字也可以看出，它是把上面暂存的stagedReceives放进一个List<NetworkReceive> completedReceives里面。<br>下面handleCompletedReceives会用到这个list</p>
+<p>我们看到如果当前channel已经准备好并且SelectionKey已经可以读取并且没有staged receive，那么就把收到的消息缓存到Map&lt;KafkaChannel, Deque<NetworkReceive>&gt; stagedReceives这个里面。然后我们看下后续是怎么处理这些缓存的消息的。<br>上面poll方法处理完了pollSelectionKeys之后，就会调用addToCompletedReceives，从方法名字也可以看出，它是把上面暂存的stagedReceives放进一个List<NetworkReceive> completedReceives里面。<br>下面handleCompletedReceives会用到这个list</NetworkReceive></NetworkReceive></p>
 <p><font color="#08c">NetworkClient</font></p>
 <pre class="line-numbers language-none"><code class="language-none">public List&lt;ClientResponse&gt; poll(long timeout, long now) &#123;
     long metadataTimeout &#x3D; metadataUpdater.maybeUpdate(now);
@@ -887,7 +887,7 @@ private void handleCompletedReceives(List&lt;ClientResponse&gt; responses, long 
             responses.add(new ClientResponse(req, now, false, body));
     &#125;
 &#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<p>可以看到上述方法会根据之前获得的List<NetworkReceive> completedReceives组装response，然后调用response.request().callback().onComplete(response);最终会触发Fetcher类sendFetches方法中注册RequestFutureListener的回调onSuccess方法</p>
+<p>可以看到上述方法会根据之前获得的List<NetworkReceive> completedReceives组装response，然后调用response.request().callback().onComplete(response);最终会触发Fetcher类sendFetches方法中注册RequestFutureListener的回调onSuccess方法</NetworkReceive></p>
 <pre class="line-numbers language-none"><code class="language-none">public void sendFetches() &#123;
     for (Map.Entry&lt;Node, FetchRequest&gt; fetchEntry: createFetchRequests().entrySet()) &#123;
         final FetchRequest request &#x3D; fetchEntry.getValue();
@@ -917,7 +917,7 @@ private void handleCompletedReceives(List&lt;ClientResponse&gt; responses, long 
                 &#125;);
     &#125;
 &#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<p>可以看到onSuccess回调方法会把record封装后，添加到List<CompletedFetch> completedFetches，之前上面讲到的pollOnce方法会调用<br>fetcher.fetchedRecords()方法，这个方法会根据获得的completedFetches，返回一个封装好的Map&lt;TopicPartition, List&lt;ConsumerRecord&lt;K, V&gt;&gt;&gt; recordMap。</p>
+<p>可以看到onSuccess回调方法会把record封装后，添加到List<CompletedFetch> completedFetches，之前上面讲到的pollOnce方法会调用<br>fetcher.fetchedRecords()方法，这个方法会根据获得的completedFetches，返回一个封装好的Map&lt;TopicPartition, List&lt;ConsumerRecord&lt;K, V&gt;&gt;&gt; recordMap。</CompletedFetch></p>
 <h2 id="消费获取的record"><a href="#消费获取的record" class="headerlink" title="消费获取的record"></a>消费获取的record</h2><h3 id="配置了自动commit"><a href="#配置了自动commit" class="headerlink" title="配置了自动commit"></a>配置了自动commit</h3><p>回到最开始的KafkaMessageListenerContainer.ListenerConsumer类的run方法</p>
 <pre class="line-numbers language-none"><code class="language-none">ConsumerRecords&lt;K, V&gt; records &#x3D; this.consumer.poll(this.containerProperties.getPollTimeout());
 if (records !&#x3D; null &amp;&amp; this.logger.isDebugEnabled()) &#123;
@@ -1096,7 +1096,7 @@ private boolean sendToListener(final ConsumerRecords&lt;K, V&gt; records) throws
                     </i>
                 </span>
                 <span class="reprint-info">
-                    <a href="http://yeming.me/2016/12/30/kafkaconsumer/">http://yeming.me/2016/12/30/kafkaconsumer/</a>
+                    <a href="http://yeming.fun/2016/12/30/kafkaconsumer/">http://yeming.fun/2016/12/30/kafkaconsumer/</a>
                 </span>
             </div>
             <div class="reprint__notice">
@@ -1687,7 +1687,7 @@ private boolean sendToListener(final ConsumerRecords&lt;K, V&gt; records) throws
         <div class="col s12 m8 l8 copy-right">
             Copyright&nbsp;&copy;
             
-                <span id="year">2019-2021</span>
+                <span id="year">2019-2024</span>
             
             <span id="year">2019</span>
             <a href="/about" target="_blank">叶明</a>
@@ -1696,7 +1696,7 @@ private boolean sendToListener(final ConsumerRecords&lt;K, V&gt; records) throws
             <br>
             
             &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                class="white-color">67k</span>&nbsp;字
+                class="white-color">78.8k</span>&nbsp;字
             
             
             

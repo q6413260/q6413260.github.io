@@ -484,19 +484,19 @@
             <div id="articleContent">
                 <p>K8s的所有操作基本都是通过调用kube-apiserver这个组件进行的，它提供了restful api供外部系统访问，当然为了保证整个k8s集群的安全性，k8s提供了多种认证方式来保证集群的安全性：比如客户端证书、静态token、静态密码文件、ServiceAccountTokens等等。你可以同时使用一种或多种认证方式。只要通过任何一个都被认作是认证通过，我们一般都是使用证书方式：客户端证书认证叫作TLS双向认证(关于SSL/TLS认证的可以参考这篇文章<a target="_blank" rel="noopener" href="http://www.ruanyifeng.com/blog/2014/02/ssl_tls.html">《SSL/TLS协议运行机制的概述》</a>)，也就是服务器客户端互相验证证书的正确性，在都正确的情况下协调通信加密方案。下面来看下如何配置客户端证书验证，我们通过配置一个kubeconfig文件来讲解下</p>
 <span id="more"></span>
-<img src="https://lightoheaven.coding.net/p/image2/d/image2/git/raw/master/201811/kubeconfig.jpeg" width="600" hegiht="300"/>
+<img src="https://lightoheaven.coding.net/p/image2/d/image2/git/raw/master/201811/kubeconfig.jpeg" width="600" hegiht="300">
 
 <p>红框标出的3个参数分别如下：<br>certificate-authority CA 证书的路径。<br>client-certificate TLS 证书文件<br>client-key TLS Key 文件<br>注意以上3个文件是由k8s集群服务端授权生成的，需要服务端提供给客户端。<br>下面我们分别介绍下如何通过Postman和java client来调用kube-apiserver提供的api</p>
-<h2 id="Postman访问kube-apiserver"><a href="#Postman访问kube-apiserver" class="headerlink" title="Postman访问kube-apiserver"></a>Postman访问kube-apiserver</h2><img src="https://lightoheaven.coding.net/p/image2/d/image2/git/raw/master/201811/postman1.jpeg" width="600" hegiht="300"/>
+<h2 id="Postman访问kube-apiserver"><a href="#Postman访问kube-apiserver" class="headerlink" title="Postman访问kube-apiserver"></a>Postman访问kube-apiserver</h2><img src="https://lightoheaven.coding.net/p/image2/d/image2/git/raw/master/201811/postman1.jpeg" width="600" hegiht="300">
 这里我们以获取集群某个namespaces下面所有的pod列表api来演示，我们直接通过Postman发起一个get请求，可以看到报403 Forbidden错误。这是因为k8s集群开启了客户端证书认证，我们可以通过下面的办法来解决这个问题。
 
 <ul>
 <li>首先确保Postman是最新版本，最新版本可以支持添加证书</li>
-<li>打开设置，把SSL certificate verification关闭，然后点击证书 tab添加证书，分别输入kube-apiserver地址，证书文件和秘钥，然后添加<br><img src="https://lightoheaven.coding.net/p/image2/d/image2/git/raw/master/201811/postman2.jpeg" width="400" hegiht="200"/> &nbsp;&nbsp;<img src="https://lightoheaven.coding.net/p/image2/d/image2/git/raw/master/201811/postman3.jpeg" width="400" hegiht="200"/></li>
-<li>最后重新访问，可以看到此时http请求返回200，可以正常访问(<font color="red">注意postman请求地址不要添加端口号</font>)<img src="https://lightoheaven.coding.net/p/image2/d/image2/git/raw/master/201811/postman4.jpeg" width="600" hegiht="300"/>
+<li>打开设置，把SSL certificate verification关闭，然后点击证书 tab添加证书，分别输入kube-apiserver地址，证书文件和秘钥，然后添加<br><img src="https://lightoheaven.coding.net/p/image2/d/image2/git/raw/master/201811/postman2.jpeg" width="400" hegiht="200"> &nbsp;&nbsp;<img src="https://lightoheaven.coding.net/p/image2/d/image2/git/raw/master/201811/postman3.jpeg" width="400" hegiht="200"></li>
+<li>最后重新访问，可以看到此时http请求返回200，可以正常访问(<font color="red">注意postman请求地址不要添加端口号</font>)<img src="https://lightoheaven.coding.net/p/image2/d/image2/git/raw/master/201811/postman4.jpeg" width="600" hegiht="300">
 <br>
 另外我们通过command+option+c可以打开postman的console，可以看到发送的请求会自动附带Client Certificate信息
-<img src="https://lightoheaven.coding.net/p/image2/d/image2/git/raw/master/201811/console.jpeg" width="600" hegiht="300"/></li>
+<img src="https://lightoheaven.coding.net/p/image2/d/image2/git/raw/master/201811/console.jpeg" width="600" hegiht="300"></li>
 </ul>
 <h2 id="Java-client访问kube-apiserver"><a href="#Java-client访问kube-apiserver" class="headerlink" title="Java client访问kube-apiserver"></a>Java client访问kube-apiserver</h2><p>pom.xml文件添加以下依赖</p>
 <pre class="line-numbers language-none"><code class="language-none">&lt;dependency&gt;
@@ -546,7 +546,7 @@
                     </i>
                 </span>
                 <span class="reprint-info">
-                    <a href="http://yeming.me/2018/11/11/k8s/">http://yeming.me/2018/11/11/k8s/</a>
+                    <a href="http://yeming.fun/2018/11/11/k8s/">http://yeming.fun/2018/11/11/k8s/</a>
                 </span>
             </div>
             <div class="reprint__notice">
@@ -950,25 +950,24 @@
                 下一篇&nbsp;<i class="fas fa-chevron-right"></i>
             </div>
             <div class="card">
-                <a href="/2018/08/27/tidb2/">
+                <a href="/2018/10/01/redishotkey/">
                     <div class="card-image">
                         
                         
-                        <img src="/medias/featureimages/18.jpg" class="responsive-img" alt="从零开始学TIDB二(TIDB简介与整体架构)">
+                        <img src="/medias/featureimages/23.jpg" class="responsive-img" alt="Redis热点Key解决方案">
                         
-                        <span class="card-title">从零开始学TIDB二(TIDB简介与整体架构)</span>
+                        <span class="card-title">Redis热点Key解决方案</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
                     <div class="summary block-with-text">
                         
-                            上一篇博客，我们简单介绍了怎么在Mac OS系统上面使用docker compose搭建一个包含3个pd，3个tikv，1个tidb的TIDB集群。本文，我们会详细介绍TIDB的一些基本概念和整体架构。
-TIDB 简介TIDB是pingca
+                            Squirrel是基于redis cluster开发的K-V存储系统，对某个key进行读写时，会根据该key的hash计算出对应的slot，根据这个slot就能找到与之对应的分片(一个master和多个slave组成的一组redis集群)来存取该K-V，如果集群不发生服务器数量变化，那么这一映射关系就不会变化。但是在实际应用过程中，对于某些特定业务或者一些特定的时段，可能会发生大量的请求访问同一个key。所有的请求（且这类请求读写比例非常高）都会落到同一个redis server上，该redis的负载就会严重加剧，此时整个系统增加新redis实例也没有任何用处，因为根据hash算法，同一个key的请求还是会落到同一台新机器上，该机器依然会成为系统瓶颈。若此热点 key 的 value 也比较大，也会造成网卡达到瓶颈。这个问题称为 “热点key” 问题。
                         
                     </div>
                     <div class="publish-info">
                             <span class="publish-date">
-                                <i class="far fa-clock fa-fw icon-date"></i>2018-08-27
+                                <i class="far fa-clock fa-fw icon-date"></i>2018-10-01
                             </span>
                         <span class="publish-author">
                             
@@ -985,8 +984,8 @@ TIDB 简介TIDB是pingca
                 
                 <div class="card-action article-tags">
                     
-                    <a href="/tags/TIDB/">
-                        <span class="chip bg-color">TIDB</span>
+                    <a href="/tags/Redis/">
+                        <span class="chip bg-color">Redis</span>
                     </a>
                     
                 </div>
@@ -1126,7 +1125,7 @@ TIDB 简介TIDB是pingca
         <div class="col s12 m8 l8 copy-right">
             Copyright&nbsp;&copy;
             
-                <span id="year">2019-2021</span>
+                <span id="year">2019-2024</span>
             
             <span id="year">2019</span>
             <a href="/about" target="_blank">叶明</a>
@@ -1135,7 +1134,7 @@ TIDB 简介TIDB是pingca
             <br>
             
             &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                class="white-color">67k</span>&nbsp;字
+                class="white-color">78.8k</span>&nbsp;字
             
             
             

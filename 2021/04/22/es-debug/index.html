@@ -487,10 +487,10 @@
         <div class="card-content article-card-content">
             <div id="articleContent">
                 <h2 id="1、Mac上安装es"><a href="#1、Mac上安装es" class="headerlink" title="1、Mac上安装es"></a>1、Mac上安装es</h2><hr>
-<p>最近在调研Elasticsearch（后续简称es）的translog，在Mac上安装了es单机版和集群版本，这里推荐使用docker搭建，简单叙述下过程：<br><strong>安装Docker环境</strong><br>首先需要在Mac上安装Docker运行环境，这里推荐直接安装 docker-for-mac，安装完成并启动成功后Mac右上方会显示running<br><img src="https://lightoheaven.coding.net/p/image2/d/image2/git/raw/master/2021/04/docker.png" width=30%/><br>安装完docker-for-mac后，建议修改镜像源，默认镜像源拉取镜像太慢了。修改方式如下：依次点击Preferences -&gt; Docker Engine</p>
+<p>最近在调研Elasticsearch（后续简称es）的translog，在Mac上安装了es单机版和集群版本，这里推荐使用docker搭建，简单叙述下过程：<br><strong>安装Docker环境</strong><br>首先需要在Mac上安装Docker运行环境，这里推荐直接安装 docker-for-mac，安装完成并启动成功后Mac右上方会显示running<br><img src="https://lightoheaven.coding.net/p/image2/d/image2/git/raw/master/2021/04/docker.png" width="30%/"><br>安装完docker-for-mac后，建议修改镜像源，默认镜像源拉取镜像太慢了。修改方式如下：依次点击Preferences -&gt; Docker Engine</p>
 <figure>
-<img src="https://lightoheaven.coding.net/p/image2/d/image2/git/raw/master/2021/04/docker-preference.png" width=30%/>
-<img src="https://lightoheaven.coding.net/p/image2/d/image2/git/raw/master/2021/04/docker-engine.png"/>
+<img src="https://lightoheaven.coding.net/p/image2/d/image2/git/raw/master/2021/04/docker-preference.png" width="30%/">
+<img src="https://lightoheaven.coding.net/p/image2/d/image2/git/raw/master/2021/04/docker-engine.png">
 </figure>
 
 
@@ -585,8 +585,8 @@
 </ul>
 <p><strong><a target="_blank" rel="noopener" href="https://github.com/elastic/elasticsearch">github pull代码</a></strong><br>es代码挺大的，第一次拉取很慢，后面从google应用商店下载了github加速插件，拉代码速度提升很明显。安装完成后，会有一个加速按钮</p>
 <figure>
-<img src="https://lightoheaven.coding.net/p/image2/d/image2/git/raw/master/2021/04/github-speed.png" width=45%/>
-<img src="https://lightoheaven.coding.net/p/image2/d/image2/git/raw/master/2021/04/github-speed2.png" width=45%/>
+<img src="https://lightoheaven.coding.net/p/image2/d/image2/git/raw/master/2021/04/github-speed.png" width="45%/">
+<img src="https://lightoheaven.coding.net/p/image2/d/image2/git/raw/master/2021/04/github-speed2.png" width="45%/">
 </figure>
 
 <p><strong>编译es代码</strong></p>
@@ -600,9 +600,9 @@
 </ol>
 <p><strong>运行es代码</strong><br>es启动类位于 ：elasticsearch\server\src\main\java\org\elasticsearch\bootstrap\Elasticsearch.java</p>
 <ol>
-<li>ERROR: the system property [es.path.conf] must be set<br>添加VM options： -Des.path.conf=/Users/dianping/Downloads/elasticsearch-7.8.1/config，这里可以直接指向成之前下载的es 7.8.1的config目录<img src="https://lightoheaven.coding.net/p/image2/d/image2/git/raw/master/2021/04/es-vm.png" width=85%/> </li>
+<li>ERROR: the system property [es.path.conf] must be set<br>添加VM options： -Des.path.conf=/Users/dianping/Downloads/elasticsearch-7.8.1/config，这里可以直接指向成之前下载的es 7.8.1的config目录<img src="https://lightoheaven.coding.net/p/image2/d/image2/git/raw/master/2021/04/es-vm.png" width="85%/"> </li>
 <li>Exception in thread “main” java.lang.IllegalStateException: path.home is not configured<br>添加VM options： -Des.path.home=/Users/dianping/Downloads/elasticsearch-7.8.1</li>
-<li>Exception in thread “main” java.lang.NullPointerException: Cannot invoke “String.hashCode()” because “<local3>“ is null<br>直接注释**InternalSettingsPreparer.checkSettingsForTerminalDeprecation()**for循环代码，不影响启动<img src="https://lightoheaven.coding.net/p/image2/d/image2/git/raw/master/2021/04/InternalSettingsPreparer.png" width=85%/> </li>
+<li>Exception in thread “main” java.lang.NullPointerException: Cannot invoke “String.hashCode()” because “<local3>“ is null<br>直接注释**InternalSettingsPreparer.checkSettingsForTerminalDeprecation()**for循环代码，不影响启动<img src="https://lightoheaven.coding.net/p/image2/d/image2/git/raw/master/2021/04/InternalSettingsPreparer.png" width="85%/"> </local3></li>
 <li>ERROR Could not register mbeans java.security.AccessControlException: access denied (“javax.management.MBeanTrustPermission” “register”)<br>添加VM options：-Dlog4j2.disable.jmx=true 禁用jmx</li>
 <li>java.security.AccessControlException: access denied (“java.lang.RuntimePermission” “createClassLoader”)<br>创建java.policy文件，然后 -Djava.security.policy=/Users/dianping/Downloads/elasticsearch-7.8.1/config/java.policy<pre class="line-numbers language-shell" data-language="shell"><code class="language-shell">grant &#123;
 	permission java.lang.RuntimePermission &quot;createClassLoader&quot;;
@@ -635,7 +635,7 @@
                     </i>
                 </span>
                 <span class="reprint-info">
-                    <a href="http://yeming.me/2021/04/22/es-debug/">http://yeming.me/2021/04/22/es-debug/</a>
+                    <a href="http://yeming.fun/2021/04/22/es-debug/">http://yeming.fun/2021/04/22/es-debug/</a>
                 </span>
             </div>
             <div class="reprint__notice">
@@ -990,30 +990,29 @@
 <article id="prenext-posts" class="prev-next articles">
     <div class="row article-row">
         
-        <div class="article col s12 m6" data-aos="fade-up" data-aos="fade-up">
+        <div class="article col s12 m6" data-aos="fade-up">
             <div class="article-badge left-badge text-color">
-                <i class="far fa-dot-circle"></i>&nbsp;本篇
-            </div>
+                <i class="fas fa-chevron-left"></i>&nbsp;上一篇</div>
             <div class="card">
-                <a href="/2021/04/22/es-debug/">
+                <a href="/2023/01/15/zkprocess/">
                     <div class="card-image">
                         
                         
-                        <img src="/medias/featureimages/3.jpg" class="responsive-img" alt="IDEA调试Elasticsearch源码">
+                        <img src="/medias/featureimages/1.jpg" class="responsive-img" alt="ZK处理客户端请求流程梳理">
                         
-                        <span class="card-title">IDEA调试Elasticsearch源码</span>
+                        <span class="card-title">ZK处理客户端请求流程梳理</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
                     <div class="summary block-with-text">
                         
-                            本文首先会介绍在Mac上如何通过docker来安装es单机版本和集群版本，然后重点叙述如何使用IDEA编译Elasticsearch源码并进行调试
+                            ZK整体构成包括Leader、Follower、Observer以及客户端，其中Leader、Follower参与Leader竞选，并负责对于写请求进行投票。由于每次写请求，Leader都必须和所有Follower基于类似两阶段提交协议来决定写入是否成功，所以Follower节点不能过多。同时为了提高集群整体的读性能，进而引入了Observer节点。下图描述了从客户端发起一次请求到服务端响应的整个过程（假设客户端此时连接的是Follower节点，相比于连接Leader处理过程更为复杂）
                         
                     </div>
                     <div class="publish-info">
-                            <span class="publish-date">
-                                <i class="far fa-clock fa-fw icon-date"></i>2021-04-22
-                            </span>
+                        <span class="publish-date">
+                            <i class="far fa-clock fa-fw icon-date"></i>2023-01-15
+                        </span>
                         <span class="publish-author">
                             
                             <i class="fas fa-bookmark fa-fw icon-category"></i>
@@ -1026,16 +1025,11 @@
                         </span>
                     </div>
                 </div>
-
                 
                 <div class="card-action article-tags">
                     
-                    <a href="/tags/Elasticsearch/">
-                        <span class="chip bg-color">Elasticsearch</span>
-                    </a>
-                    
-                    <a href="/tags/docker/">
-                        <span class="chip bg-color">docker</span>
+                    <a href="/tags/ZK/">
+                        <span class="chip bg-color">ZK</span>
                     </a>
                     
                 </div>
@@ -1224,7 +1218,7 @@
         <div class="col s12 m8 l8 copy-right">
             Copyright&nbsp;&copy;
             
-                <span id="year">2019-2021</span>
+                <span id="year">2019-2024</span>
             
             <span id="year">2019</span>
             <a href="/about" target="_blank">叶明</a>
@@ -1233,7 +1227,7 @@
             <br>
             
             &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                class="white-color">67k</span>&nbsp;字
+                class="white-color">78.8k</span>&nbsp;字
             
             
             

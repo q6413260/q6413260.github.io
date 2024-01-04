@@ -351,11 +351,11 @@
                 </a>
                 
                 
-                <a href="/categories/%E6%8A%80%E6%9C%AF%E5%88%86%E4%BA%AB/" title="技术分享: 29">
+                <a href="/categories/%E6%8A%80%E6%9C%AF%E5%88%86%E4%BA%AB/" title="技术分享: 32">
                     <span class="chip center-align waves-effect waves-light
                              chip-active "
                             style="background-color: #F5EEF8;">技术分享
-                        <span class="tag-length">29</span>
+                        <span class="tag-length">32</span>
                     </span>
                 </a>
                 
@@ -388,6 +388,102 @@
 
     <article id="articles" class="container articles">
         <div class="row tags-posts">
+            
+            <div class="article tag-post col s12 m6 l4" data-aos="zoom-in">
+                <div class="card">
+                    <a href="/2023/02/03/zkarch/">
+                        <div class="card-image tag-image">
+                            
+                            
+                            <img src="/medias/featureimages/10.jpg" class="responsive-img" alt="ZK架构设计与优化">
+                            
+                            <span class="card-title">ZK架构设计与优化</span>
+                        </div>
+                    </a>
+                    <div class="card-content article-content">
+                        <div class="summary block-with-text">
+                            
+                                ZK，全称为 ZooKeeper，是一个分布式协调服务，由雅虎公司开发并开源。ZK 提供了一个高可用、高性能（Raptor测试链接同机房直连ZK节点Avg耗时0.1ms）、分布式的协调服务，用于解决分布式系统中的一些协调问题，如分布式锁、分布式协调、分布式配置中心、分布式队列等。被广泛地应用于诸如 Hadoop、HBase、Kafka 和 Dubbo 等大型开源分布式系统中，公司内部的Squirrel、MNS、Crane、Mafka、DTS以及一些业务系统也广泛使用ZK来实现数据订阅、Leader选举、分布式锁等。
+                            
+                        </div>
+                        <div class="publish-info">
+                            <span class="publish-date">
+                                <i class="far fa-clock fa-fw icon-date"></i>2023-02-03
+                            </span>
+                            <span class="publish-author">
+                                
+                                <i class="fas fa-bookmark fa-fw icon-category"></i>
+                                
+                                <a href="/categories/%E6%8A%80%E6%9C%AF%E5%88%86%E4%BA%AB/" class="post-category">
+                                    技术分享
+                                </a>
+                                
+                                
+                            </span>
+                        </div>
+                    </div>
+
+                    
+                    <div class="card-action article-tags">
+                        
+                        <a href="/tags/ZK/">
+                            <span class="chip bg-color">ZK</span>
+                        </a>
+                        
+                        <a href="/tags/CAP/">
+                            <span class="chip bg-color">CAP</span>
+                        </a>
+                        
+                    </div>
+                    
+                </div>
+            </div>
+            
+            <div class="article tag-post col s12 m6 l4" data-aos="zoom-in">
+                <div class="card">
+                    <a href="/2023/01/15/zkprocess/">
+                        <div class="card-image tag-image">
+                            
+                            
+                            <img src="/medias/featureimages/1.jpg" class="responsive-img" alt="ZK处理客户端请求流程梳理">
+                            
+                            <span class="card-title">ZK处理客户端请求流程梳理</span>
+                        </div>
+                    </a>
+                    <div class="card-content article-content">
+                        <div class="summary block-with-text">
+                            
+                                ZK整体构成包括Leader、Follower、Observer以及客户端，其中Leader、Follower参与Leader竞选，并负责对于写请求进行投票。由于每次写请求，Leader都必须和所有Follower基于类似两阶段提交协议来决定写入是否成功，所以Follower节点不能过多。同时为了提高集群整体的读性能，进而引入了Observer节点。下图描述了从客户端发起一次请求到服务端响应的整个过程（假设客户端此时连接的是Follower节点，相比于连接Leader处理过程更为复杂）
+                            
+                        </div>
+                        <div class="publish-info">
+                            <span class="publish-date">
+                                <i class="far fa-clock fa-fw icon-date"></i>2023-01-15
+                            </span>
+                            <span class="publish-author">
+                                
+                                <i class="fas fa-bookmark fa-fw icon-category"></i>
+                                
+                                <a href="/categories/%E6%8A%80%E6%9C%AF%E5%88%86%E4%BA%AB/" class="post-category">
+                                    技术分享
+                                </a>
+                                
+                                
+                            </span>
+                        </div>
+                    </div>
+
+                    
+                    <div class="card-action article-tags">
+                        
+                        <a href="/tags/ZK/">
+                            <span class="chip bg-color">ZK</span>
+                        </a>
+                        
+                    </div>
+                    
+                </div>
+            </div>
             
             <div class="article tag-post col s12 m6 l4" data-aos="zoom-in">
                 <div class="card">
@@ -533,25 +629,24 @@
             
             <div class="article tag-post col s12 m6 l4" data-aos="zoom-in">
                 <div class="card">
-                    <a href="/2018/08/27/tidb2/">
+                    <a href="/2018/10/01/redishotkey/">
                         <div class="card-image tag-image">
                             
                             
-                            <img src="/medias/featureimages/18.jpg" class="responsive-img" alt="从零开始学TIDB二(TIDB简介与整体架构)">
+                            <img src="/medias/featureimages/23.jpg" class="responsive-img" alt="Redis热点Key解决方案">
                             
-                            <span class="card-title">从零开始学TIDB二(TIDB简介与整体架构)</span>
+                            <span class="card-title">Redis热点Key解决方案</span>
                         </div>
                     </a>
                     <div class="card-content article-content">
                         <div class="summary block-with-text">
                             
-                                上一篇博客，我们简单介绍了怎么在Mac OS系统上面使用docker compose搭建一个包含3个pd，3个tikv，1个tidb的TIDB集群。本文，我们会详细介绍TIDB的一些基本概念和整体架构。
-TIDB 简介TIDB是pingca
+                                Squirrel是基于redis cluster开发的K-V存储系统，对某个key进行读写时，会根据该key的hash计算出对应的slot，根据这个slot就能找到与之对应的分片(一个master和多个slave组成的一组redis集群)来存取该K-V，如果集群不发生服务器数量变化，那么这一映射关系就不会变化。但是在实际应用过程中，对于某些特定业务或者一些特定的时段，可能会发生大量的请求访问同一个key。所有的请求（且这类请求读写比例非常高）都会落到同一个redis server上，该redis的负载就会严重加剧，此时整个系统增加新redis实例也没有任何用处，因为根据hash算法，同一个key的请求还是会落到同一台新机器上，该机器依然会成为系统瓶颈。若此热点 key 的 value 也比较大，也会造成网卡达到瓶颈。这个问题称为 “热点key” 问题。
                             
                         </div>
                         <div class="publish-info">
                             <span class="publish-date">
-                                <i class="far fa-clock fa-fw icon-date"></i>2018-08-27
+                                <i class="far fa-clock fa-fw icon-date"></i>2018-10-01
                             </span>
                             <span class="publish-author">
                                 
@@ -569,110 +664,8 @@ TIDB 简介TIDB是pingca
                     
                     <div class="card-action article-tags">
                         
-                        <a href="/tags/TIDB/">
-                            <span class="chip bg-color">TIDB</span>
-                        </a>
-                        
-                    </div>
-                    
-                </div>
-            </div>
-            
-            <div class="article tag-post col s12 m6 l4" data-aos="zoom-in">
-                <div class="card">
-                    <a href="/2018/08/26/tidb1/">
-                        <div class="card-image tag-image">
-                            
-                            
-                            <img src="/medias/featureimages/3.jpg" class="responsive-img" alt="从零开始学TIDB一(搭建TIDB集群)">
-                            
-                            <span class="card-title">从零开始学TIDB一(搭建TIDB集群)</span>
-                        </div>
-                    </a>
-                    <div class="card-content article-content">
-                        <div class="summary block-with-text">
-                            
-                                本文介绍如何在单机上(Mac OS)通过 Docker Compose 快速一键部署一套 TiDB 测试集群，我们会从零开始搭建一套由3 个 PD，3 个 TiKV，1 个 TiDB构成的集群。主要包括以下两个步骤：
-
-Mac OS系统上安
-                            
-                        </div>
-                        <div class="publish-info">
-                            <span class="publish-date">
-                                <i class="far fa-clock fa-fw icon-date"></i>2018-08-26
-                            </span>
-                            <span class="publish-author">
-                                
-                                <i class="fas fa-bookmark fa-fw icon-category"></i>
-                                
-                                <a href="/categories/%E6%8A%80%E6%9C%AF%E5%88%86%E4%BA%AB/" class="post-category">
-                                    技术分享
-                                </a>
-                                
-                                
-                            </span>
-                        </div>
-                    </div>
-
-                    
-                    <div class="card-action article-tags">
-                        
-                        <a href="/tags/docker/">
-                            <span class="chip bg-color">docker</span>
-                        </a>
-                        
-                        <a href="/tags/TIDB/">
-                            <span class="chip bg-color">TIDB</span>
-                        </a>
-                        
-                    </div>
-                    
-                </div>
-            </div>
-            
-            <div class="article tag-post col s12 m6 l4" data-aos="zoom-in">
-                <div class="card">
-                    <a href="/2018/08/24/curatorleader/">
-                        <div class="card-image tag-image">
-                            
-                            
-                            <img src="/medias/featureimages/16.jpg" class="responsive-img" alt="Curator leader选举">
-                            
-                            <span class="card-title">Curator leader选举</span>
-                        </div>
-                    </a>
-                    <div class="card-content article-content">
-                        <div class="summary block-with-text">
-                            
-                                背景最近一周，一直在做squirrel-ha-service高可用的改进。简单介绍下squirrel-ha-service。squirrel-ha-service(后文都简写为ha)是线上持续监控redis集群，保证redis集群高可用的一
-                            
-                        </div>
-                        <div class="publish-info">
-                            <span class="publish-date">
-                                <i class="far fa-clock fa-fw icon-date"></i>2018-08-24
-                            </span>
-                            <span class="publish-author">
-                                
-                                <i class="fas fa-bookmark fa-fw icon-category"></i>
-                                
-                                <a href="/categories/%E6%8A%80%E6%9C%AF%E5%88%86%E4%BA%AB/" class="post-category">
-                                    技术分享
-                                </a>
-                                
-                                
-                            </span>
-                        </div>
-                    </div>
-
-                    
-                    <div class="card-action article-tags">
-                        
-                        <a href="/tags/curator/">
-                            <span class="chip bg-color">curator</span>
-                        </a>
-                        
-                        <a href="/tags/zookeeper/">
-                            <span class="chip bg-color">zookeeper</span>
+                        <a href="/tags/Redis/">
+                            <span class="chip bg-color">Redis</span>
                         </a>
                         
                     </div>
@@ -695,7 +688,7 @@ Mac OS系统上安
             
         </div>
         <div class="page-info col m4 l4 hide-on-small-only">
-            <div class="center-align b-text-gray">1 / 5</div>
+            <div class="center-align b-text-gray">1 / 6</div>
         </div>
         <div class="col s6 m4 l4">
             
@@ -717,7 +710,7 @@ Mac OS系统上安
         <div class="col s12 m8 l8 copy-right">
             Copyright&nbsp;&copy;
             
-                <span id="year">2019-2021</span>
+                <span id="year">2019-2024</span>
             
             <span id="year">2019</span>
             <a href="/about" target="_blank">叶明</a>
@@ -726,7 +719,7 @@ Mac OS系统上安
             <br>
             
             &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                class="white-color">67k</span>&nbsp;字
+                class="white-color">78.8k</span>&nbsp;字
             
             
             

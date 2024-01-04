@@ -512,13 +512,13 @@ public class GroupDataSourceAnatationSample &#123;
 
 <span id="more"></span>
 
-<h2 id="原因"><a href="#原因" class="headerlink" title="原因"></a>原因</h2><p>上面这段代码是基于java Annotation注解配置的zebra-dao的demo，上述存在一个问题，就是Value注解标注的两个属性jdbcType和poolType的值不能被注入进来。这个原因有点复杂，需要对spring容器的加载比较熟悉，之前我有两篇博客已经分析了spring容器加载的源码，有兴趣可以看一下《<a href="http://yeming.me/2016/04/16/spring/">SpringIOC源码分析</a>》《<a href="http://yeming.me/2016/04/26/spring2/">SpringIOC源码分析二(Bean实例化)</a>》。这里稍微提一下。</p>
+<h2 id="原因"><a href="#原因" class="headerlink" title="原因"></a>原因</h2><p>上面这段代码是基于java Annotation注解配置的zebra-dao的demo，上述存在一个问题，就是Value注解标注的两个属性jdbcType和poolType的值不能被注入进来。这个原因有点复杂，需要对spring容器的加载比较熟悉，之前我有两篇博客已经分析了spring容器加载的源码，有兴趣可以看一下《<a target="_blank" rel="noopener" href="http://yeming.me/2016/04/16/spring/">SpringIOC源码分析</a>》《<a target="_blank" rel="noopener" href="http://yeming.me/2016/04/26/spring2/">SpringIOC源码分析二(Bean实例化)</a>》。这里稍微提一下。</p>
 <p><img src="https://lightoheaven.coding.net/p/image2/d/image2/git/raw/master/201604/spring2/refresh.jpg" alt="spring容器初始化"></p>
 <p>上面这个图是spring容器的加载顺序。ZebraMapperScannerConfigurer这个类实现了BeanDefinitionRegistryPostProcessor，这是一个BeanFactoryPostProcessor可以看到若实现了这个processor，那么会在第5步调用的时候触发这个processor，所以ZebraMapperScannerConfigurer这个类会先初始化。(本来初始化是第完成第6个步骤向spring容器注册了若干个BeanPostProcessor）</p>
 <p><img src="https://lightoheaven.coding.net/p/image2/d/image2/git/raw/master/201704/WechatIMG3.jpeg" alt="注册BeanPostProcessor"></p>
 <p>注意第5个BeanPostProcessor，有了这个processor，才会在bean被实例化的时候调用这个processor来完成对@Value标注属性值的注入)。正因为现在在完成spring容器初始化第5个步骤的时候，由于实现了BeanDefinitionRegistryPostProcessor这个接口，会提前触发对ZebraMapperScannerConfigurer的实例化，可以把ZebraMapperScannerConfigurer看做GroupDataSourceAnatationSample的一个成员属性，所以也会提前触发GroupDataSourceAnatationSample的实例化，因为没有注册上述红框圈出的第5个BeanPostProcessor所以jdbcRef和poorType不会被注入。</p>
 <p><img src="https://lightoheaven.coding.net/p/image2/d/image2/git/raw/master/201704/WechatIMG4.jpeg"></p>
-<p>这个图是在ZebraMapperScannerConfigurer(singletonObject的第5个属性)初始化过程中debug出来的数据，证明了上述分析。<font color="#08c"><b>所以总结原因，就是因为ZebraMapperScannerConfigurer实现了BeanDefinitionRegistryPostProcessor这个接口造成后续spring容器的执行的一些顺序问题,引起了上述@Value属性不能注入</font></b></p>
+<p>这个图是在ZebraMapperScannerConfigurer(singletonObject的第5个属性)初始化过程中debug出来的数据，证明了上述分析。<font color="#08c"><b>所以总结原因，就是因为ZebraMapperScannerConfigurer实现了BeanDefinitionRegistryPostProcessor这个接口造成后续spring容器的执行的一些顺序问题,引起了上述@Value属性不能注入</b></font></p>
 <h2 id="解决问题"><a href="#解决问题" class="headerlink" title="解决问题"></a>解决问题</h2><p>那么我们该怎么解决，我提供以下3种解决方案，下述三种方法都可以解决问题，大家有兴趣可以去尝试一下。</p>
 <h3 id="嵌套Configuration"><a href="#嵌套Configuration" class="headerlink" title="嵌套Configuration"></a>嵌套Configuration</h3><pre class="line-numbers language-none"><code class="language-none">@Configuration
 @PropertySource(&quot;annotation&#x2F;mysql.properties&quot;)
@@ -584,8 +584,8 @@ public class GroupDataSourceAnatationSample &#123;
 
 <h3 id="拆分配置类"><a href="#拆分配置类" class="headerlink" title="拆分配置类"></a>拆分配置类</h3><p>把ZebraMapperScannerConfigurer这个bean的配置从上述DataSource中抽出来，单独放到另外一个独立的@Configuration类里面。</p>
 <h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
-<li><a href="http://yeming.me/2016/04/16/spring/">SpringIOC源码分析</a></li>
-<li><a href="http://yeming.me/2016/04/26/spring2/">SpringIOC源码分析二(Bean实例化)</a></li>
+<li><a target="_blank" rel="noopener" href="http://yeming.me/2016/04/16/spring/">SpringIOC源码分析</a></li>
+<li><a target="_blank" rel="noopener" href="http://yeming.me/2016/04/26/spring2/">SpringIOC源码分析二(Bean实例化)</a></li>
 </ul>
 
                 
@@ -613,7 +613,7 @@ public class GroupDataSourceAnatationSample &#123;
                     </i>
                 </span>
                 <span class="reprint-info">
-                    <a href="http://yeming.me/2017/04/16/springvalueannotation/">http://yeming.me/2017/04/16/springvalueannotation/</a>
+                    <a href="http://yeming.fun/2017/04/16/springvalueannotation/">http://yeming.fun/2017/04/16/springvalueannotation/</a>
                 </span>
             </div>
             <div class="reprint__notice">
@@ -1201,7 +1201,7 @@ public class GroupDataSourceAnatationSample &#123;
         <div class="col s12 m8 l8 copy-right">
             Copyright&nbsp;&copy;
             
-                <span id="year">2019-2021</span>
+                <span id="year">2019-2024</span>
             
             <span id="year">2019</span>
             <a href="/about" target="_blank">叶明</a>
@@ -1210,7 +1210,7 @@ public class GroupDataSourceAnatationSample &#123;
             <br>
             
             &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                class="white-color">67k</span>&nbsp;字
+                class="white-color">78.8k</span>&nbsp;字
             
             
             

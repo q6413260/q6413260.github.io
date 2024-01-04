@@ -482,7 +482,7 @@
 
         <div class="card-content article-card-content">
             <div id="articleContent">
-                <p>上一篇博客，我们简单介绍了怎么在Mac OS系统上面使用docker compose搭建一个包含3个pd，3个tikv，1个tidb的<a href="http://yeming.me/2018/08/26/tidb1/">TIDB集群</a>。本文，我们会详细介绍TIDB的一些基本概念和整体架构。</p>
+                <p>上一篇博客，我们简单介绍了怎么在Mac OS系统上面使用docker compose搭建一个包含3个pd，3个tikv，1个tidb的<a target="_blank" rel="noopener" href="http://yeming.me/2018/08/26/tidb1/">TIDB集群</a>。本文，我们会详细介绍TIDB的一些基本概念和整体架构。</p>
 <h2 id="TIDB-简介"><a href="#TIDB-简介" class="headerlink" title="TIDB 简介"></a>TIDB 简介</h2><p>TIDB是pingcap公司开源的一款分布式数据库，结合了RDBMS和NOSQL两者的特性，支持对业务无感知的水平扩容，具备数据强一致性和高可用性。TIDB具备以下特性对某些业务应该有很大的吸引力。</p>
 <ul>
 <li><p>兼容MYSQL协议：由于TIDB兼容了MYSQL协议，业务几乎可以零成本的从MYSQL迁移到TIDB。</p>
@@ -493,8 +493,8 @@
 </li>
 <li><p>高可用数据强一致：TIDB基于raft的多数派选举保证了数据的强一致性，并且在不丢失大部分副本的情况下，可以自动failover。</p>
 <span id="more"></span>
-<h2 id="TiDB-整体架构"><a href="#TiDB-整体架构" class="headerlink" title="TiDB 整体架构"></a>TiDB 整体架构</h2><p>之前我们搭建了包含3个pd，3个tikv，1个tidb的<a href="http://yeming.me/2018/08/26/tidb1/">TIDB集群</a>，从这里可以看出TIDB其实主要包含了以下3个模块：<br>tidb server，tikv server，pd server</p>
-<center><img src="https://lightoheaven.coding.net/p/image2/d/image2/git/raw/master/201808/tidbArch.jpeg" width="350" hegiht="200"/></center></li>
+<h2 id="TiDB-整体架构"><a href="#TiDB-整体架构" class="headerlink" title="TiDB 整体架构"></a>TiDB 整体架构</h2><p>之前我们搭建了包含3个pd，3个tikv，1个tidb的<a target="_blank" rel="noopener" href="http://yeming.me/2018/08/26/tidb1/">TIDB集群</a>，从这里可以看出TIDB其实主要包含了以下3个模块：<br>tidb server，tikv server，pd server</p>
+<center><img src="https://lightoheaven.coding.net/p/image2/d/image2/git/raw/master/201808/tidbArch.jpeg" width="350" hegiht="200"></center></li>
 <li><p>tidb server：tidb server负责和客户端进行交互。tidb server接受客户端的sql语句进行解析，通过PD获取sql关联的数据对应的tikv server对应的地址，然后访问相应的tikv server，获取数据(或者修改数据)，然后返回结果给客户端。tidb server本身不存储任何数据，只提供计算能力，本身是无状态的，可以根据需要水平扩展。</p>
 </li>
 <li><p>pd server：pd server是整个TIDB的管理模块。主要负责以下工作：存储集群的元信息(某个key存储在哪个tikv上)；对tikv集群进行调度和负载均衡(数据迁移，raft group leader的迁移)；分配全局唯一且递增的事物id；pd本身通过raft协议选举leader保证高可用性，建议线上至少部署3个pd节点。</p>
@@ -605,7 +605,7 @@ KeyN-Version1 -&gt; Value
                     </i>
                 </span>
                 <span class="reprint-info">
-                    <a href="http://yeming.me/2018/08/27/tidb2/">http://yeming.me/2018/08/27/tidb2/</a>
+                    <a href="http://yeming.fun/2018/08/27/tidb2/">http://yeming.fun/2018/08/27/tidb2/</a>
                 </span>
             </div>
             <div class="reprint__notice">
@@ -960,24 +960,24 @@ KeyN-Version1 -&gt; Value
             <div class="article-badge left-badge text-color">
                 <i class="fas fa-chevron-left"></i>&nbsp;上一篇</div>
             <div class="card">
-                <a href="/2018/11/11/k8s/">
+                <a href="/2018/10/01/redishotkey/">
                     <div class="card-image">
                         
                         
-                        <img src="/medias/featureimages/0.jpg" class="responsive-img" alt="Postman和Java Client访问K8s">
+                        <img src="/medias/featureimages/23.jpg" class="responsive-img" alt="Redis热点Key解决方案">
                         
-                        <span class="card-title">Postman和Java Client访问K8s</span>
+                        <span class="card-title">Redis热点Key解决方案</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
                     <div class="summary block-with-text">
                         
-                            K8s的所有操作基本都是通过调用kube-apiserver这个组件进行的，它提供了restful api供外部系统访问，当然为了保证整个k8s集群的安全性，k8s提供了多种认证方式来保证集群的安全性：比如客户端证书、静态token、静态密
+                            Squirrel是基于redis cluster开发的K-V存储系统，对某个key进行读写时，会根据该key的hash计算出对应的slot，根据这个slot就能找到与之对应的分片(一个master和多个slave组成的一组redis集群)来存取该K-V，如果集群不发生服务器数量变化，那么这一映射关系就不会变化。但是在实际应用过程中，对于某些特定业务或者一些特定的时段，可能会发生大量的请求访问同一个key。所有的请求（且这类请求读写比例非常高）都会落到同一个redis server上，该redis的负载就会严重加剧，此时整个系统增加新redis实例也没有任何用处，因为根据hash算法，同一个key的请求还是会落到同一台新机器上，该机器依然会成为系统瓶颈。若此热点 key 的 value 也比较大，也会造成网卡达到瓶颈。这个问题称为 “热点key” 问题。
                         
                     </div>
                     <div class="publish-info">
                         <span class="publish-date">
-                            <i class="far fa-clock fa-fw icon-date"></i>2018-11-11
+                            <i class="far fa-clock fa-fw icon-date"></i>2018-10-01
                         </span>
                         <span class="publish-author">
                             
@@ -994,8 +994,8 @@ KeyN-Version1 -&gt; Value
                 
                 <div class="card-action article-tags">
                     
-                    <a href="/tags/k8s/">
-                        <span class="chip bg-color">k8s</span>
+                    <a href="/tags/Redis/">
+                        <span class="chip bg-color">Redis</span>
                     </a>
                     
                 </div>
@@ -1190,7 +1190,7 @@ Mac OS系统上安
         <div class="col s12 m8 l8 copy-right">
             Copyright&nbsp;&copy;
             
-                <span id="year">2019-2021</span>
+                <span id="year">2019-2024</span>
             
             <span id="year">2019</span>
             <a href="/about" target="_blank">叶明</a>
@@ -1199,7 +1199,7 @@ Mac OS系统上安
             <br>
             
             &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                class="white-color">67k</span>&nbsp;字
+                class="white-color">78.8k</span>&nbsp;字
             
             
             
