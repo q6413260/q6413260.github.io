@@ -452,7 +452,7 @@
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    596
+                    593
                 </div>
                 
 
@@ -482,15 +482,20 @@
 
         <div class="card-content article-card-content">
             <div id="articleContent">
-                <h2 id="netty服务端代码分析"><a href="#netty服务端代码分析" class="headerlink" title="netty服务端代码分析"></a>netty服务端代码分析</h2><h3 id="服务端启动配置"><a href="#服务端启动配置" class="headerlink" title="服务端启动配置"></a>服务端启动配置</h3><p><img src="https://lightoheaven.coding.net/p/image2/d/image2/git/raw/master/201603/netty/server.jpg" alt="用户线程启动服务端监听代码"></p>
+                <h2 id="netty服务端代码分析"><a href="#netty服务端代码分析" class="headerlink" title="netty服务端代码分析"></a>netty服务端代码分析</h2><h3 id="服务端启动配置"><a href="#服务端启动配置" class="headerlink" title="服务端启动配置"></a>服务端启动配置</h3><img src="/2016/03/12/netty1/server.jpg" width="60%/">
 <span id="more"></span>
-<ul>
-<li>对于ServerBootstrap：ServerBootstrap继承于AbstractBootstrap，它从父类继承了EventLoopGroup group，ChannelFactory&lt;? extends C&gt; channelFactory，自己新增了EventLoopGroup childGroup，ChannelHandler childHandler。上面b.group开始的链式代码就是初始化上面这些属性的值的。</li>
-<li>bossgroup和workergroup：可以看到都是NioEventLoopGroup,可以理解成2个线程池。从bossgroup中随便选一个作为Reactor模型中的acceptor，监听客户端连接，创建socketChannel，然后从workergroup选取一个io线程来处理socketChannel的读取事件。</li>
-<li>对于NioEventLoopGroup和NioEventLoop：先看下类图</li>
-</ul>
-<p><img src="https://lightoheaven.coding.net/p/image2/d/image2/git/raw/master/201603/netty/nioEventLoopGroup.jpg" alt="nioEventLoopGroup"><br><font color="#08c"><b>可以看到NioEventLoopGroup继承了EventLoopGroup</b></font><br><img src="https://lightoheaven.coding.net/p/image2/d/image2/git/raw/master/201603/netty/nioEventLoop.jpg" alt="nioEventLoop"><br><font color="#08c"><b>NioEventLoop实现了EventLoop,而EventLoop又继承自EventLoopGroup。eventloopgroup.next()又可以返回一个eventloop。可以看到EventLoop最终继承于线程池Executor。而最终NioEventLoopGroup又实现了EventLoop，接下来我们还会分析下NioEventLoopGroup</b></font></p>
-<h3 id="服务端注册感兴趣事件和监听端口"><a href="#服务端注册感兴趣事件和监听端口" class="headerlink" title="服务端注册感兴趣事件和监听端口"></a>服务端注册感兴趣事件和监听端口</h3><p><img src="https://lightoheaven.coding.net/p/image2/d/image2/git/raw/master/201603/netty/AbstractBootstrap.jpg" alt="AbstractBootstrap"></p>
+ - 对于ServerBootstrap：ServerBootstrap继承于AbstractBootstrap，它从父类继承了EventLoopGroup group，ChannelFactory<? extends C> channelFactory，自己新增了EventLoopGroup childGroup，ChannelHandler childHandler。上面b.group开始的链式代码就是初始化上面这些属性的值的。
+ - bossgroup和workergroup：可以看到都是NioEventLoopGroup,可以理解成2个线程池。从bossgroup中随便选一个作为Reactor模型中的acceptor，监听客户端连接，创建socketChannel，然后从workergroup选取一个io线程来处理socketChannel的读取事件。
+ - 对于NioEventLoopGroup和NioEventLoop：先看下类图
+
+<img src="/2016/03/12/netty1/nioEventLoopGroup.jpg" width="60%/">
+
+<p><font color="#08c"><b>可以看到NioEventLoopGroup继承了EventLoopGroup</b></font></p>
+<img src="/2016/03/12/netty1/nioEventLoop.jpg" width="60%/">
+
+<p><font color="#08c"><b>NioEventLoop实现了EventLoop,而EventLoop又继承自EventLoopGroup。eventloopgroup.next()又可以返回一个eventloop。可以看到EventLoop最终继承于线程池Executor。而最终NioEventLoopGroup又实现了EventLoop，接下来我们还会分析下NioEventLoopGroup</b></font></p>
+<h3 id="服务端注册感兴趣事件和监听端口"><a href="#服务端注册感兴趣事件和监听端口" class="headerlink" title="服务端注册感兴趣事件和监听端口"></a>服务端注册感兴趣事件和监听端口</h3><img src="/2016/03/12/netty1/AbstractBootstrap.jpg" width="60%/">
+
 <h4 id="注册感兴趣事件"><a href="#注册感兴趣事件" class="headerlink" title="注册感兴趣事件"></a>注册感兴趣事件</h4><p>b.bind最终调用到AbstractBootstrop的以下方法</p>
 <ul>
 <li>final ChannelFuture initAndRegister() {<br>this.group().register(channel);（中间省略）<br>}这个this.group就是一开始设置的bossgroup（NioEventLoopGroup）,看到这个方法基本可以想到这个应该是把channel注册到某个选择器上</li>
@@ -1139,7 +1144,7 @@ if(regFuture.cause() !&#x3D; null) &#123;
             <br>
             
             &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                class="white-color">78.8k</span>&nbsp;字
+                class="white-color">84.4k</span>&nbsp;字
             
             
             

@@ -432,6 +432,52 @@
         
             
             <div class="carousel-item amber white-text carousel-post bg-cover"
+                 style="background-image: url('/medias/featureimages/1.jpg');">
+                <div class="container">
+                    <div class="row">
+                        <div class="col s10 offset-s1">
+                            <div class="title center-align">MySQL Binlog性能优化</div>
+                            <div class="description center-align">
+                                
+                                    最近一段时间，一到业务午高峰，外卖集群的一些订阅机器就会出现Binlog消费大量延时。出现Binlog延时的原因主要是：一般11点开始，外卖业务进入中午午高峰，数据库的Binlog QPS会逐渐增加，一旦订阅服务出现性能瓶颈，处理Binlog的能力跟不上Binlog生成的速度，就会导致消费Binlog出现延时，并且延时时间会越来越长。业务在BCP上配置的核对规则一般最小是60s，一旦Binlog延时时间超过60s，那么规则就会大量误告。
+                                
+                            </div>
+                            <div class="cover-btns">
+                                <a href="/2021/04/26/binlog/" class="waves-effect waves-light btn"
+                                   target="_blank">
+                                    <i class="icon fa fa-eye fa-fw"></i>阅读更多
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        
+            
+            <div class="carousel-item amber white-text carousel-post bg-cover"
+                 style="background-image: url('/medias/featureimages/1.jpg');">
+                <div class="container">
+                    <div class="row">
+                        <div class="col s10 offset-s1">
+                            <div class="title center-align">基于本地日志的可靠消息型事务</div>
+                            <div class="description center-align">
+                                
+                                    业务经常会使用消息中间件进行上下游解耦或者异步削峰填谷的目的，通常处理流程是如下：操作本地数据库，完成自身业务逻辑
+                                
+                            </div>
+                            <div class="cover-btns">
+                                <a href="/2021/04/15/distributiontransaction/" class="waves-effect waves-light btn"
+                                   target="_blank">
+                                    <i class="icon fa fa-eye fa-fw"></i>阅读更多
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        
+            
+            <div class="carousel-item amber white-text carousel-post bg-cover"
                  style="background-image: url('/medias/featureimages/23.jpg');">
                 <div class="container">
                     <div class="row">
@@ -468,29 +514,6 @@ zebra整体架
                             </div>
                             <div class="cover-btns">
                                 <a href="/2017/11/29/zebra/" class="waves-effect waves-light btn"
-                                   target="_blank">
-                                    <i class="icon fa fa-eye fa-fw"></i>阅读更多
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        
-            
-            <div class="carousel-item amber white-text carousel-post bg-cover"
-                 style="background-image: url('/medias/featureimages/1.jpg');">
-                <div class="container">
-                    <div class="row">
-                        <div class="col s10 offset-s1">
-                            <div class="title center-align">ZK处理客户端请求流程梳理</div>
-                            <div class="description center-align">
-                                
-                                    ZK整体构成包括Leader、Follower、Observer以及客户端，其中Leader、Follower参与Leader竞选，并负责对于写请求进行投票。由于每次写请求，Leader都必须和所有Follower基于类似两阶段提交协议来决定写入是否成功，所以Follower节点不能过多。同时为了提高集群整体的读性能，进而引入了Observer节点。下图描述了从客户端发起一次请求到服务端响应的整个过程（假设客户端此时连接的是Follower节点，相比于连接Leader处理过程更为复杂）
-                                
-                            </div>
-                            <div class="cover-btns">
-                                <a href="/2023/01/15/zkprocess/" class="waves-effect waves-light btn"
                                    target="_blank">
                                     <i class="icon fa fa-eye fa-fw"></i>阅读更多
                                 </a>
@@ -795,6 +818,57 @@ zebra整体架
             
             <div class="article col s12 m6 l4" data-aos="zoom-in">
                 <div class="card">
+                    <a href="/2021/04/26/binlog/">
+                        <div class="card-image">
+                            
+                            
+                            <img src="/medias/featureimages/1.jpg" class="responsive-img" alt="MySQL Binlog性能优化">
+                            
+                            <span class="card-title">MySQL Binlog性能优化</span>
+                        </div>
+                    </a>
+
+                    <div class="card-content article-content">
+                        <div class="summary block-with-text">
+                            
+                                最近一段时间，一到业务午高峰，外卖集群的一些订阅机器就会出现Binlog消费大量延时。出现Binlog延时的原因主要是：一般11点开始，外卖业务进入中午午高峰，数据库的Binlog QPS会逐渐增加，一旦订阅服务出现性能瓶颈，处理Binlog的能力跟不上Binlog生成的速度，就会导致消费Binlog出现延时，并且延时时间会越来越长。业务在BCP上配置的核对规则一般最小是60s，一旦Binlog延时时间超过60s，那么规则就会大量误告。
+                            
+                        </div>
+                        <div class="publish-info">
+                            <span class="publish-date">
+                                <i class="far fa-clock fa-fw icon-date"></i>2021-04-26
+                            </span>
+                            <span class="publish-author">
+                                
+                                <i class="fas fa-bookmark fa-fw icon-category"></i>
+                                
+                                <a href="/categories/%E6%8A%80%E6%9C%AF%E5%88%86%E4%BA%AB/" class="post-category">
+                                    技术分享
+                                </a>
+                                
+                                
+                            </span>
+                        </div>
+                    </div>
+
+                    
+                    <div class="card-action article-tags">
+                        
+                        <a href="/tags/MySQL/">
+                            <span class="chip bg-color">MySQL</span>
+                        </a>
+                        
+                        <a href="/tags/%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96/">
+                            <span class="chip bg-color">性能优化</span>
+                        </a>
+                        
+                    </div>
+                    
+                </div>
+            </div>
+            
+            <div class="article col s12 m6 l4" data-aos="zoom-in">
+                <div class="card">
                     <a href="/2021/04/22/es-debug/">
                         <div class="card-image">
                             
@@ -837,6 +911,57 @@ zebra整体架
                         
                         <a href="/tags/docker/">
                             <span class="chip bg-color">docker</span>
+                        </a>
+                        
+                    </div>
+                    
+                </div>
+            </div>
+            
+            <div class="article col s12 m6 l4" data-aos="zoom-in">
+                <div class="card">
+                    <a href="/2021/04/15/distributiontransaction/">
+                        <div class="card-image">
+                            
+                            
+                            <img src="/medias/featureimages/1.jpg" class="responsive-img" alt="基于本地日志的可靠消息型事务">
+                            
+                            <span class="card-title">基于本地日志的可靠消息型事务</span>
+                        </div>
+                    </a>
+
+                    <div class="card-content article-content">
+                        <div class="summary block-with-text">
+                            
+                                业务经常会使用消息中间件进行上下游解耦或者异步削峰填谷的目的，通常处理流程是如下：操作本地数据库，完成自身业务逻辑
+                            
+                        </div>
+                        <div class="publish-info">
+                            <span class="publish-date">
+                                <i class="far fa-clock fa-fw icon-date"></i>2021-04-15
+                            </span>
+                            <span class="publish-author">
+                                
+                                <i class="fas fa-bookmark fa-fw icon-category"></i>
+                                
+                                <a href="/categories/%E6%8A%80%E6%9C%AF%E5%88%86%E4%BA%AB/" class="post-category">
+                                    技术分享
+                                </a>
+                                
+                                
+                            </span>
+                        </div>
+                    </div>
+
+                    
+                    <div class="card-action article-tags">
+                        
+                        <a href="/tags/%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E5%8A%A1/">
+                            <span class="chip bg-color">分布式事务</span>
+                        </a>
+                        
+                        <a href="/tags/Spring/">
+                            <span class="chip bg-color">Spring</span>
                         </a>
                         
                     </div>
@@ -891,100 +1016,6 @@ zebra整体架
                 </div>
             </div>
             
-            <div class="article col s12 m6 l4" data-aos="zoom-in">
-                <div class="card">
-                    <a href="/2018/11/11/k8s/">
-                        <div class="card-image">
-                            
-                            
-                            <img src="/medias/featureimages/0.jpg" class="responsive-img" alt="Postman和Java Client访问K8s">
-                            
-                            <span class="card-title">Postman和Java Client访问K8s</span>
-                        </div>
-                    </a>
-
-                    <div class="card-content article-content">
-                        <div class="summary block-with-text">
-                            
-                                K8s的所有操作基本都是通过调用kube-apiserver这个组件进行的，它提供了restful api供外部系统访问，当然为了保证整个k8s集群的安全性，k8s提供了多种认证方式来保证集群的安全性：比如客户端证书、静态token、静态密
-                            
-                        </div>
-                        <div class="publish-info">
-                            <span class="publish-date">
-                                <i class="far fa-clock fa-fw icon-date"></i>2018-11-11
-                            </span>
-                            <span class="publish-author">
-                                
-                                <i class="fas fa-bookmark fa-fw icon-category"></i>
-                                
-                                <a href="/categories/%E6%8A%80%E6%9C%AF%E5%88%86%E4%BA%AB/" class="post-category">
-                                    技术分享
-                                </a>
-                                
-                                
-                            </span>
-                        </div>
-                    </div>
-
-                    
-                    <div class="card-action article-tags">
-                        
-                        <a href="/tags/k8s/">
-                            <span class="chip bg-color">k8s</span>
-                        </a>
-                        
-                    </div>
-                    
-                </div>
-            </div>
-            
-            <div class="article col s12 m6 l4" data-aos="zoom-in">
-                <div class="card">
-                    <a href="/2018/10/01/redishotkey/">
-                        <div class="card-image">
-                            
-                            
-                            <img src="/medias/featureimages/23.jpg" class="responsive-img" alt="Redis热点Key解决方案">
-                            
-                            <span class="card-title">Redis热点Key解决方案</span>
-                        </div>
-                    </a>
-
-                    <div class="card-content article-content">
-                        <div class="summary block-with-text">
-                            
-                                Squirrel是基于redis cluster开发的K-V存储系统，对某个key进行读写时，会根据该key的hash计算出对应的slot，根据这个slot就能找到与之对应的分片(一个master和多个slave组成的一组redis集群)来存取该K-V，如果集群不发生服务器数量变化，那么这一映射关系就不会变化。但是在实际应用过程中，对于某些特定业务或者一些特定的时段，可能会发生大量的请求访问同一个key。所有的请求（且这类请求读写比例非常高）都会落到同一个redis server上，该redis的负载就会严重加剧，此时整个系统增加新redis实例也没有任何用处，因为根据hash算法，同一个key的请求还是会落到同一台新机器上，该机器依然会成为系统瓶颈。若此热点 key 的 value 也比较大，也会造成网卡达到瓶颈。这个问题称为 “热点key” 问题。
-                            
-                        </div>
-                        <div class="publish-info">
-                            <span class="publish-date">
-                                <i class="far fa-clock fa-fw icon-date"></i>2018-10-01
-                            </span>
-                            <span class="publish-author">
-                                
-                                <i class="fas fa-bookmark fa-fw icon-category"></i>
-                                
-                                <a href="/categories/%E6%8A%80%E6%9C%AF%E5%88%86%E4%BA%AB/" class="post-category">
-                                    技术分享
-                                </a>
-                                
-                                
-                            </span>
-                        </div>
-                    </div>
-
-                    
-                    <div class="card-action article-tags">
-                        
-                        <a href="/tags/Redis/">
-                            <span class="chip bg-color">Redis</span>
-                        </a>
-                        
-                    </div>
-                    
-                </div>
-            </div>
-            
         </div>
     </article>
 
@@ -1032,7 +1063,7 @@ zebra整体架
             <br>
             
             &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                class="white-color">78.8k</span>&nbsp;字
+                class="white-color">84.4k</span>&nbsp;字
             
             
             

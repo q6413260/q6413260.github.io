@@ -49,7 +49,7 @@
     <link href="http://yeming.fun/2023/01/15/zkprocess/"/>
     <id>http://yeming.fun/2023/01/15/zkprocess/</id>
     <published>2023-01-15T12:00:23.000Z</published>
-    <updated>2024-01-04T06:04:20.448Z</updated>
+    <updated>2024-01-04T11:22:42.174Z</updated>
     
     
       
@@ -66,6 +66,33 @@
     
     
     <category term="ZK" scheme="http://yeming.fun/tags/ZK/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>MySQL Binlog性能优化</title>
+    <link href="http://yeming.fun/2021/04/26/binlog/"/>
+    <id>http://yeming.fun/2021/04/26/binlog/</id>
+    <published>2021-04-26T14:00:23.000Z</published>
+    <updated>2024-01-04T11:42:29.659Z</updated>
+    
+    
+      
+      
+        
+        
+    <summary type="html">&lt;h2 id=&quot;一、背景&quot;&gt;&lt;a href=&quot;#一、背景&quot; class=&quot;headerlink&quot;</summary>
+        
+      
+    
+    
+    
+    <category term="技术分享" scheme="http://yeming.fun/categories/%E6%8A%80%E6%9C%AF%E5%88%86%E4%BA%AB/"/>
+    
+    
+    <category term="MySQL" scheme="http://yeming.fun/tags/MySQL/"/>
+    
+    <category term="性能优化" scheme="http://yeming.fun/tags/%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96/"/>
     
   </entry>
   
@@ -97,6 +124,33 @@
   </entry>
   
   <entry>
+    <title>基于本地日志的可靠消息型事务</title>
+    <link href="http://yeming.fun/2021/04/15/distributiontransaction/"/>
+    <id>http://yeming.fun/2021/04/15/distributiontransaction/</id>
+    <published>2021-04-15T13:00:23.000Z</published>
+    <updated>2024-01-04T11:15:45.994Z</updated>
+    
+    
+      
+      
+        
+        
+    <summary type="html">&lt;h2 id=&quot;一、背景&quot;&gt;&lt;a href=&quot;#一、背景&quot; class=&quot;headerlink&quot;</summary>
+        
+      
+    
+    
+    
+    <category term="技术分享" scheme="http://yeming.fun/categories/%E6%8A%80%E6%9C%AF%E5%88%86%E4%BA%AB/"/>
+    
+    
+    <category term="分布式事务" scheme="http://yeming.fun/tags/%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E5%8A%A1/"/>
+    
+    <category term="Spring" scheme="http://yeming.fun/tags/Spring/"/>
+    
+  </entry>
+  
+  <entry>
     <title>Mybatis如何从DAO到SQL</title>
     <link href="http://yeming.fun/2021/04/03/mybatis/"/>
     <id>http://yeming.fun/2021/04/03/mybatis/</id>
@@ -119,6 +173,33 @@
     
     
     <category term="Mybatis" scheme="http://yeming.fun/tags/Mybatis/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>如何进行JVM GC调优</title>
+    <link href="http://yeming.fun/2021/01/20/gcresearch/"/>
+    <id>http://yeming.fun/2021/01/20/gcresearch/</id>
+    <published>2021-01-20T11:46:56.000Z</published>
+    <updated>2024-01-04T15:41:51.801Z</updated>
+    
+    
+      
+      
+        
+        
+    <summary type="html">&lt;h2 id=&quot;CMS-background-gc导致服务频繁GC排查优化&quot;&gt;&lt;a href=&quot;#CMS-background-gc导致服务频繁GC排查优化&quot; class=&quot;headerlink&quot; title=&quot;CMS background</summary>
+        
+      
+    
+    
+    
+    <category term="技术分享" scheme="http://yeming.fun/categories/%E6%8A%80%E6%9C%AF%E5%88%86%E4%BA%AB/"/>
+    
+    
+    <category term="Java" scheme="http://yeming.fun/tags/Java/"/>
+    
+    <category term="JVM" scheme="http://yeming.fun/tags/JVM/"/>
     
   </entry>
   
@@ -246,11 +327,10 @@
     <link href="http://yeming.fun/2018/07/31/dubbo4/"/>
     <id>http://yeming.fun/2018/07/31/dubbo4/</id>
     <published>2018-07-31T14:03:58.000Z</published>
-    <updated>2021-04-18T07:38:23.089Z</updated>
+    <updated>2024-01-04T11:00:51.647Z</updated>
     
     
-    <summary type="html">&lt;p&gt;之前我们介绍了Provider启动时候向注册中心注册服务&lt;br&gt;&lt;a href=&quot;http://yeming.me/2018/07/28/dubbo2/&quot;&gt;Dubbo源码学习二(服务注册)&lt;/a&gt;，Consumer启动时候向注册中心订阅服务&lt;a href=&quot;http://yeming.me/2018/07/29/dubbo3/&quot;&gt;Dubbo源码学习三(服务引用)&lt;/a&gt;，本文我们就来看下Consumer端和Provider是怎么通信的。&lt;/p&gt;
-&lt;center&gt;&lt;img src=&quot;https://lightoheaven.coding.net/p/image2/d/image2/git/raw/master/201807/communicate.jpeg&quot; width=&quot;700&quot; hegiht=&quot;350&quot;&gt;&lt;/center&gt;</summary>
+    <summary type="html">&lt;p&gt;之前我们介绍了Provider启动时候向注册中心注册服务&lt;br&gt;&lt;a href=&quot;http://yeming.me/2018/07/28/dubbo2/&quot;&gt;Dubbo源码学习二(服务注册)&lt;/a&gt;，Consumer启动时候向注册中心订阅服务&lt;a href=&quot;http://yeming.me/2018/07/29/dubbo3/&quot;&gt;Dubbo源码学习三(服务引用)&lt;/a&gt;，本文我们就来看下Consumer端和Provider是怎么通信的。&lt;br&gt;&lt;img src=&quot;/2018/07/31/dubbo4/communicate.jpeg&quot; width=&quot;60%/&quot;&gt;&lt;/p&gt;</summary>
     
     
     
@@ -370,12 +450,13 @@
     <link href="http://yeming.fun/2017/11/27/lion/"/>
     <id>http://yeming.fun/2017/11/27/lion/</id>
     <published>2017-11-27T13:00:50.000Z</published>
-    <updated>2021-04-18T07:38:23.139Z</updated>
+    <updated>2024-01-04T10:51:38.249Z</updated>
     
     
     <summary type="html">&lt;p&gt;先说下我自己理解的什么是配置中心。究其本质是我们人类无法掌控和预知一切，映射到软件领域上，我们总是需要对系统的某些功能特性预留出一些控制的线头，以便我们在未来需要的时候，可以人为的拨弄这些线头从而控制系统的行为特征，我把它叫做 “系统运行时(runtime)飞行姿态的动态调整“。具体可以参考阿里中间件团队的这篇文章&lt;a href=&quot;http://jm.taobao.org/2016/09/28/an-article-about-config-center/&quot;&gt;一篇好TM长的关于配置中心的文章&lt;/a&gt;。简明扼要，一个配置中心必须要做到能动态的获取配置参数，并且当配置发生变更了，能及时准确无误的获取最新的配置。阿里用的配置中心叫diamon，我们点评用的是自研的Lion，本篇文章我们来阅读下Lion的源码。&lt;/p&gt;
-&lt;h2 id=&quot;Lion架构&quot;&gt;&lt;a href=&quot;#Lion架构&quot; class=&quot;headerlink&quot; title=&quot;Lion架构&quot;&gt;&lt;/a&gt;Lion架构&lt;/h2&gt;&lt;p&gt;&lt;img src=&quot;https://lightoheaven.coding.net/p/image2/d/image2/git/raw/master/201711/lion.jpeg&quot; alt=&quot;Lion架构图&quot;&gt;&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;https://lightoheaven.coding.net/p/image2/d/image2/git/raw/master/201711/flow.jpeg&quot; alt=&quot;流程图&quot;&gt;&lt;/p&gt;</summary>
+&lt;h2 id=&quot;Lion架构&quot;&gt;&lt;a href=&quot;#Lion架构&quot; class=&quot;headerlink&quot; title=&quot;Lion架构&quot;&gt;&lt;/a&gt;Lion架构&lt;/h2&gt;&lt;img src=&quot;/2017/11/27/lion/lion.jpeg&quot; width=&quot;60%/&quot;&gt;
+
+&lt;img src=&quot;/2017/11/27/lion/flow.jpeg&quot; width=&quot;60%/&quot;&gt;</summary>
     
     
     
@@ -421,72 +502,6 @@
     
     
     <category term="Hystrix" scheme="http://yeming.fun/tags/Hystrix/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>Hystrix初探</title>
-    <link href="http://yeming.fun/2017/09/27/hystrix1/"/>
-    <id>http://yeming.fun/2017/09/27/hystrix1/</id>
-    <published>2017-09-27T13:00:50.000Z</published>
-    <updated>2021-04-18T07:38:23.070Z</updated>
-    
-    
-    <summary type="html">&lt;p&gt;去年在看spring cloud系列的时候，当时就已经了解到了hystrix，这个组件和eureka，zuul等组件一样都是netflix公司开源的。当时由于没有太多的精力，只简单了解了下hystrix的一些简单功能。这半年因为工作关系一直接触redis相关的东西，redis相关也看过不少书了，有时候一直搞一件事可能觉得有点枯燥。就偶然又产生了想法，就决定重新看一下hystrix，决定搞一个hystrix系列。在阅读hystrix的代码过程中，刚开始看起来很吃力，里面用到了rxjava(采用函数响应式编程模式写的，感觉看起来很费劲)，发现要学习的东西越来越多。就想从最简单的hystrix介绍到使用最后到源码分析，写一个系列的博客，正好也长时间没有研究一些新的框架了。上面废话了很多，下面进入正题，本文主要从以下几方面简要介绍下hystrix，基本都是一些概念性的(基本都是翻译自github上Hystrix主页)。&lt;/p&gt;</summary>
-    
-    
-    
-    <category term="技术分享" scheme="http://yeming.fun/categories/%E6%8A%80%E6%9C%AF%E5%88%86%E4%BA%AB/"/>
-    
-    
-    <category term="Hystrix" scheme="http://yeming.fun/tags/Hystrix/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>JedisPool连接池相关配置</title>
-    <link href="http://yeming.fun/2017/07/08/jedispoolconfig/"/>
-    <id>http://yeming.fun/2017/07/08/jedispoolconfig/</id>
-    <published>2017-07-08T06:37:50.000Z</published>
-    <updated>2021-04-17T14:57:30.111Z</updated>
-    
-    
-    <summary type="html">&lt;p&gt;最近有些其他业务部门的同学在线上环境redis有出现以下错误Unexpected end of stream，这个错误大致是因为，redis服务器端已经关闭了客户端的连接，而客户端不知道依然拿着原来的连接去访问redis服务器，结果就会报出这个exception。既然我们知道原因是服务器端主动关闭与客户端连接，那么我们下面看下有哪些情况会导致服务器端主动关闭连接。主要在redis.conf中有以下两个参数client-output-buffer-limit、timeout，下面我们分别来介绍下这两个参数的作用。&lt;/p&gt;</summary>
-    
-    
-    
-    <category term="技术分享" scheme="http://yeming.fun/categories/%E6%8A%80%E6%9C%AF%E5%88%86%E4%BA%AB/"/>
-    
-    
-    <category term="redis-cluster" scheme="http://yeming.fun/tags/redis-cluster/"/>
-    
-    <category term="jedis" scheme="http://yeming.fun/tags/jedis/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>jedis源码分析</title>
-    <link href="http://yeming.fun/2017/06/18/jedis-cluster/"/>
-    <id>http://yeming.fun/2017/06/18/jedis-cluster/</id>
-    <published>2017-06-18T15:56:49.000Z</published>
-    <updated>2021-04-18T07:38:23.080Z</updated>
-    
-    
-    <summary type="html">&lt;p&gt;&lt;img src=&quot;https://lightoheaven.coding.net/p/image2/d/image2/git/raw/master/201706/jedis-cluster.jpeg&quot; alt=&quot;类图&quot;&gt;&lt;/p&gt;
-&lt;h2 id=&quot;创建redisClient-BinaryJedisCluster&quot;&gt;&lt;a href=&quot;#创建redisClient-BinaryJedisCluster&quot; class=&quot;headerlink&quot; title=&quot;创建redisClient BinaryJedisCluster&quot;&gt;&lt;/a&gt;创建redisClient BinaryJedisCluster&lt;/h2&gt;&lt;p&gt;我们可以从jedis给出官方的redis-clusterdemo上可以看到通过构造一个BinaryJedisCluster，这个类就是jedis给我们提供的一个与redis-cluster集群交互的一个基本接口类，有了这个类我们就能执行各种查询写入操作了。&lt;/p&gt;
-&lt;pre class=&quot;line-numbers language-none&quot;&gt;&lt;code class=&quot;language-none&quot;&gt;Set&amp;lt;HostAndPort&amp;gt; set &amp;#x3D; new HashSet&amp;lt;&amp;gt;();
-HostAndPort hostAndPort &amp;#x3D; new HostAndPort(&amp;quot;127.0.0.1&amp;quot;, 7000);
-set.add(hostAndPort);
-BinaryJedisCluster client &amp;#x3D; new BinaryJedisCluster(set);&lt;span aria-hidden=&quot;true&quot; class=&quot;line-numbers-rows&quot;&gt;&lt;span&gt;&lt;/span&gt;&lt;span&gt;&lt;/span&gt;&lt;span&gt;&lt;/span&gt;&lt;span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;</summary>
-    
-    
-    
-    <category term="技术分享" scheme="http://yeming.fun/categories/%E6%8A%80%E6%9C%AF%E5%88%86%E4%BA%AB/"/>
-    
-    
-    <category term="redis-cluster" scheme="http://yeming.fun/tags/redis-cluster/"/>
-    
-    <category term="jedis" scheme="http://yeming.fun/tags/jedis/"/>
     
   </entry>
   

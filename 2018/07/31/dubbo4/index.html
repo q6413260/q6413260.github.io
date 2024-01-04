@@ -486,8 +486,7 @@
 
         <div class="card-content article-card-content">
             <div id="articleContent">
-                <p>之前我们介绍了Provider启动时候向注册中心注册服务<br><a target="_blank" rel="noopener" href="http://yeming.me/2018/07/28/dubbo2/">Dubbo源码学习二(服务注册)</a>，Consumer启动时候向注册中心订阅服务<a target="_blank" rel="noopener" href="http://yeming.me/2018/07/29/dubbo3/">Dubbo源码学习三(服务引用)</a>，本文我们就来看下Consumer端和Provider是怎么通信的。</p>
-<center><img src="https://lightoheaven.coding.net/p/image2/d/image2/git/raw/master/201807/communicate.jpeg" width="700" hegiht="350"></center>
+                <p>之前我们介绍了Provider启动时候向注册中心注册服务<br><a target="_blank" rel="noopener" href="http://yeming.me/2018/07/28/dubbo2/">Dubbo源码学习二(服务注册)</a>，Consumer启动时候向注册中心订阅服务<a target="_blank" rel="noopener" href="http://yeming.me/2018/07/29/dubbo3/">Dubbo源码学习三(服务引用)</a>，本文我们就来看下Consumer端和Provider是怎么通信的。<br><img src="/2018/07/31/dubbo4/communicate.jpeg" width="60%/"></p>
 <span id="more"></span>
 
 <h2 id="Consumer"><a href="#Consumer" class="headerlink" title="Consumer"></a>Consumer</h2><pre class="line-numbers language-java" data-language="java"><code class="language-java"><span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">main</span><span class="token punctuation">(</span><span class="token class-name">String</span><span class="token punctuation">[</span><span class="token punctuation">]</span> args<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
@@ -503,7 +502,9 @@
 <li>业务自定义线程池对response进行相应处理，设置1中的future状态为done状态</li>
 <li>主线程future返回<br>我们主要看下上述1，2，3，4几个过程</li>
 </ul>
-<h3 id="主线程发送request"><a href="#主线程发送request" class="headerlink" title="主线程发送request"></a>主线程发送request</h3><p><img src="https://lightoheaven.coding.net/p/image2/d/image2/git/raw/master/201807/consumerSend.jpeg" alt="Consumer.send"><br>上图是主线程发送request的时序图，接下来会对从1-7的几个过程逐一分析。<font color="red">过程1</font>在上一篇文章中，我们知道demoService在Consumer端通过JDK动态代理，把Invoker转换成为客户端需要的接口。然后调用sayHello方法时，经由动态代理调用到InvokerInvocationHandler.invoke()方法</p>
+<h3 id="主线程发送request"><a href="#主线程发送request" class="headerlink" title="主线程发送request"></a>主线程发送request</h3><img src="/2018/07/31/dubbo4/consumerSend.jpeg" width="60%/">
+上图是主线程发送request的时序图，接下来会对从1-7的几个过程逐一分析。<font color="red">过程1</font>在上一篇文章中，我们知道demoService在Consumer端通过JDK动态代理，把Invoker转换成为客户端需要的接口。然后调用sayHello方法时，经由动态代理调用到InvokerInvocationHandler.invoke()方法
+
 <p><b>InvokerInvocationHandler</b></p>
 <pre class="line-numbers language-java" data-language="java"><code class="language-java"><span class="token annotation punctuation">@Override</span>
     <span class="token keyword">public</span> <span class="token class-name">Object</span> <span class="token function">invoke</span><span class="token punctuation">(</span><span class="token class-name">Object</span> proxy<span class="token punctuation">,</span> <span class="token class-name">Method</span> method<span class="token punctuation">,</span> <span class="token class-name">Object</span><span class="token punctuation">[</span><span class="token punctuation">]</span> args<span class="token punctuation">)</span> <span class="token keyword">throws</span> <span class="token class-name">Throwable</span> <span class="token punctuation">&#123;</span>
@@ -800,7 +801,9 @@
 <span class="token number">5</span>、参数类型描述符
 <span class="token number">6</span>、遍历请求参数值并编码
 <span class="token number">7</span>、dubbo请求的attachments<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<p><img src="https://lightoheaven.coding.net/p/image2/d/image2/git/raw/master/201807/dubbo2.jpeg" alt="header"><br>上述代码是dubbo的编码过程，dubbo通过上述代码自定义通信协议，每条dubbo消息包含header和body(包含方法参数值等信息)，header固定16个字节。buffer先将writeIndex设置为header长度，然后将body req.getData()序列化写进buffer。最后重新设置writeIndex=0，将header写入buffer。</p>
+<img src="/2018/07/31/dubbo4/dubbo2.jpeg" width="60%/">
+上述代码是dubbo的编码过程，dubbo通过上述代码自定义通信协议，每条dubbo消息包含header和body(包含方法参数值等信息)，header固定16个字节。buffer先将writeIndex设置为header长度，然后将body req.getData()序列化写进buffer。最后重新设置writeIndex=0，将header写入buffer。
+
 <p>最后WriteAndFlushTask类，ctx.invokeFlush() flush刷新buffer就会提交消息到Provider端</p>
 <pre class="line-numbers language-java" data-language="java"><code class="language-java"><span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">write</span><span class="token punctuation">(</span><span class="token class-name">AbstractChannelHandlerContext</span> ctx<span class="token punctuation">,</span> <span class="token class-name">Object</span> msg<span class="token punctuation">,</span> <span class="token class-name">ChannelPromise</span> promise<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
     <span class="token keyword">super</span><span class="token punctuation">.</span><span class="token function">write</span><span class="token punctuation">(</span>ctx<span class="token punctuation">,</span> msg<span class="token punctuation">,</span> promise<span class="token punctuation">)</span><span class="token punctuation">;</span>
@@ -808,7 +811,8 @@
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
 
 <p>用Netty作为传输框架时，图中的Client和Server分别对应NettyClient和NettyServer，在创建的时候会指定encoder和decoder完成对象的编码和解码。Dubbo协议默认DubboCountCodec为编解码器，该类的成员DubboCodec封装了Dubbo协议的编解码逻辑，同时完成对象的序列化或反序列化。</p>
-<p><img src="https://lightoheaven.coding.net/p/image2/d/image2/git/raw/master/201807/transporter.jpeg" alt="transporter"></p>
+<img src="/2018/07/31/dubbo4/transporter.jpeg" width="60%/">
+
 <h3 id="Netty工作线程接收response"><a href="#Netty工作线程接收response" class="headerlink" title="Netty工作线程接收response"></a>Netty工作线程接收response</h3><p>上述发送request对应的客户端ChannelOutboundHandler，接收response对应ChannelInboundHandler，Consumer端接收到Provider端的response会依次经由adapter.getDecoder()，nettyClientHandler进行处理。这里有一点比较麻烦，Consumer收到Provider response时通过InternalDecoder进行解码(对应的Provider接收Consumer的request)，InternalDecoder每次收到的数据包不一定是完整的dubbo协议包，也有可能是多个dubbo协议包。这里就是tcp传输所谓的<font color="red">黏包和拆包问题</font>。黏包/拆包问题是由于底层的TCP无法理解上层的业务数据，所以底层是无法保证数据包不被拆分和分组的，只能通过上层的应用协议栈来设计解决。一般有以下几种方案来解决</p>
 <ul>
 <li>消息定长，如果不够，用空格来补</li>
@@ -1070,7 +1074,7 @@
 <li>Provider自定义线程池</li>
 <li>Consumer端自定义线城池</li>
 </ul>
-<p>本身对于异步编程，都没有同步调用看起来那么舒服，dubbo中又有这么多不同的线程进行交互，所以就更容易摸不着头脑了。我们下面再来以上述线程的发生时间先后梳理下整个过程。<br><img src="https://lightoheaven.coding.net/p/image2/d/image2/git/raw/master/201807/communicate.jpeg" alt="通信交互过程"></p>
+<p>本身对于异步编程，都没有同步调用看起来那么舒服，dubbo中又有这么多不同的线程进行交互，所以就更容易摸不着头脑了。我们下面再来以上述线程的发生时间先后梳理下整个过程。<br><img src="/2018/07/31/dubbo4/communicate.jpeg" width="60%/"></p>
 <ol>
 <li>Consumer端启动过程中请求与Provider端建立连接，Netty server boss线程接受OP_ACCEPT事件，并生成对应的NioSocketChannel，这个channel后续读写请求交由某个Netty server worker线程处理</li>
 <li>首先Consumer端有个线程调用service某个方法(web应用一般是tomcat线程)，然后提交一个WriteAndFlushTask到Netty client worker线程</li>
@@ -1082,8 +1086,7 @@
 <li>Consumer端业务线程池处理相关逻辑，然后通知Consumer端调用service方法的线程(如果是同步方法则唤醒被阻塞的线程)。</li>
 <li>Consumer端调用service的线程获取最终的结果。</li>
 </ol>
-<p>注意上述Consumer端和Provider都有一个业务线程池，这个是不能少的，有些同学可能会觉得把任务直接交给worker线程来做不就行了吗，然而并不能这样。因为worker线程主要是用来做编解码的一些与业务无关的耗时很短的逻辑，对于Provider端来说，服务的真正实现的方法可能会耗时比较长；对于Consumer端来说，可能还要支持某些callBack方法，耗时也可能比较长，所以上述步骤5和8是不能少的。
- </p>
+<p>注意上述Consumer端和Provider都有一个业务线程池，这个是不能少的，有些同学可能会觉得把任务直接交给worker线程来做不就行了吗，然而并不能这样。因为worker线程主要是用来做编解码的一些与业务无关的耗时很短的逻辑，对于Provider端来说，服务的真正实现的方法可能会耗时比较长；对于Consumer端来说，可能还要支持某些callBack方法，耗时也可能比较长，所以上述步骤5和8是不能少的。</p>
 
                 
             </div>
@@ -1714,7 +1717,7 @@ Registry：服务注册与发现的注册中心
             <br>
             
             &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                class="white-color">78.8k</span>&nbsp;字
+                class="white-color">84.4k</span>&nbsp;字
             
             
             

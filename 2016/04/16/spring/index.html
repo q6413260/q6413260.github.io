@@ -484,7 +484,9 @@
             <div id="articleContent">
                 <h2 id="IOC简要解释"><a href="#IOC简要解释" class="headerlink" title="IOC简要解释"></a>IOC简要解释</h2><p>在应用开发中，开发人员往往需要引用和调用其它组件的服务，这种依赖关系如果固化在组件设计中，就会造成依赖关系的僵化和以后维护成本的增加。如果使用IoC容易，把资源的获取反转，具体相对java来说就是把bean的依赖关系交给IoC容易来处理。在反转实现中，具体通过可读的文件来配置。并且bean的耦合关系需要变动时候，可以不用重新改变或者编译源代码就可以实现，这也符合设计原则中的开闭原则，能够提供组件系统设计的灵活性。基于此，我们下面来简要分析一下Spring IoC相关的源码</p>
 <span id="more"></span>
-<h2 id="ApplicationContext"><a href="#ApplicationContext" class="headerlink" title="ApplicationContext"></a>ApplicationContext</h2><p><img src="https://lightoheaven.coding.net/p/image2/d/image2/git/raw/master/201604/spring/uml.jpg" alt="spring容器uml类图"><br>通过上面的类图，可以看到ApplicationContext是基于BeanFactory接口扩展来的，但它还继承了一些其它的接口，所以它是一个Spring提供给我们的一个更高级的IoC容易。<br>下面我们来分析一下ApplicationContext启动部分的源码。我们看到<br><img src="https://lightoheaven.coding.net/p/image2/d/image2/git/raw/master/201604/spring/refresh.jpg" alt="AbstractApplicationContext.refresh"></p>
+<h2 id="ApplicationContext"><a href="#ApplicationContext" class="headerlink" title="ApplicationContext"></a>ApplicationContext</h2><img src="/2016/04/16/spring/uml.jpeg" width="60%/">
+
+<p>通过上面的类图，可以看到ApplicationContext是基于BeanFactory接口扩展来的，但它还继承了一些其它的接口，所以它是一个Spring提供给我们的一个更高级的IoC容易。<br>下面我们来分析一下ApplicationContext启动部分的源码。我们看到<br><img src="/2016/04/16/spring/refresh.jpeg" width="60%/"></p>
 <pre class="line-numbers language-none"><code class="language-none">public ClassPathXmlApplicationContext(String[] configLocations, boolean refresh, ApplicationContext parent)
 throws BeansException &#123;
     super(parent);
@@ -494,7 +496,8 @@ throws BeansException &#123;
     &#125;
 &#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <p>基于上面的ClassPathXmlApplicationContext可以看到它会调用AbstractApplicationContext的refresh方法，这个也是IoC启动的核心代码，下面就来看下。<br>我们可以看到refresh方法里面又包含很多步骤，我们主要关注一下红线标记出来的那个方法，它就是Spring IoC的初始化。</p>
-<h3 id="refresh的时序图"><a href="#refresh的时序图" class="headerlink" title="refresh的时序图"></a>refresh的时序图</h3><p><img src="https://lightoheaven.coding.net/p/image2/d/image2/git/raw/master/201604/spring/shixu.jpg" alt="IoC加载时序图"></p>
+<h3 id="refresh的时序图"><a href="#refresh的时序图" class="headerlink" title="refresh的时序图"></a>refresh的时序图</h3><img src="/2016/04/16/spring/shixu.jpeg" width="60%/">
+
 <p>通过上面的时序图，我们可以看到ioc启动大致可以分为3个过程。</p>
 <ul>
 <li>resource的定位过程，可以简单理解就是找到我们定义bean的相关的xml文件</li>
@@ -509,8 +512,8 @@ throws BeansException &#123;
 </ul>
 <h3 id="BeanDifinition的载入和解析"><a href="#BeanDifinition的载入和解析" class="headerlink" title="BeanDifinition的载入和解析"></a>BeanDifinition的载入和解析</h3><ul>
 <li>XmlBeanDefinitionReader.doLoadBeanDefinitions(InputSource inputSource, Resource resource)这个方法把资源封装成一个Document</li>
-<li>DefaultBeanDefinitionDocumentReader.parseBeanDefinitions(Element root, BeanDefinitionParserDelegate delegate)这个方法解析document中的每一个获取到的标签<br><img src="https://lightoheaven.coding.net/p/image2/d/image2/git/raw/master/201604/spring/beanParse.jpg" alt="xml bean的解析"></li>
-<li>最终通过BeanDefinitionParserDelegate..parseBeanDefinitionElement(Element)来解析Element，并用BeanDefinitionHolder来持有BeanDifinition。<br><img src="https://lightoheaven.coding.net/p/image2/d/image2/git/raw/master/201604/spring/beanDifinitionHolder.jpg" alt="beanDifinitionHolder"></li>
+<li>DefaultBeanDefinitionDocumentReader.parseBeanDefinitions(Element root, BeanDefinitionParserDelegate delegate)这个方法解析document中的每一个获取到的标签<img src="/2016/04/16/spring/beanParse.jpeg" width="60%/"></li>
+<li>最终通过BeanDefinitionParserDelegate..parseBeanDefinitionElement(Element)来解析Element，并用BeanDefinitionHolder来持有BeanDifinition。<img src="/2016/04/16/spring/beanDifinitionHolder.jpeg" width="60%/"></li>
 </ul>
 <h3 id="BeanDifinition在IoC容器中的注册"><a href="#BeanDifinition在IoC容器中的注册" class="headerlink" title="BeanDifinition在IoC容器中的注册"></a>BeanDifinition在IoC容器中的注册</h3><ul>
 <li>BeanDefinitionReaderUtils.registerBeanDefinition(bdHolder, getReaderContext().getRegistry());其中这个getReaderContext().getRegistry()返回的就是最早创建的DefaultListableBeanFactory</li>
@@ -1135,7 +1138,7 @@ finishBeanFactoryInitialization(beanFactory);<span aria-hidden="true" class="lin
             <br>
             
             &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                class="white-color">78.8k</span>&nbsp;字
+                class="white-color">84.4k</span>&nbsp;字
             
             
             
