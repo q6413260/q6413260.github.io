@@ -4,7 +4,7 @@
 
 <head>
     <meta charset="utf-8">
-    <meta name="keywords" content="MySQL Binlog性能优化, 叶明の个人博客">
+    <meta name="keywords" content="IDEA调试Elasticsearch源码, 叶明の个人博客">
     <meta name="description" content="苦练基本功，长期有耐心">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
@@ -27,7 +27,7 @@
 </script>
 
 
-    <title>MySQL Binlog性能优化 | 叶明の个人博客</title>
+    <title>IDEA调试Elasticsearch源码 | 叶明の个人博客</title>
     <link rel="icon" type="image/png" href="/avatar.png">
 
     <link rel="stylesheet" type="text/css" href="/libs/awesome/css/all.css">
@@ -316,12 +316,12 @@
 
 
 
-<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/1.jpg')">
+<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/3.jpg')">
     <div class="container" style="right: 0px;left: 0px;">
         <div class="row">
             <div class="col s12 m12 l12">
                 <div class="brand">
-                    <h1 class="description center-align post-title">MySQL Binlog性能优化</h1>
+                    <h1 class="description center-align post-title">IDEA调试Elasticsearch源码</h1>
                 </div>
             </div>
         </div>
@@ -437,12 +437,12 @@
                     
                     <div class="article-tag">
                         
-                            <a href="/tags/MySQL/">
-                                <span class="chip bg-color">MySQL</span>
+                            <a href="/tags/Elasticsearch/">
+                                <span class="chip bg-color">Elasticsearch</span>
                             </a>
                         
-                            <a href="/tags/%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96/">
-                                <span class="chip bg-color">性能优化</span>
+                            <a href="/tags/docker/">
+                                <span class="chip bg-color">docker</span>
                             </a>
                         
                     </div>
@@ -466,7 +466,7 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-minus fa-fw"></i>发布日期:&nbsp;&nbsp;
-                    2021-04-26
+                    2021-10-22
                 </div>
                 
 
@@ -475,14 +475,14 @@
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    1.7k
+                    1.1k
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
-                    6 分
+                    4 分
                 </div>
                 
 
@@ -505,92 +505,129 @@
 
         <div class="card-content article-card-content">
             <div id="articleContent">
-                <h2 id="一、背景"><a href="#一、背景" class="headerlink" title="一、背景"></a>一、背景</h2><p>最近一段时间，一到业务午高峰，外卖集群的一些订阅机器就会出现Binlog消费大量延时。出现Binlog延时的原因主要是：一般11点开始，外卖业务进入中午午高峰，数据库的Binlog QPS会逐渐增加，一旦订阅服务出现性能瓶颈，处理Binlog的能力跟不上Binlog生成的速度，就会导致消费Binlog出现延时，并且延时时间会越来越长。业务在BCP上配置的核对规则一般最小是60s，一旦Binlog延时时间超过60s，那么规则就会大量误告。<br><img src="/2021/04/26/binlog/cat1.png" width="60%/"><br><img src="/2021/04/26/binlog/cat2.png" width="60%/"></p>
-<h2 id="二、Binlog消费线程分析"><a href="#二、Binlog消费线程分析" class="headerlink" title="二、Binlog消费线程分析"></a>二、Binlog消费线程分析</h2><p>排查性能瓶颈之前，需要先梳理出当前订阅服务消费Binlog的整体流程，如下图，整体流程大致包含7个步骤</p>
-<table>
-<thead>
-<tr>
-<th>步骤</th>
-<th>过程描述</th>
-<th>影响性能因素</th>
-<th>Binlog延时原因分析</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>1</td>
-<td>启动一个独立线程，实现了MySQL同步协议，伪装成Slave，从业务DB实时拉取Binlog字节流，并将其解析成常规的Binlog结构</td>
-<td>外部原因：网络原因导致的MySQL主从同步延时；内部原因：Binlog解析出现性能瓶颈</td>
-<td>Raptor监控看，当前无主从同步延时；另外根据以往测试，目前单库Binlog极限解析速度能达到20000QPS（外卖午高峰单库QPS最多5000+）</td>
-</tr>
-<tr>
-<td>2</td>
-<td>解析出来的Binlog写入到内存中的LinkedBlockingQueue（历史架构图原因，之前Binlog解析和拉取是两个独立服务，通过Netty交互，后来合并成一个服务）</td>
-<td>步骤3拉取Binlog过慢，导致步骤2写入Binlog出现阻塞</td>
-<td>根据1的分析，理论上2的写入速度能达到20000QPS，故该步骤无性能瓶颈</td>
-</tr>
-<tr>
-<td>3</td>
-<td>Binlog拉取线程从LinkedBlockingQueue中拉取Binlog</td>
-<td>步骤2写入Binlog过慢，导致步骤3拉取Binlog出现阻塞</td>
-<td>单纯从LinkedBlockingQueue中拉取Binlog，显然无性能瓶颈</td>
-</tr>
-<tr>
-<td>4</td>
-<td>将拉取到的Binlog基于业务主键进行hashCode交由不同的BlockingQueue，提高性能的同时保证Binlog处理局部有序性</td>
-<td>步骤5拉取Binlog过慢，导致步骤4写入Binlog出现阻塞</td>
-<td>该步骤仅根据Binlog计算hashCode，耗时基本可以忽略，无性能瓶颈</td>
-</tr>
-<tr>
-<td>5</td>
-<td>Binlog聚合线程从LinkedBlockingQueue中拉取Binlog，对每条Binlog执行业务配置的Aviator filter脚本和Java匹配脚本，对满足提交的Binlog进行压缩序列化</td>
-<td>同一条Binlog上关联的业务规则较多，需要执行较多业务配置的filter脚本和Java核对脚本</td>
-<td>存在性能瓶颈</td>
-</tr>
-<tr>
-<td>6</td>
-<td>将聚合好的Binlog交由Binlog存储线程池进行处理</td>
-<td>存储线程池处理性能</td>
-<td>线程池没有抛出拒绝策略，且阻塞队列也没有积压，无性能瓶颈</td>
-</tr>
-<tr>
-<td>7</td>
-<td>将Binlog写入到Squirrel</td>
-<td>Squirrel性能</td>
-<td>Raptor监控看，Squirrel各项指标正常，耗时没有明显增加，写入没有报错，无性能瓶颈</td>
-</tr>
-</tbody></table>
-<p>总结：整体上看，订阅服务Binlog消费过程是一个典型的生产消费者模型：</p>
+                <h2 id="一、Mac上安装es"><a href="#一、Mac上安装es" class="headerlink" title="一、Mac上安装es"></a>一、Mac上安装es</h2><hr>
+<p>最近在调研Elasticsearch（后续简称es）的translog，在Mac上安装了es单机版和集群版本，这里推荐使用docker搭建，简单叙述下过程：<br><strong>安装Docker环境</strong><br>首先需要在Mac上安装Docker运行环境，这里推荐直接安装 docker-for-mac，安装完成并启动成功后Mac右上方会显示running<br><img src="/2021/10/22/es-debug/docker.png" width="30%/"><br>安装完docker-for-mac后，建议修改镜像源，默认镜像源拉取镜像太慢了。修改方式如下：依次点击Preferences -&gt; Docker Engine</p>
+<figure>
+<img src="/2021/10/22/es-debug/docker-preference.png" width="30%/">
+<img src="/2021/10/22/es-debug/docker-engine.png">
+</figure>
+
+
+<p><strong><a target="_blank" rel="noopener" href="https://www.elastic.co/guide/en/elasticsearch/reference/7.12/docker.html">安装es单机版</a></strong></p>
+<ol>
+<li>拉取镜像，docker pull docker.elastic.co/elasticsearch/elasticsearch:7.12.0</li>
+<li>启动容器，docker run –name es01-test -p 9200:9200 -p 9300:9300 -e “discovery.type=single-node” docker.elastic.co/elasticsearch/elasticsearch:7.12.0</li>
+<li>当容器退出后，下次需要启动该容器，可以执行 docker ps -a 显示当前所有容器（docker ps显示运行时容器，-a会显示包括非运行在内所有容器），找到对应的container id名称，然后 docker  start 891f7a68c705<br><img src="/2021/10/22/es-debug/docker-ps.png" alt="docker-ps"></li>
+</ol>
+<p><strong><a target="_blank" rel="noopener" href="https://www.elastic.co/guide/en/elasticsearch/reference/7.12/docker.html">安装es集群版本</a></strong>  </p>
+<ol>
+<li>创建docker-compose.yml<pre class="line-numbers language-yaml" data-language="yaml"><code class="language-yaml"><span class="token key atrule">version</span><span class="token punctuation">:</span> <span class="token string">'2.2'</span>
+<span class="token key atrule">services</span><span class="token punctuation">:</span>
+  <span class="token key atrule">es01</span><span class="token punctuation">:</span>
+    <span class="token key atrule">image</span><span class="token punctuation">:</span> docker.elastic.co/elasticsearch/elasticsearch<span class="token punctuation">:</span>7.12.0
+    <span class="token key atrule">container_name</span><span class="token punctuation">:</span> es01
+    <span class="token key atrule">environment</span><span class="token punctuation">:</span>
+      <span class="token punctuation">-</span> node.name=es01
+      <span class="token punctuation">-</span> cluster.name=es<span class="token punctuation">-</span>docker<span class="token punctuation">-</span>cluster
+      <span class="token punctuation">-</span> discovery.seed_hosts=es02<span class="token punctuation">,</span>es03
+      <span class="token punctuation">-</span> cluster.initial_master_nodes=es01<span class="token punctuation">,</span>es02<span class="token punctuation">,</span>es03
+      <span class="token punctuation">-</span> bootstrap.memory_lock=true
+      <span class="token punctuation">-</span> <span class="token string">"ES_JAVA_OPTS=-Xms512m -Xmx512m"</span>
+    <span class="token key atrule">ulimits</span><span class="token punctuation">:</span>
+      <span class="token key atrule">memlock</span><span class="token punctuation">:</span>
+        <span class="token key atrule">soft</span><span class="token punctuation">:</span> <span class="token number">-1</span>
+        <span class="token key atrule">hard</span><span class="token punctuation">:</span> <span class="token number">-1</span>
+    <span class="token key atrule">volumes</span><span class="token punctuation">:</span>
+      <span class="token punctuation">-</span> data01<span class="token punctuation">:</span>/usr/share/elasticsearch/data
+    <span class="token key atrule">ports</span><span class="token punctuation">:</span>
+      <span class="token punctuation">-</span> 9200<span class="token punctuation">:</span><span class="token number">9200</span>
+    <span class="token key atrule">networks</span><span class="token punctuation">:</span>
+      <span class="token punctuation">-</span> elastic
+  <span class="token key atrule">es02</span><span class="token punctuation">:</span>
+    <span class="token key atrule">image</span><span class="token punctuation">:</span> docker.elastic.co/elasticsearch/elasticsearch<span class="token punctuation">:</span>7.12.0
+    <span class="token key atrule">container_name</span><span class="token punctuation">:</span> es02
+    <span class="token key atrule">environment</span><span class="token punctuation">:</span>
+      <span class="token punctuation">-</span> node.name=es02
+      <span class="token punctuation">-</span> cluster.name=es<span class="token punctuation">-</span>docker<span class="token punctuation">-</span>cluster
+      <span class="token punctuation">-</span> discovery.seed_hosts=es01<span class="token punctuation">,</span>es03
+      <span class="token punctuation">-</span> cluster.initial_master_nodes=es01<span class="token punctuation">,</span>es02<span class="token punctuation">,</span>es03
+      <span class="token punctuation">-</span> bootstrap.memory_lock=true
+      <span class="token punctuation">-</span> <span class="token string">"ES_JAVA_OPTS=-Xms512m -Xmx512m"</span>
+    <span class="token key atrule">ulimits</span><span class="token punctuation">:</span>
+      <span class="token key atrule">memlock</span><span class="token punctuation">:</span>
+        <span class="token key atrule">soft</span><span class="token punctuation">:</span> <span class="token number">-1</span>
+        <span class="token key atrule">hard</span><span class="token punctuation">:</span> <span class="token number">-1</span>
+    <span class="token key atrule">volumes</span><span class="token punctuation">:</span>
+      <span class="token punctuation">-</span> data02<span class="token punctuation">:</span>/usr/share/elasticsearch/data
+    <span class="token key atrule">networks</span><span class="token punctuation">:</span>
+      <span class="token punctuation">-</span> elastic
+  <span class="token key atrule">es03</span><span class="token punctuation">:</span>
+    <span class="token key atrule">image</span><span class="token punctuation">:</span> docker.elastic.co/elasticsearch/elasticsearch<span class="token punctuation">:</span>7.12.0
+    <span class="token key atrule">container_name</span><span class="token punctuation">:</span> es03
+    <span class="token key atrule">environment</span><span class="token punctuation">:</span>
+      <span class="token punctuation">-</span> node.name=es03
+      <span class="token punctuation">-</span> cluster.name=es<span class="token punctuation">-</span>docker<span class="token punctuation">-</span>cluster
+      <span class="token punctuation">-</span> discovery.seed_hosts=es01<span class="token punctuation">,</span>es02
+      <span class="token punctuation">-</span> cluster.initial_master_nodes=es01<span class="token punctuation">,</span>es02<span class="token punctuation">,</span>es03
+      <span class="token punctuation">-</span> bootstrap.memory_lock=true
+      <span class="token punctuation">-</span> <span class="token string">"ES_JAVA_OPTS=-Xms512m -Xmx512m"</span>
+    <span class="token key atrule">ulimits</span><span class="token punctuation">:</span>
+      <span class="token key atrule">memlock</span><span class="token punctuation">:</span>
+        <span class="token key atrule">soft</span><span class="token punctuation">:</span> <span class="token number">-1</span>
+        <span class="token key atrule">hard</span><span class="token punctuation">:</span> <span class="token number">-1</span>
+    <span class="token key atrule">volumes</span><span class="token punctuation">:</span>
+      <span class="token punctuation">-</span> data03<span class="token punctuation">:</span>/usr/share/elasticsearch/data
+    <span class="token key atrule">networks</span><span class="token punctuation">:</span>
+      <span class="token punctuation">-</span> elastic
+
+<span class="token key atrule">volumes</span><span class="token punctuation">:</span>
+  <span class="token key atrule">data01</span><span class="token punctuation">:</span>
+    <span class="token key atrule">driver</span><span class="token punctuation">:</span> local
+  <span class="token key atrule">data02</span><span class="token punctuation">:</span>
+    <span class="token key atrule">driver</span><span class="token punctuation">:</span> local
+  <span class="token key atrule">data03</span><span class="token punctuation">:</span>
+    <span class="token key atrule">driver</span><span class="token punctuation">:</span> local
+
+<span class="token key atrule">networks</span><span class="token punctuation">:</span>
+  <span class="token key atrule">elastic</span><span class="token punctuation">:</span>
+    <span class="token key atrule">driver</span><span class="token punctuation">:</span> bridge<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></li>
+<li>在同目录下执行 docker-compose up 创建集群</li>
+<li>执行 curl -X GET “localhost:9200/_cat/nodes?v=true&amp;pretty” 确认集群是否启动</li>
+</ol>
+<h2 id="二、IDEA编译es源码"><a href="#二、IDEA编译es源码" class="headerlink" title="二、IDEA编译es源码"></a>二、IDEA编译es源码</h2><p><strong>环境准备：</strong> </p>
 <ul>
-<li>生产者：步骤1、2</li>
-<li>消费者：步骤3、4、5、6、7</li>
+<li>JDK 16：版本要求可以参考CONTRIBUTING.md，es对jdk版本要求较高，建议直接使用最新版本，下载完成后，建议配置JAVA_HOME</li>
+<li>IDEA 2021.1：低版本的IDEA貌似不太支持高版本的JDK，根据自己情况选择。</li>
+<li>ElasticSearch 7.8.1代码分支：刚开始编译master分支代码和7.12.0一直有问题，后改成7.8.1版本</li>
+<li>ElasticSearch 7.8.1服务端：建议下载服务端完整包，后续启动时候一些配置路径可以直接指向完整安装包中的目录</li>
+<li><a target="_blank" rel="noopener" href="https://gradle.org/releases/">Gradle 7.0</a>：下载完成后，建议配置GRADLE_HOME和PATH，最好修改gradle镜像源为阿里云，在 ~/.gradle目录创建 init.gradle 文件</li>
 </ul>
-<p>当前生产者理论上能达到20000QPS，外卖午高峰单库QPS 5000+，故生产者当前无性能瓶颈；消费者3、4、5、6、7中，3、4、5基本是同步处理，其中一个步骤处理慢就会影响整个过程。6和7是异步处理的，和3、4、5基本独立，不会影响3、4、5的性能。故整体性能瓶颈在3、4、5，其中3和4都是很轻量级的操作，耗时基本忽略不计，所以性能瓶颈大概率是步骤5<br><img src="/2021/04/26/binlog/parser.jpeg" width="60%/"></p>
-<h2 id="三、Binlog聚合线程分析"><a href="#三、Binlog聚合线程分析" class="headerlink" title="三、Binlog聚合线程分析"></a>三、Binlog聚合线程分析</h2><pre class="line-numbers language-java" data-language="java"><code class="language-java"><span class="token keyword">private</span> <span class="token keyword">void</span> <span class="token function">processMultiBinlog</span><span class="token punctuation">(</span><span class="token class-name">BlockingQueue</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token class-name">EventEntry</span><span class="token punctuation">></span></span> changedEvents<span class="token punctuation">,</span> <span class="token keyword">int</span> threadNo<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
-	<span class="token keyword">while</span> <span class="token punctuation">(</span><span class="token operator">!</span><span class="token class-name">Thread</span><span class="token punctuation">.</span><span class="token function">currentThread</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">isInterrupted</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
-  	<span class="token class-name">EventEntry</span> eventEntry <span class="token operator">=</span> rowChangedEvents<span class="token punctuation">.</span><span class="token function">poll</span><span class="token punctuation">(</span><span class="token number">10</span><span class="token punctuation">,</span> <span class="token class-name">TimeUnit</span><span class="token punctuation">.</span>MILLISECONDS<span class="token punctuation">)</span><span class="token punctuation">;</span>
-    <span class="token class-name">Transaction</span> t1 <span class="token operator">=</span> <span class="token class-name">Cat</span><span class="token punctuation">.</span><span class="token function">newTransaction</span><span class="token punctuation">(</span><span class="token string">"processBinlogMsg"</span><span class="token punctuation">,</span> rowChangedEvent<span class="token punctuation">.</span><span class="token function">getJdbcRef</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-    <span class="token keyword">try</span> <span class="token punctuation">&#123;</span>                   
-      <span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token class-name">SubMsgConfigDTO</span> config <span class="token operator">:</span> configMap<span class="token punctuation">.</span><span class="token function">values</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
-        <span class="token class-name">Transaction</span> t2 <span class="token operator">=</span> <span class="token class-name">Cat</span><span class="token punctuation">.</span><span class="token function">newTransaction</span><span class="token punctuation">(</span><span class="token string">"createCacheValue"</span><span class="token punctuation">,</span> config<span class="token punctuation">.</span><span class="token function">getId</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">toString</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-        <span class="token keyword">try</span> <span class="token punctuation">&#123;</span>
-        	filterConfig <span class="token operator">=</span> <span class="token function">createCacheValue</span><span class="token punctuation">(</span>rawData<span class="token punctuation">,</span> config<span class="token punctuation">,</span> sb<span class="token punctuation">,</span> config<span class="token punctuation">.</span><span class="token function">getSaveToList</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-        <span class="token punctuation">&#125;</span> <span class="token keyword">finally</span> <span class="token punctuation">&#123;</span>
-        	t2<span class="token punctuation">.</span><span class="token function">complete</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-        <span class="token punctuation">&#125;</span>
-      <span class="token punctuation">&#125;</span>
-  	<span class="token punctuation">&#125;</span><span class="token keyword">finally</span> <span class="token punctuation">&#123;</span>
-    	t1<span class="token punctuation">.</span><span class="token function">complete</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-    <span class="token punctuation">&#125;</span>
-	<span class="token punctuation">&#125;</span>
-<span class="token punctuation">&#125;</span>  <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<p>内层 Transaction 耗时<br><img src="/2021/04/26/binlog/cat3.png" width="60%/"></p>
-<p>外层 Transaction 耗时<br><img src="/2021/04/26/binlog/cat4.jpeg" width="60%/"></p>
-<p>看Raptor监控，内层Transaction：createCacheValue平均耗时0ms，而外层Transaction：processBinlogMsg 平均耗时1.1ms（理论上最高qps 1000）。数据上看比较奇怪，即使内层循环执行70次，外层平均耗时应该也还是0，只能怀疑单个内层循环执行时间太短，导致被统计成0ms了。故优化思路：将串行执行createCacheValue修改成并行执行。</p>
-<p>并行化优化后，平均处理时间从1.1变成0了。<br><img src="/2021/04/26/binlog/cat5.png" width="60%/"></p>
-<h2 id="四、确定最终优化方案"><a href="#四、确定最终优化方案" class="headerlink" title="四、确定最终优化方案"></a>四、确定最终优化方案</h2><p>优化方案与初始方案不同在于：初始方案使用了4个线程分别拉取4个不同的阻塞队列，优化方案使用4个线程拉取同一个阻塞队列。粗看上去，两个方案似乎没有区别。仔细分析下初始方案，由于生产方步骤4产生Binlog较快，故很自然的就想到了使用4个不同的阻塞队列，交由4个不同的线程去处理。但是考虑下面一种情形，若BlockingQueue1满容，此时聚合线程1的上一个任务还没有结束，步骤4又产生了一条Binlog，将Binlog写入BlockingQueue1就会阻塞，进而就阻塞了整个处理流程。反过来看优化方案，若BlockingQueue1满容，即使聚合线程1的上一个任务还没有结束，聚合线程2、3、4只要任务结束，就会从队列中拉取Binlog，后续步骤4产生一条新的Binlog写入队列也不会阻塞。<br><img src="/2021/04/26/binlog/solution.png" width="60%/"></p>
-<p>线上开启5个Binlog聚合线程进行测试，外卖订单waimaiorderidwest02_waimai_product单库Binlog消费速度达到320K/min（当前外卖午高峰一般150K/min）<br><img src="/2021/04/26/binlog/cat6.png" width="60%/"></p>
-<p>接下来其实还做了进一步的优化：将优化方案中的聚合线程串行执行Aviator和Java脚本改成并行执行Aviator和Java脚本本以为能进一步提升速度，测试下来性能反而下降。后来发现在执行Aviator脚本时候，会进行加锁操作，故实际耗时可能更长。故最终方案是多个聚合线程拉取同一个阻塞队列，聚合线程内部串行执行Aviator和Java脚本<br><img src="/2021/04/26/binlog/cat7.png" width="60%/"></p>
-<h2 id="五、思考"><a href="#五、思考" class="headerlink" title="五、思考"></a>五、思考</h2><p>一个完整链路的数据处理流程，整体性能主要取决于性能最弱的一环，显然优化思路就是先分通过监控打点或者代码找出性能最弱的一个缓解，然后进行针对性的优化。常见优化方式就就是串行改并行，同步转异步。同时并行修改后，还要考虑到会不会引入锁冲突问题，这个往往容易被忽视。</p>
+<p><strong><a target="_blank" rel="noopener" href="https://github.com/elastic/elasticsearch">github pull代码</a></strong><br>es代码挺大的，第一次拉取很慢，后面从google应用商店下载了github加速插件，拉代码速度提升很明显。安装完成后，会有一个加速按钮</p>
+<figure>
+<img src="/2021/10/22/es-debug/github-speed.png" width="45%/">
+<img src="/2021/10/22/es-debug/github-speed2.png" width="45%/">
+</figure>
+
+<p><strong>编译es代码</strong></p>
+<ol>
+<li>切换分支 git checkout v7.8.1</li>
+<li>两种方式导入IDEA：我是使用第二种方式导入的，第一种一直报错。<ul>
+<li>cd到代码根目录，执行./gradlew idea，会下载6.5版本的gradle来编译源代码（或者执行gradle idea，直接使用之前环境准备配置的es版本），生成 IML, IPR, IWS 3个文件，然后导入 elasticsearch.ipr。</li>
+<li>IDEA直接 File -&gt; Open 打开es根目录的 build.gradle，然后等待编译源码</li>
+</ul>
+</li>
+</ol>
+<p><strong>运行es代码</strong><br>es启动类位于 ：elasticsearch\server\src\main\java\org\elasticsearch\bootstrap\Elasticsearch.java</p>
+<ol>
+<li>ERROR: the system property [es.path.conf] must be set<br>添加VM options： -Des.path.conf=/Users/dianping/Downloads/elasticsearch-7.8.1/config，这里可以直接指向成之前下载的es 7.8.1的config目录<img src="/2021/10/22/es-debug/es-vm.png" width="85%/"> </li>
+<li>Exception in thread “main” java.lang.IllegalStateException: path.home is not configured<br>添加VM options： -Des.path.home=/Users/dianping/Downloads/elasticsearch-7.8.1</li>
+<li>Exception in thread “main” java.lang.NullPointerException: Cannot invoke “String.hashCode()” because “<local3>“ is null<br>直接注释**InternalSettingsPreparer.checkSettingsForTerminalDeprecation()**for循环代码，不影响启动<img src="/2021/10/22/es-debug/InternalSettingsPreparer.png" width="85%/"> </local3></li>
+<li>ERROR Could not register mbeans java.security.AccessControlException: access denied (“javax.management.MBeanTrustPermission” “register”)<br>添加VM options：-Dlog4j2.disable.jmx=true 禁用jmx</li>
+<li>java.security.AccessControlException: access denied (“java.lang.RuntimePermission” “createClassLoader”)<br>创建java.policy文件，然后 -Djava.security.policy=/Users/dianping/Downloads/elasticsearch-7.8.1/config/java.policy<pre class="line-numbers language-shell" data-language="shell"><code class="language-shell">grant &#123;
+	permission java.lang.RuntimePermission &quot;createClassLoader&quot;;
+&#125;;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre></li>
+</ol>
+<p>解决上述问题后，es应该就能在IDEA中启动了，后续调试的话即可debug模式启动 Elasticsearch.java main函数   </p>
 
                 
             </div>
@@ -617,7 +654,7 @@
                     </i>
                 </span>
                 <span class="reprint-info">
-                    <a href="http://yeming.fun/2021/04/26/binlog/">http://yeming.fun/2021/04/26/binlog/</a>
+                    <a href="http://yeming.fun/2021/10/22/es-debug/">http://yeming.fun/2021/10/22/es-debug/</a>
                 </span>
             </div>
             <div class="reprint__notice">
@@ -655,12 +692,12 @@
                     
                         <div class="article-tag">
                             
-                                <a href="/tags/MySQL/">
-                                    <span class="chip bg-color">MySQL</span>
+                                <a href="/tags/Elasticsearch/">
+                                    <span class="chip bg-color">Elasticsearch</span>
                                 </a>
                             
-                                <a href="/tags/%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96/">
-                                    <span class="chip bg-color">性能优化</span>
+                                <a href="/tags/docker/">
+                                    <span class="chip bg-color">docker</span>
                                 </a>
                             
                         </div>
@@ -976,24 +1013,24 @@
             <div class="article-badge left-badge text-color">
                 <i class="fas fa-chevron-left"></i>&nbsp;上一篇</div>
             <div class="card">
-                <a href="/2023/01/15/zkprocess/">
+                <a href="/2022/04/26/binlog/">
                     <div class="card-image">
                         
                         
-                        <img src="/medias/featureimages/1.jpg" class="responsive-img" alt="ZK处理客户端请求流程梳理">
+                        <img src="/medias/featureimages/1.jpg" class="responsive-img" alt="MySQL Binlog性能优化">
                         
-                        <span class="card-title">ZK处理客户端请求流程梳理</span>
+                        <span class="card-title">MySQL Binlog性能优化</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
                     <div class="summary block-with-text">
                         
-                            ZK整体构成包括Leader、Follower、Observer以及客户端，其中Leader、Follower参与Leader竞选，并负责对于写请求进行投票。由于每次写请求，Leader都必须和所有Follower基于类似两阶段提交协议来决定写入是否成功，所以Follower节点不能过多。同时为了提高集群整体的读性能，进而引入了Observer节点。下图描述了从客户端发起一次请求到服务端响应的整个过程（假设客户端此时连接的是Follower节点，相比于连接Leader处理过程更为复杂）
+                            最近一段时间，一到业务午高峰，外卖集群的一些订阅机器就会出现Binlog消费大量延时。出现Binlog延时的原因主要是：一般11点开始，外卖业务进入中午午高峰，数据库的Binlog QPS会逐渐增加，一旦订阅服务出现性能瓶颈，处理Binlog的能力跟不上Binlog生成的速度，就会导致消费Binlog出现延时，并且延时时间会越来越长。业务在BCP上配置的核对规则一般最小是60s，一旦Binlog延时时间超过60s，那么规则就会大量误告。
                         
                     </div>
                     <div class="publish-info">
                         <span class="publish-date">
-                            <i class="far fa-clock fa-fw icon-date"></i>2023-01-15
+                            <i class="far fa-clock fa-fw icon-date"></i>2022-04-26
                         </span>
                         <span class="publish-author">
                             
@@ -1010,8 +1047,12 @@
                 
                 <div class="card-action article-tags">
                     
-                    <a href="/tags/ZK/">
-                        <span class="chip bg-color">ZK</span>
+                    <a href="/tags/MySQL/">
+                        <span class="chip bg-color">MySQL</span>
+                    </a>
+                    
+                    <a href="/tags/%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96/">
+                        <span class="chip bg-color">性能优化</span>
                     </a>
                     
                 </div>
@@ -1025,24 +1066,24 @@
                 下一篇&nbsp;<i class="fas fa-chevron-right"></i>
             </div>
             <div class="card">
-                <a href="/2021/04/22/es-debug/">
+                <a href="/2021/04/15/distributiontransaction/">
                     <div class="card-image">
                         
                         
-                        <img src="/medias/featureimages/3.jpg" class="responsive-img" alt="IDEA调试Elasticsearch源码">
+                        <img src="/medias/featureimages/1.jpg" class="responsive-img" alt="基于本地日志的可靠消息型事务">
                         
-                        <span class="card-title">IDEA调试Elasticsearch源码</span>
+                        <span class="card-title">基于本地日志的可靠消息型事务</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
                     <div class="summary block-with-text">
                         
-                            本文首先会介绍在Mac上如何通过docker来安装es单机版本和集群版本，然后重点叙述如何使用IDEA编译Elasticsearch源码并进行调试
+                            业务经常会使用消息中间件进行上下游解耦或者异步削峰填谷的目的，通常处理流程是如下：操作本地数据库，完成自身业务逻辑
                         
                     </div>
                     <div class="publish-info">
                             <span class="publish-date">
-                                <i class="far fa-clock fa-fw icon-date"></i>2021-04-22
+                                <i class="far fa-clock fa-fw icon-date"></i>2021-04-15
                             </span>
                         <span class="publish-author">
                             
@@ -1059,12 +1100,12 @@
                 
                 <div class="card-action article-tags">
                     
-                    <a href="/tags/Elasticsearch/">
-                        <span class="chip bg-color">Elasticsearch</span>
+                    <a href="/tags/%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E5%8A%A1/">
+                        <span class="chip bg-color">分布式事务</span>
                     </a>
                     
-                    <a href="/tags/docker/">
-                        <span class="chip bg-color">docker</span>
+                    <a href="/tags/Spring/">
+                        <span class="chip bg-color">Spring</span>
                     </a>
                     
                 </div>
