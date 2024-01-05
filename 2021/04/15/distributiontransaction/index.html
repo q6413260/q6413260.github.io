@@ -115,6 +115,15 @@
         </a>
       </li>
       
+      <li>
+        <a href="/categories/%E5%85%B6%E4%BB%96%E5%88%86%E4%BA%AB">
+          
+          <i class="fas fa-list" style="margin-top: -20px; zoom: 0.6;"></i>
+          
+          <span>其他分享</span>
+        </a>
+      </li>
+      
     </ul>
     
   </li>
@@ -228,6 +237,16 @@
 				   <i class="fa fas fa-film" style="position: absolute;left:50px" ></i>
 			      
 		          <span>旅行足迹</span>
+                  </a>
+                </li>
+              
+                <li>
+
+                  <a href="/categories/%E5%85%B6%E4%BB%96%E5%88%86%E4%BA%AB " style="margin-left:75px">
+				  
+				   <i class="fa fas fa-list" style="position: absolute;left:50px" ></i>
+			      
+		          <span>其他分享</span>
                   </a>
                 </li>
               
@@ -527,7 +546,7 @@
 <li>事务异常重试（可选）：扫描步骤2中的事务日志表，若扫描到事务日志，则调用sendBizMsg方法，直到该方法成功后，删除事务日志。</li>
 <li>若事务多次重试失败，事务日志会上传服务端，并大象通知，业务可以在Swan管理平台人工重试</li>
 </ol>
-<h3 id="3-1、事务启动过程"><a href="#3-1、事务启动过程" class="headerlink" title="3.1、事务启动过程"></a>3.1、事务启动过程</h3><img src="/2021/04/15/distributiontransaction/process.jpeg" width="60%/">
+<h3 id="3-1、事务启动过程"><a href="#3-1、事务启动过程" class="headerlink" title="3.1、事务启动过程"></a>3.1、事务启动过程</h3><img src="/2021/04/15/distributiontransaction/process.png" width="60%/">
 
 <ol>
 <li>框架启动时候，扫描是否有方法标注了@SwanReliableNotifyTransactional</li>
@@ -574,7 +593,7 @@
     map<span class="token punctuation">.</span><span class="token function">put</span><span class="token punctuation">(</span>entry<span class="token punctuation">.</span><span class="token function">getKey</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> proxy<span class="token punctuation">)</span><span class="token punctuation">;</span>
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
-<h3 id="3-2、事务运行时"><a href="#3-2、事务运行时" class="headerlink" title="3.2、事务运行时"></a>3.2、事务运行时</h3><img src="/2021/04/15/distributiontransaction/run.jpeg" width="60%/">
+<h3 id="3-2、事务运行时"><a href="#3-2、事务运行时" class="headerlink" title="3.2、事务运行时"></a>3.2、事务运行时</h3><img src="/2021/04/15/distributiontransaction/run.png" width="60%/">
 
 <ol>
 <li>判断当前方法是否存在事务注解，若不存在，则执行被代理对象自身方法</li>
@@ -1222,7 +1241,7 @@
             <br>
             
             &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                class="white-color">84.4k</span>&nbsp;字
+                class="white-color">90.2k</span>&nbsp;字
             
             
             

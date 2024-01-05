@@ -115,6 +115,15 @@
         </a>
       </li>
       
+      <li>
+        <a href="/categories/%E5%85%B6%E4%BB%96%E5%88%86%E4%BA%AB">
+          
+          <i class="fas fa-list" style="margin-top: -20px; zoom: 0.6;"></i>
+          
+          <span>其他分享</span>
+        </a>
+      </li>
+      
     </ul>
     
   </li>
@@ -228,6 +237,16 @@
 				   <i class="fa fas fa-film" style="position: absolute;left:50px" ></i>
 			      
 		          <span>旅行足迹</span>
+                  </a>
+                </li>
+              
+                <li>
+
+                  <a href="/categories/%E5%85%B6%E4%BB%96%E5%88%86%E4%BA%AB " style="margin-left:75px">
+				  
+				   <i class="fa fas fa-list" style="position: absolute;left:50px" ></i>
+			      
+		          <span>其他分享</span>
                   </a>
                 </li>
               
@@ -486,11 +505,11 @@
 
         <div class="card-content article-card-content">
             <div id="articleContent">
-                <h2 id="1、Mac上安装es"><a href="#1、Mac上安装es" class="headerlink" title="1、Mac上安装es"></a>1、Mac上安装es</h2><hr>
-<p>最近在调研Elasticsearch（后续简称es）的translog，在Mac上安装了es单机版和集群版本，这里推荐使用docker搭建，简单叙述下过程：<br><strong>安装Docker环境</strong><br>首先需要在Mac上安装Docker运行环境，这里推荐直接安装 docker-for-mac，安装完成并启动成功后Mac右上方会显示running<br><img src="https://lightoheaven.coding.net/p/image2/d/image2/git/raw/master/2021/04/docker.png" width="30%/"><br>安装完docker-for-mac后，建议修改镜像源，默认镜像源拉取镜像太慢了。修改方式如下：依次点击Preferences -&gt; Docker Engine</p>
+                <h2 id="一、Mac上安装es"><a href="#一、Mac上安装es" class="headerlink" title="一、Mac上安装es"></a>一、Mac上安装es</h2><hr>
+<p>最近在调研Elasticsearch（后续简称es）的translog，在Mac上安装了es单机版和集群版本，这里推荐使用docker搭建，简单叙述下过程：<br><strong>安装Docker环境</strong><br>首先需要在Mac上安装Docker运行环境，这里推荐直接安装 docker-for-mac，安装完成并启动成功后Mac右上方会显示running<br><img src="/2021/04/22/es-debug/docker.png" width="30%/"><br>安装完docker-for-mac后，建议修改镜像源，默认镜像源拉取镜像太慢了。修改方式如下：依次点击Preferences -&gt; Docker Engine</p>
 <figure>
-<img src="https://lightoheaven.coding.net/p/image2/d/image2/git/raw/master/2021/04/docker-preference.png" width="30%/">
-<img src="https://lightoheaven.coding.net/p/image2/d/image2/git/raw/master/2021/04/docker-engine.png">
+<img src="/2021/04/22/es-debug/docker-preference.png" width="30%/">
+<img src="/2021/04/22/es-debug/docker-engine.png">
 </figure>
 
 
@@ -498,7 +517,7 @@
 <ol>
 <li>拉取镜像，docker pull docker.elastic.co/elasticsearch/elasticsearch:7.12.0</li>
 <li>启动容器，docker run –name es01-test -p 9200:9200 -p 9300:9300 -e “discovery.type=single-node” docker.elastic.co/elasticsearch/elasticsearch:7.12.0</li>
-<li>当容器退出后，下次需要启动该容器，可以执行 docker ps -a 显示当前所有容器（docker ps显示运行时容器，-a会显示包括非运行在内所有容器），找到对应的container id名称，然后 docker  start 891f7a68c705<br><img src="https://lightoheaven.coding.net/p/image2/d/image2/git/raw/master/2021/04/docker-ps.png" alt="docker-ps"></li>
+<li>当容器退出后，下次需要启动该容器，可以执行 docker ps -a 显示当前所有容器（docker ps显示运行时容器，-a会显示包括非运行在内所有容器），找到对应的container id名称，然后 docker  start 891f7a68c705<br><img src="/2021/04/22/es-debug/docker-ps.png" alt="docker-ps"></li>
 </ol>
 <p><strong><a target="_blank" rel="noopener" href="https://www.elastic.co/guide/en/elasticsearch/reference/7.12/docker.html">安装es集群版本</a></strong>  </p>
 <ol>
@@ -575,7 +594,7 @@
 <li>在同目录下执行 docker-compose up 创建集群</li>
 <li>执行 curl -X GET “localhost:9200/_cat/nodes?v=true&amp;pretty” 确认集群是否启动</li>
 </ol>
-<h2 id="2、IDEA编译es源码"><a href="#2、IDEA编译es源码" class="headerlink" title="2、IDEA编译es源码"></a>2、IDEA编译es源码</h2><p><strong>环境准备：</strong> </p>
+<h2 id="二、IDEA编译es源码"><a href="#二、IDEA编译es源码" class="headerlink" title="二、IDEA编译es源码"></a>二、IDEA编译es源码</h2><p><strong>环境准备：</strong> </p>
 <ul>
 <li>JDK 16：版本要求可以参考CONTRIBUTING.md，es对jdk版本要求较高，建议直接使用最新版本，下载完成后，建议配置JAVA_HOME</li>
 <li>IDEA 2021.1：低版本的IDEA貌似不太支持高版本的JDK，根据自己情况选择。</li>
@@ -585,8 +604,8 @@
 </ul>
 <p><strong><a target="_blank" rel="noopener" href="https://github.com/elastic/elasticsearch">github pull代码</a></strong><br>es代码挺大的，第一次拉取很慢，后面从google应用商店下载了github加速插件，拉代码速度提升很明显。安装完成后，会有一个加速按钮</p>
 <figure>
-<img src="https://lightoheaven.coding.net/p/image2/d/image2/git/raw/master/2021/04/github-speed.png" width="45%/">
-<img src="https://lightoheaven.coding.net/p/image2/d/image2/git/raw/master/2021/04/github-speed2.png" width="45%/">
+<img src="/2021/04/22/es-debug/github-speed.png" width="45%/">
+<img src="/2021/04/22/es-debug/github-speed2.png" width="45%/">
 </figure>
 
 <p><strong>编译es代码</strong></p>
@@ -600,9 +619,9 @@
 </ol>
 <p><strong>运行es代码</strong><br>es启动类位于 ：elasticsearch\server\src\main\java\org\elasticsearch\bootstrap\Elasticsearch.java</p>
 <ol>
-<li>ERROR: the system property [es.path.conf] must be set<br>添加VM options： -Des.path.conf=/Users/dianping/Downloads/elasticsearch-7.8.1/config，这里可以直接指向成之前下载的es 7.8.1的config目录<img src="https://lightoheaven.coding.net/p/image2/d/image2/git/raw/master/2021/04/es-vm.png" width="85%/"> </li>
+<li>ERROR: the system property [es.path.conf] must be set<br>添加VM options： -Des.path.conf=/Users/dianping/Downloads/elasticsearch-7.8.1/config，这里可以直接指向成之前下载的es 7.8.1的config目录<img src="/2021/04/22/es-debug/es-vm.png" width="85%/"> </li>
 <li>Exception in thread “main” java.lang.IllegalStateException: path.home is not configured<br>添加VM options： -Des.path.home=/Users/dianping/Downloads/elasticsearch-7.8.1</li>
-<li>Exception in thread “main” java.lang.NullPointerException: Cannot invoke “String.hashCode()” because “<local3>“ is null<br>直接注释**InternalSettingsPreparer.checkSettingsForTerminalDeprecation()**for循环代码，不影响启动<img src="https://lightoheaven.coding.net/p/image2/d/image2/git/raw/master/2021/04/InternalSettingsPreparer.png" width="85%/"> </local3></li>
+<li>Exception in thread “main” java.lang.NullPointerException: Cannot invoke “String.hashCode()” because “<local3>“ is null<br>直接注释**InternalSettingsPreparer.checkSettingsForTerminalDeprecation()**for循环代码，不影响启动<img src="/2021/04/22/es-debug/InternalSettingsPreparer.png" width="85%/"> </local3></li>
 <li>ERROR Could not register mbeans java.security.AccessControlException: access denied (“javax.management.MBeanTrustPermission” “register”)<br>添加VM options：-Dlog4j2.disable.jmx=true 禁用jmx</li>
 <li>java.security.AccessControlException: access denied (“java.lang.RuntimePermission” “createClassLoader”)<br>创建java.policy文件，然后 -Djava.security.policy=/Users/dianping/Downloads/elasticsearch-7.8.1/config/java.policy<pre class="line-numbers language-shell" data-language="shell"><code class="language-shell">grant &#123;
 	permission java.lang.RuntimePermission &quot;createClassLoader&quot;;
@@ -1235,7 +1254,7 @@
             <br>
             
             &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                class="white-color">84.4k</span>&nbsp;字
+                class="white-color">90.2k</span>&nbsp;字
             
             
             

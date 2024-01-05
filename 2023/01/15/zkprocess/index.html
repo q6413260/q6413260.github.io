@@ -115,6 +115,15 @@
         </a>
       </li>
       
+      <li>
+        <a href="/categories/%E5%85%B6%E4%BB%96%E5%88%86%E4%BA%AB">
+          
+          <i class="fas fa-list" style="margin-top: -20px; zoom: 0.6;"></i>
+          
+          <span>其他分享</span>
+        </a>
+      </li>
+      
     </ul>
     
   </li>
@@ -228,6 +237,16 @@
 				   <i class="fa fas fa-film" style="position: absolute;left:50px" ></i>
 			      
 		          <span>旅行足迹</span>
+                  </a>
+                </li>
+              
+                <li>
+
+                  <a href="/categories/%E5%85%B6%E4%BB%96%E5%88%86%E4%BA%AB " style="margin-left:75px">
+				  
+				   <i class="fa fas fa-list" style="position: absolute;left:50px" ></i>
+			      
+		          <span>其他分享</span>
                   </a>
                 </li>
               
@@ -501,7 +520,7 @@
 <li>（Observer处理）Observer 收到 Inform Packet 后，待补充</li>
 </ol>
 <h2 id="四、可优化点"><a href="#四、可优化点" class="headerlink" title="四、可优化点"></a>四、可优化点</h2><ol>
-<li>当前除正常的写请求以外，所有的创建连接、关闭连接（全局链接，只要有写操作就是全局链接）请求也会转给给 Leader ，然后 Leader 进行两阶段提交。极端情况，若Leader检测到大量链接超时，会向所有 Follower 和 Observer 发起两阶段请求关闭链接（之前出过 case  <a target="_blank" rel="noopener" href="https://km.sankuai.com/page/1296541262%EF%BC%8C%E4%B8%80%E4%B8%AA%E9%87%8D%E8%A6%81%E5%8E%9F%E5%9B%A0%E8%BF%98%E6%98%AF%E4%B9%8B%E5%89%8D">https://km.sankuai.com/page/1296541262，一个重要原因还是之前</a> sgagent会直连 zk，导致 leader 节点全局链接过多），导致集群中多个节点不可用。<br><br>改进点：创建连接和关闭连接应该不需要同步给集群中所有节点，只需要同步给指定节点。</li>
+<li>当前除正常的写请求以外，所有的创建连接、关闭连接（全局链接，只要有写操作就是全局链接）请求也会转给给 Leader ，然后 Leader 进行两阶段提交。极端情况，若Leader检测到大量链接超时，会向所有 Follower 和 Observer 发起两阶段请求关闭链接（之前出过 case，一个重要原因还是之前 sgagent会直连 zk，导致 leader 节点全局链接过多），导致集群中多个节点不可用。<br><br>改进点：创建连接和关闭连接应该不需要同步给集群中所有节点，只需要同步给指定节点。</li>
 <li>对于所有的写请求，在二阶段提交的时候，都需要由 Leader 将请求同步给所有的 Observer，以 MNS ZK  集群为例，当前有 100多个 Observer，每次写请求 Leader 都需要转发 100多次请求。<br><br>改进点：为了降低 Leader 压力，可以将 Inform 操作交由 Follower 节点。</li>
 </ol>
 
@@ -1126,7 +1145,7 @@
             <br>
             
             &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                class="white-color">84.4k</span>&nbsp;字
+                class="white-color">90.2k</span>&nbsp;字
             
             
             

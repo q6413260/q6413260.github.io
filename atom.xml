@@ -6,7 +6,7 @@
   <link href="http://yeming.fun/atom.xml" rel="self"/>
   
   <link href="http://yeming.fun/"/>
-  <updated>2024-01-04T06:23:59.137Z</updated>
+  <updated>2024-01-05T09:18:29.294Z</updated>
   <id>http://yeming.fun/</id>
   
   <author>
@@ -15,6 +15,33 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>行为金融学典型偏差分享</title>
+    <link href="http://yeming.fun/2023/12/12/behaviorfinance/"/>
+    <id>http://yeming.fun/2023/12/12/behaviorfinance/</id>
+    <published>2023-12-12T13:46:56.000Z</published>
+    <updated>2024-01-05T09:18:29.294Z</updated>
+    
+    
+      
+      
+        
+        
+    <summary type="html">&lt;img src=&quot;/2023/12/12/behaviorfinance/mangge.png&quot;</summary>
+        
+      
+    
+    
+    
+    <category term="其他分享" scheme="http://yeming.fun/categories/%E5%85%B6%E4%BB%96%E5%88%86%E4%BA%AB/"/>
+    
+    
+    <category term="CFA" scheme="http://yeming.fun/tags/CFA/"/>
+    
+    <category term="金融" scheme="http://yeming.fun/tags/%E9%87%91%E8%9E%8D/"/>
+    
+  </entry>
   
   <entry>
     <title>ZK架构设计与优化</title>
@@ -49,7 +76,7 @@
     <link href="http://yeming.fun/2023/01/15/zkprocess/"/>
     <id>http://yeming.fun/2023/01/15/zkprocess/</id>
     <published>2023-01-15T12:00:23.000Z</published>
-    <updated>2024-01-04T11:22:42.174Z</updated>
+    <updated>2024-01-04T16:14:49.293Z</updated>
     
     
       
@@ -101,14 +128,14 @@
     <link href="http://yeming.fun/2021/04/22/es-debug/"/>
     <id>http://yeming.fun/2021/04/22/es-debug/</id>
     <published>2021-04-22T10:26:17.000Z</published>
-    <updated>2024-01-04T02:10:12.143Z</updated>
+    <updated>2024-01-05T15:21:33.532Z</updated>
     
     
       
       
         
         
-    <summary type="html">&lt;h2 id=&quot;1、Mac上安装es&quot;&gt;&lt;a href=&quot;#1、Mac上安装es&quot; class=&quot;headerlink&quot;</summary>
+    <summary type="html">&lt;h2 id=&quot;一、Mac上安装es&quot;&gt;&lt;a href=&quot;#一、Mac上安装es&quot; class=&quot;headerlink&quot;</summary>
         
       
     
@@ -128,7 +155,7 @@
     <link href="http://yeming.fun/2021/04/15/distributiontransaction/"/>
     <id>http://yeming.fun/2021/04/15/distributiontransaction/</id>
     <published>2021-04-15T13:00:23.000Z</published>
-    <updated>2024-01-04T11:15:45.994Z</updated>
+    <updated>2024-01-04T16:07:06.120Z</updated>
     
     
       
@@ -181,14 +208,15 @@
     <link href="http://yeming.fun/2021/01/20/gcresearch/"/>
     <id>http://yeming.fun/2021/01/20/gcresearch/</id>
     <published>2021-01-20T11:46:56.000Z</published>
-    <updated>2024-01-04T15:41:51.801Z</updated>
+    <updated>2024-01-05T08:29:07.433Z</updated>
     
     
       
       
         
         
-    <summary type="html">&lt;h2 id=&quot;CMS-background-gc导致服务频繁GC排查优化&quot;&gt;&lt;a href=&quot;#CMS-background-gc导致服务频繁GC排查优化&quot; class=&quot;headerlink&quot; title=&quot;CMS background</summary>
+    <summary type="html">&lt;p&gt;下文通过3个案例来叙述JVM GC问题的根因定位和优化方案。&lt;/p&gt;
+&lt;h2 id=&quot;一、CMS-background-gc导致服务频繁GC排查优化&quot;&gt;&lt;a href=&quot;#一、CMS-background-gc导致服务频繁GC排查优化&quot;</summary>
         
       
     
@@ -476,25 +504,6 @@
     
     
     <summary type="html">&lt;p&gt;前两篇文章我们已经讲解了Hystrix的一些基本概念，并举了一些demo说明如何使用Hystrix，这篇文章我们更深一步，通过阅读一些源码来看下Hystrix是怎么工作的。我们主要根据官方文档上的一个流程图，对其中几个主要的过程从源码层面来研究下。&lt;/p&gt;</summary>
-    
-    
-    
-    <category term="技术分享" scheme="http://yeming.fun/categories/%E6%8A%80%E6%9C%AF%E5%88%86%E4%BA%AB/"/>
-    
-    
-    <category term="Hystrix" scheme="http://yeming.fun/tags/Hystrix/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>Hystrix使用</title>
-    <link href="http://yeming.fun/2017/09/30/hystrix2/"/>
-    <id>http://yeming.fun/2017/09/30/hystrix2/</id>
-    <published>2017-09-30T13:00:50.000Z</published>
-    <updated>2021-04-17T14:57:30.115Z</updated>
-    
-    
-    <summary type="html">&lt;p&gt;上一篇文章主要讲了Hystrix是什么，用来做什么，解决了什么问题，以及设计模式等，这篇文章主要来讲下Hystrix如何使用。下面我们从最简单的Hello World入手，来讲解下Hystrix的用法。&lt;/p&gt;</summary>
     
     
     
