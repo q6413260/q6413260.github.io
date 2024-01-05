@@ -596,6 +596,8 @@
             
             <tag> jedis </tag>
             
+            <tag> Redis </tag>
+            
         </tags>
       
     </entry>
@@ -622,6 +624,8 @@
             <tag> redis-cluster </tag>
             
             <tag> jedis </tag>
+            
+            <tag> Redis </tag>
             
         </tags>
       
