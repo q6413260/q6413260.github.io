@@ -540,7 +540,7 @@
                         <div class="card-content article-content">
                             <div class="summary block-with-text">
                                 
-                                    Squirrel是基于redis cluster开发的K-V存储系统，对某个key进行读写时，会根据该key的hash计算出对应的slot，根据这个slot就能找到与之对应的分片(一个master和多个slave组成的一组redis集群)来存取该K-V，如果集群不发生服务器数量变化，那么这一映射关系就不会变化。但是在实际应用过程中，对于某些特定业务或者一些特定的时段，可能会发生大量的请求访问同一个key。所有的请求（且这类请求读写比例非常高）都会落到同一个redis server上，该redis的负载就会严重加剧，此时整个系统增加新redis实例也没有任何用处，因为根据hash算法，同一个key的请求还是会落到同一台新机器上，该机器依然会成为系统瓶颈。若此热点 key 的 value 也比较大，也会造成网卡达到瓶颈。这个问题称为 “热点key” 问题。
+                                    随着公司业务规模越来越大，基本上所有的业务都接入了Squirrel，目前我们线上redis集群支撑了每天服务端万亿+、端到端3000亿+的调用量。用户因为一些业务的特性触发热点问题是业务需要，是不可避免，理所当然的，难免会触发“热点key问题”。
                                 
                             </div>
                             <div class="publish-info">
@@ -793,10 +793,7 @@ Mac OS系统上安
                         <div class="card-content article-content">
                             <div class="summary block-with-text">
                                 
-                                    之前我们介绍了Provider启动时候向注册中心注册服务Dubbo源码学习二(服务注册)，Consumer启动时候向注册中心订阅服务Dubbo源码学习三(服务引用)，本文我们就来看下Consumer端和Provider是怎么通信的。
-
-
-C
+                                    Consumer和Provider默认使用Netty通信框架建立链接，然后进行RPC调用。
                                 
                             </div>
                             <div class="publish-info">

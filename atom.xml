@@ -48,7 +48,7 @@
     <link href="http://yeming.fun/2023/02/03/zkarch/"/>
     <id>http://yeming.fun/2023/02/03/zkarch/</id>
     <published>2023-02-03T12:58:23.000Z</published>
-    <updated>2024-01-04T06:23:59.137Z</updated>
+    <updated>2024-01-06T02:22:35.582Z</updated>
     
     
       
@@ -101,7 +101,7 @@
     <link href="http://yeming.fun/2022/04/26/binlog/"/>
     <id>http://yeming.fun/2022/04/26/binlog/</id>
     <published>2022-04-26T14:00:23.000Z</published>
-    <updated>2024-01-05T15:39:41.087Z</updated>
+    <updated>2024-01-06T02:20:51.841Z</updated>
     
     
       
@@ -208,7 +208,7 @@
     <link href="http://yeming.fun/2021/01/20/gcresearch/"/>
     <id>http://yeming.fun/2021/01/20/gcresearch/</id>
     <published>2021-01-20T11:46:56.000Z</published>
-    <updated>2024-01-05T08:29:07.433Z</updated>
+    <updated>2024-01-06T02:28:22.195Z</updated>
     
     
       
@@ -255,7 +255,7 @@
     <link href="http://yeming.fun/2018/10/01/redishotkey/"/>
     <id>http://yeming.fun/2018/10/01/redishotkey/</id>
     <published>2018-10-01T08:00:36.000Z</published>
-    <updated>2024-01-04T05:55:41.445Z</updated>
+    <updated>2024-01-06T02:23:20.311Z</updated>
     
     
       
@@ -355,7 +355,7 @@
     <link href="http://yeming.fun/2018/07/31/dubbo4/"/>
     <id>http://yeming.fun/2018/07/31/dubbo4/</id>
     <published>2018-07-31T14:03:58.000Z</published>
-    <updated>2024-01-04T11:00:51.647Z</updated>
+    <updated>2024-01-06T02:26:54.208Z</updated>
     
     
     <summary type="html">&lt;p&gt;之前我们介绍了Provider启动时候向注册中心注册服务&lt;br&gt;&lt;a href=&quot;http://yeming.me/2018/07/28/dubbo2/&quot;&gt;Dubbo源码学习二(服务注册)&lt;/a&gt;，Consumer启动时候向注册中心订阅服务&lt;a href=&quot;http://yeming.me/2018/07/29/dubbo3/&quot;&gt;Dubbo源码学习三(服务引用)&lt;/a&gt;，本文我们就来看下Consumer端和Provider是怎么通信的。&lt;br&gt;&lt;img src=&quot;/2018/07/31/dubbo4/communicate.jpeg&quot; width=&quot;60%/&quot;&gt;&lt;/p&gt;</summary>
