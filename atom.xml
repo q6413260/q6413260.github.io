@@ -376,18 +376,18 @@
     <link href="http://yeming.fun/2018/07/29/dubbo3/"/>
     <id>http://yeming.fun/2018/07/29/dubbo3/</id>
     <published>2018-07-29T02:03:58.000Z</published>
-    <updated>2021-04-18T07:38:23.155Z</updated>
+    <updated>2024-01-06T01:22:48.414Z</updated>
     
     
     <summary type="html">&lt;p&gt;我们知道Dubbo逻辑上由以下几个模块组成(不考虑Monitor和Container)&lt;/p&gt;
-&lt;center&gt;&lt;img src=&quot;https://lightoheaven.coding.net/p/image2/d/image2/git/raw/master/201807/dubboArch.jpeg&quot; width=&quot;400&quot; hegiht=&quot;200&quot;&gt;&lt;/center&gt;
+&lt;center&gt;&lt;img src=&quot;/2018/07/29/dubbo3/dubboArch.jpeg&quot; width=&quot;400&quot; hegiht=&quot;200&quot;&gt;&lt;/center&gt;
 
 &lt;ul&gt;
 &lt;li&gt;Provider：服务提供方&lt;/li&gt;
 &lt;li&gt;Consumer：服务消费方&lt;/li&gt;
 &lt;li&gt;Registry：服务注册与发现的注册中心&lt;/li&gt;
 &lt;/ul&gt;
-&lt;p&gt;上一篇文章&lt;a href=&quot;http://yeming.me/2018/07/28/dubbo2/&quot;&gt;Dubbo源码学习二(服务注册)&lt;/a&gt;我们分析了服务提供方启动时候怎么向注册中心注册服务，本文我们就来看下Consumer启动时候怎么引用服务的&lt;/p&gt;</summary>
+&lt;p&gt;上一篇文章&lt;a href=&quot;/2018/07/28/dubbo2/&quot;&gt;Dubbo源码学习二(服务注册)&lt;/a&gt;我们分析了服务提供方启动时候怎么向注册中心注册服务，本文我们就来看下Consumer启动时候怎么引用服务的&lt;/p&gt;</summary>
     
     
     
@@ -403,11 +403,11 @@
     <link href="http://yeming.fun/2018/07/28/dubbo2/"/>
     <id>http://yeming.fun/2018/07/28/dubbo2/</id>
     <published>2018-07-28T03:58:46.000Z</published>
-    <updated>2021-04-18T07:38:23.133Z</updated>
+    <updated>2024-01-06T01:20:32.363Z</updated>
     
     
     <summary type="html">&lt;p&gt;我们知道Dubbo逻辑上由以下几个模块组成(不考虑Monitor和Container)&lt;/p&gt;
-&lt;center&gt;&lt;img src=&quot;https://lightoheaven.coding.net/p/image2/d/image2/git/raw/master/201807/dubboArch.jpeg&quot; width=&quot;400&quot; hegiht=&quot;200&quot;&gt;&lt;/center&gt;
+&lt;center&gt;&lt;img src=&quot;/2018/07/28/dubbo2/dubboArch.jpeg&quot; width=&quot;400&quot; hegiht=&quot;200&quot;&gt;&lt;/center&gt;
 
 &lt;ul&gt;
 &lt;li&gt;Provider：服务提供方&lt;/li&gt;
@@ -431,7 +431,7 @@
     <link href="http://yeming.fun/2018/07/25/dubbo1/"/>
     <id>http://yeming.fun/2018/07/25/dubbo1/</id>
     <published>2018-07-25T14:00:00.000Z</published>
-    <updated>2021-04-18T07:38:23.086Z</updated>
+    <updated>2024-01-06T01:18:43.952Z</updated>
     
     
     <summary type="html">&lt;p&gt;之前其实已经粗略看过Dubbo的源码，最近一个月在公司连续写了nodejs和go语言的redis cluster客户端之后，稍微有点空余时间就准备找个开源的java项目学习下。正好阿里准备对Dubbo重启开发3.0，就决定重新学习下Dubbo。&lt;/p&gt;

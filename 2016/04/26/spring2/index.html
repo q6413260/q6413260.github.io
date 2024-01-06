@@ -503,7 +503,7 @@
             <div id="articleContent">
                 <h2 id="AbstractApplication-refresh"><a href="#AbstractApplication-refresh" class="headerlink" title="AbstractApplication.refresh"></a>AbstractApplication.refresh</h2><p>如下图，上一篇文章我们已经提到过refresh方法，spring容器启动的一系列步骤都是这个方法来实现的。上一篇文章我们主要基于obtainFreshBeanFactory()这个方法来分析IoC容器的resource资源定位，BeanDefinition的解析和载入以及最终向容器中注册。<br>下面我们重新审视下refresh方法，我们把整个IoC容器启动分为下图中的12个步骤。</p>
 <span id="more"></span>
-<p>对于步骤5和步骤6稍微解释下，步骤5涉及到了BeanFactoryPostProcessor，步骤6涉及到了BeanPostProcessor。下面比较下两者的异同点。<br><img src="https://lightoheaven.coding.net/p/image2/d/image2/git/raw/master/201604/spring2/refresh.jpg" alt="AbstractApplicationContext.refresh"></p>
+<p>对于步骤5和步骤6稍微解释下，步骤5涉及到了BeanFactoryPostProcessor，步骤6涉及到了BeanPostProcessor。下面比较下两者的异同点。<br><img src="/2016/04/26/spring2/refresh.jpg" alt="AbstractApplicationContext.refresh"></p>
 <h2 id="BeanFactoryPostProcessor与BeanPostProcessor"><a href="#BeanFactoryPostProcessor与BeanPostProcessor" class="headerlink" title="BeanFactoryPostProcessor与BeanPostProcessor"></a>BeanFactoryPostProcessor与BeanPostProcessor</h2><ul>
 <li>从名字上看，两者都是一个后置的处理器，都提供了回调接口。</li>
 <li>BeanFactoryPostProcessor<pre class="line-numbers language-none"><code class="language-none">public interface BeanFactoryPostProcessor &#123;
@@ -528,7 +528,7 @@ BeanPostProcessor，可以在spring容器实例化bean之后，在执行bean的�
 <li>会创建一个 BeanWrapper 对象 用于存放实例化对象。如果此bean配置了工厂方法（mbd.getFactoryMethodName() != null），则使用工厂类进行bean的创建，如果此bean注入了构造器参数（ctors != null），则使用非默认的构造器对应的方法autowireConstructor进行生成，最后一种情况是最常见的，非工厂类，且使用默认无参的构造方法，instantiateBean(beanName, mbd)，这一步只是生成了一个对象，但是对象的属性值都没有注入进来。</li>
 <li>applyMergedBeanDefinitionPostProcessors(mbd, beanType, beanName);第三个BeanPostProcessor扩展点，执行Bean定义的合并</li>
 <li>populateBean，根据注入方式进行注入。根据是否有依赖检查进行依赖检查。<br>执行 bean 的注入里面会选择注入类型：AutowireByName，AutowireByType，接下来applyPropertyValues，把beanFactory中的字段属性值赋给步骤1中生成的对象。</li>
-<li>initializeBean(beanName, exposedObject, mbd);<br>判断是否实现了 BeanNameAware 、 BeanClassLoaderAware 等 spring 提供的接口，如果实现了，进行默认的注入。同时判断是否实现了 InitializingBean 接口，如果是的话，调用 afterPropertySet 方法。<br><img src="https://lightoheaven.coding.net/p/image2/d/image2/git/raw/master/201604/spring2/initializeBean.jpg" alt="initializeBean"></li>
+<li>initializeBean(beanName, exposedObject, mbd);<br>判断是否实现了 BeanNameAware 、 BeanClassLoaderAware 等 spring 提供的接口，如果实现了，进行默认的注入。同时判断是否实现了 InitializingBean 接口，如果是的话，调用 afterPropertySet 方法。<br><img src="/2016/04/26/spring2/initializeBean.jpg" alt="initializeBean"></li>
 </ul>
 <h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p> <a target="_blank" rel="noopener" href="http://www.iteye.com/topic/1122859">Spring开闭原则的表现-BeanPostProcessor扩展点</a><br> <a target="_blank" rel="noopener" href="http://www.iteye.com/topic/1115391">SpringIOC核心源码学习（二）：容器初始化过程</a><br> <a target="_blank" rel="noopener" href="http://www.iteye.com/topic/743998">Spring源码浅析依赖注入</a></p>
 

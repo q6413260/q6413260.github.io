@@ -502,7 +502,7 @@
         <div class="card-content article-card-content">
             <div id="articleContent">
                 <p>我们知道Dubbo逻辑上由以下几个模块组成(不考虑Monitor和Container)</p>
-<center><img src="https://lightoheaven.coding.net/p/image2/d/image2/git/raw/master/201807/dubboArch.jpeg" width="400" hegiht="200"></center>
+<center><img src="/2018/07/28/dubbo2/dubboArch.jpeg" width="400" hegiht="200"></center>
 
 <ul>
 <li>Provider：服务提供方</li>
@@ -605,7 +605,7 @@ http\:&#x2F;&#x2F;code.alibabatech.com&#x2F;schema&#x2F;dubbo&#x2F;dubbo.xsd&#x3
 <pre class="line-numbers language-none"><code class="language-none">Exporter&lt;?&gt; exporter &#x3D; protocol.export(wrapperInvoker);
 
 registry&#x3D;org.apache.dubbo.registry.integration.RegistryProtocol<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
-<p>上面的protocol是Protocol$Adaptive类，前一篇讲<a target="_blank" rel="noopener" href="http://yeming.me/2018/07/25/dubbo1/">ExtensionLoader</a>的时候讲到过，这个可以根据<br>wrapperInvoker.getUrl().getProtocol来真正决定调用哪个Protocol，这里返回的是registry，那么调用的就是RegistryProtocol的export方法。(严格上来说上述过程省略了两个包装类ProtocolListenerWrapper，ProtocolFilterWrapper)</p>
+<p>上面的protocol是Protocol$Adaptive类，前一篇讲<a href="/2018/07/25/dubbo1/">ExtensionLoader</a>的时候讲到过，这个可以根据<br>wrapperInvoker.getUrl().getProtocol来真正决定调用哪个Protocol，这里返回的是registry，那么调用的就是RegistryProtocol的export方法。(严格上来说上述过程省略了两个包装类ProtocolListenerWrapper，ProtocolFilterWrapper)</p>
 <h2 id="RegistryProtocol"><a href="#RegistryProtocol" class="headerlink" title="RegistryProtocol"></a>RegistryProtocol</h2><p>RegistryProtocol</p>
 <pre class="line-numbers language-none"><code class="language-none">@Override
     public &lt;T&gt; Exporter&lt;T&gt; export(final Invoker&lt;T&gt; originInvoker) throws RpcException &#123;
@@ -749,7 +749,7 @@ public &lt;T&gt; Exporter&lt;T&gt; export(Invoker&lt;T&gt; invoker) throws RpcEx
     channel &#x3D; channelFuture.channel();
 
 &#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<p>上述过程我们在<a target="_blank" rel="noopener" href="http://yeming.me/2016/03/12/netty1/">netty源码研究一(服务端启动)</a>已经讲过，有兴趣可以看下。主要是服务端通过netty暴露20880端口并持续监听，也就是接受客户端发来的各种请求。这样就完成了Provider本地服务的注册。</p>
+<p>上述过程我们在<a href="/2016/03/12/netty1/">netty源码研究一(服务端启动)</a>已经讲过，有兴趣可以看下。主要是服务端通过netty暴露20880端口并持续监听，也就是接受客户端发来的各种请求。这样就完成了Provider本地服务的注册。</p>
 <h3 id="registry-provider-向注册中心注册服务"><a href="#registry-provider-向注册中心注册服务" class="headerlink" title="registry provider(向注册中心注册服务)"></a>registry provider(向注册中心注册服务)</h3><p>上面确认服务已经开启后，下面就要向注册中心注册服务了。</p>
 <p>RegistryProtocol</p>
 <pre class="line-numbers language-none"><code class="language-none">public void register(URL registryUrl, URL registedProviderUrl) &#123;
